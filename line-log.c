@@ -34,18 +34,18 @@ void range_set_init(struct range_set *rs, size_t prealloc)
 
 void range_set_release(struct range_set *rs)
 {
-	free(rs->ranges);
+	FREE_AND_NULL(rs->ranges);
 	rs->alloc = rs->nr = 0;
-	rs->ranges = NULL;
 }
 
 /* dst must be uninitialized! */
 static void range_set_copy(struct range_set *dst, struct range_set *src)
 {
 	range_set_init(dst, src->nr);
-	memcpy(dst->ranges, src->ranges, src->nr*sizeof(struct range_set));
+	COPY_ARRAY(dst->ranges, src->ranges, src->nr);
 	dst->nr = src->nr;
 }
+
 static void range_set_move(struct range_set *dst, struct range_set *src)
 {
 	range_set_release(dst);
@@ -144,7 +144,7 @@ void sort_and_merge_range_set(struct range_set *rs)
 static void range_set_union(struct range_set *out,
 			     struct range_set *a, struct range_set *b)
 {
-	int i = 0, j = 0, o = 0;
+	int i = 0, j = 0;
 	struct range *ra = a->ranges;
 	struct range *rb = b->ranges;
 	/* cannot make an alias of out->ranges: it may change during grow */
@@ -167,16 +167,15 @@ static void range_set_union(struct range_set *out,
 			new = &rb[j++];
 		if (new->start == new->end)
 			; /* empty range */
-		else if (!o || out->ranges[o-1].end < new->start) {
+		else if (!out->nr || out->ranges[out->nr-1].end < new->start) {
 			range_set_grow(out, 1);
-			out->ranges[o].start = new->start;
-			out->ranges[o].end = new->end;
-			o++;
-		} else if (out->ranges[o-1].end < new->end) {
-			out->ranges[o-1].end = new->end;
+			out->ranges[out->nr].start = new->start;
+			out->ranges[out->nr].end = new->end;
+			out->nr++;
+		} else if (out->ranges[out->nr-1].end < new->end) {
+			out->ranges[out->nr-1].end = new->end;
 		}
 	}
-	out->nr = o;
 }
 
 /*
@@ -500,12 +499,12 @@ static struct commit *check_single_commit(struct rev_info *revs)
 static void fill_blob_sha1(struct commit *commit, struct diff_filespec *spec)
 {
 	unsigned mode;
-	unsigned char sha1[20];
+	struct object_id oid;
 
 	if (get_tree_entry(commit->object.oid.hash, spec->path,
-			   sha1, &mode))
+			   oid.hash, &mode))
 		die("There is no path %s in the commit", spec->path);
-	fill_filespec(spec, sha1, 1, mode);
+	fill_filespec(spec, &oid, 1, mode);
 
 	return;
 }
@@ -610,8 +609,7 @@ parse_lines(struct commit *commit, const char *prefix, struct string_list *args)
 		line_log_data_insert(&ranges, full_name, begin, end);
 
 		free_filespec(spec);
-		free(ends);
-		ends = NULL;
+		FREE_AND_NULL(ends);
 	}
 
 	for (p = ranges; p; p = p->next)
@@ -819,8 +817,8 @@ static void queue_diffs(struct line_log_data *range,
 	assert(commit);
 
 	DIFF_QUEUE_CLEAR(&diff_queued_diff);
-	diff_tree_sha1(parent ? parent->tree->object.oid.hash : NULL,
-			commit->tree->object.oid.hash, "", opt);
+	diff_tree_oid(parent ? &parent->tree->object.oid : NULL,
+		      &commit->tree->object.oid, "", opt);
 	if (opt->detect_rename) {
 		filter_diffs_for_paths(range, 1);
 		if (diff_might_be_rename())
@@ -1125,6 +1123,7 @@ static int process_ranges_ordinary_commit(struct rev_info *rev, struct commit *c
 	changed = process_all_files(&parent_range, rev, &queue, range);
 	if (parent)
 		add_line_range(rev, parent, parent_range);
+	free_line_log_data(parent_range);
 	return changed;
 }
 

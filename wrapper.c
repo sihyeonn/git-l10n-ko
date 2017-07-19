@@ -2,6 +2,7 @@
  * Various trivial helper wrappers around standard functions
  */
 #include "cache.h"
+#include "config.h"
 
 static void do_nothing(size_t size)
 {
@@ -418,6 +419,32 @@ FILE *fopen_for_writing(const char *path)
 	return ret;
 }
 
+static void warn_on_inaccessible(const char *path)
+{
+	warning_errno(_("unable to access '%s'"), path);
+}
+
+int warn_on_fopen_errors(const char *path)
+{
+	if (errno != ENOENT && errno != ENOTDIR) {
+		warn_on_inaccessible(path);
+		return -1;
+	}
+
+	return 0;
+}
+
+FILE *fopen_or_warn(const char *path, const char *mode)
+{
+	FILE *fp = fopen(path, mode);
+
+	if (fp)
+		return fp;
+
+	warn_on_fopen_errors(path);
+	return NULL;
+}
+
 int xmkstemp(char *template)
 {
 	int fd;
@@ -438,23 +465,6 @@ int xmkstemp(char *template)
 			nonrelative_template);
 	}
 	return fd;
-}
-
-/* git_mkstemp() - create tmp file honoring TMPDIR variable */
-int git_mkstemp(char *path, size_t len, const char *template)
-{
-	const char *tmp;
-	size_t n;
-
-	tmp = getenv("TMPDIR");
-	if (!tmp)
-		tmp = "/tmp";
-	n = snprintf(path, len, "%s/%s", tmp, template);
-	if (len <= n) {
-		errno = ENAMETOOLONG;
-		return -1;
-	}
-	return mkstemp(path);
 }
 
 /* Adapted from libiberty's mkstemp.c. */
@@ -531,13 +541,6 @@ int git_mkstemp_mode(char *pattern, int mode)
 	return git_mkstemps_mode(pattern, 0, mode);
 }
 
-#ifdef NO_MKSTEMPS
-int gitmkstemps(char *pattern, int suffix_len)
-{
-	return git_mkstemps_mode(pattern, suffix_len, 0600);
-}
-#endif
-
 int xmkstemp_mode(char *template, int mode)
 {
 	int fd;
@@ -600,15 +603,10 @@ int remove_or_warn(unsigned int mode, const char *file)
 	return S_ISGITLINK(mode) ? rmdir_or_warn(file) : unlink_or_warn(file);
 }
 
-void warn_on_inaccessible(const char *path)
-{
-	warning_errno(_("unable to access '%s'"), path);
-}
-
 static int access_error_is_ok(int err, unsigned flag)
 {
-	return err == ENOENT || err == ENOTDIR ||
-		((flag & ACCESS_EACCES_OK) && err == EACCES);
+	return (is_missing_file_error(err) ||
+		((flag & ACCESS_EACCES_OK) && err == EACCES));
 }
 
 int access_or_warn(const char *path, int mode, unsigned flag)
@@ -678,4 +676,17 @@ void write_file(const char *path, const char *fmt, ...)
 void sleep_millisec(int millisec)
 {
 	poll(NULL, 0, millisec);
+}
+
+int xgethostname(char *buf, size_t len)
+{
+	/*
+	 * If the full hostname doesn't fit in buf, POSIX does not
+	 * specify whether the buffer will be null-terminated, so to
+	 * be safe, do it ourselves.
+	 */
+	int ret = gethostname(buf, len);
+	if (!ret)
+		buf[len - 1] = 0;
+	return ret;
 }

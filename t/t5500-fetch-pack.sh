@@ -484,7 +484,7 @@ test_expect_success 'test lonely missing ref' '
 		cd client &&
 		test_must_fail git fetch-pack --no-progress .. refs/heads/xyzzy
 	) >/dev/null 2>error-m &&
-	test_cmp expect-error error-m
+	test_i18ncmp expect-error error-m
 '
 
 test_expect_success 'test missing ref after existing' '
@@ -492,7 +492,7 @@ test_expect_success 'test missing ref after existing' '
 		cd client &&
 		test_must_fail git fetch-pack --no-progress .. refs/heads/A refs/heads/xyzzy
 	) >/dev/null 2>error-em &&
-	test_cmp expect-error error-em
+	test_i18ncmp expect-error error-em
 '
 
 test_expect_success 'test missing ref before existing' '
@@ -500,7 +500,7 @@ test_expect_success 'test missing ref before existing' '
 		cd client &&
 		test_must_fail git fetch-pack --no-progress .. refs/heads/xyzzy refs/heads/A
 	) >/dev/null 2>error-me &&
-	test_cmp expect-error error-me
+	test_i18ncmp expect-error error-me
 '
 
 test_expect_success 'test --all, --depth, and explicit head' '
@@ -545,6 +545,41 @@ test_expect_success 'fetch-pack can fetch a raw sha1' '
 		git config uploadpack.allowtipsha1inwant true
 	) &&
 	git fetch-pack hidden $(git -C hidden rev-parse refs/hidden/one)
+'
+
+test_expect_success 'fetch-pack can fetch a raw sha1 that is advertised as a ref' '
+	rm -rf server client &&
+	git init server &&
+	test_commit -C server 1 &&
+
+	git init client &&
+	git -C client fetch-pack ../server \
+		$(git -C server rev-parse refs/heads/master)
+'
+
+test_expect_success 'fetch-pack can fetch a raw sha1 overlapping a named ref' '
+	rm -rf server client &&
+	git init server &&
+	test_commit -C server 1 &&
+	test_commit -C server 2 &&
+
+	git init client &&
+	git -C client fetch-pack ../server \
+		$(git -C server rev-parse refs/tags/1) refs/tags/1
+'
+
+test_expect_success 'fetch-pack cannot fetch a raw sha1 that is not advertised as a ref' '
+	rm -rf server &&
+
+	git init server &&
+	test_commit -C server 5 &&
+	git -C server tag -d 5 &&
+	test_commit -C server 6 &&
+
+	git init client &&
+	test_must_fail git -C client fetch-pack ../server \
+		$(git -C server rev-parse refs/heads/master^) 2>err &&
+	test_i18ngrep "Server does not allow request for unadvertised object" err
 '
 
 check_prot_path () {

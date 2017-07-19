@@ -1,4 +1,5 @@
 #include "cache.h"
+#include "config.h"
 #include "refs.h"
 #include "builtin.h"
 #include "parse-options.h"
@@ -433,7 +434,7 @@ int cmd_update_ref(int argc, const char **argv, const char *prefix)
 		 * For purposes of backwards compatibility, we treat
 		 * NULL_SHA1 as "don't care" here:
 		 */
-		return delete_ref(refname,
+		return delete_ref(msg, refname,
 				  (oldval && !is_null_sha1(oldsha1)) ? oldsha1 : NULL,
 				  flags);
 	else

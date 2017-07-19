@@ -1,5 +1,6 @@
 #include "builtin.h"
 #include "cache.h"
+#include "config.h"
 #include "attr.h"
 #include "object.h"
 #include "blob.h"
@@ -44,7 +45,7 @@ static uint32_t nr_result, nr_written;
 static int non_empty;
 static int reuse_delta = 1, reuse_object = 1;
 static int keep_unreachable, unpack_unreachable, include_tag;
-static unsigned long unpack_unreachable_expiration;
+static timestamp_t unpack_unreachable_expiration;
 static int pack_loose_unreachable;
 static int local;
 static int have_non_local_packs;
@@ -106,12 +107,14 @@ static void *get_delta(struct object_entry *entry)
 	void *buf, *base_buf, *delta_buf;
 	enum object_type type;
 
-	buf = read_sha1_file(entry->idx.sha1, &type, &size);
+	buf = read_sha1_file(entry->idx.oid.hash, &type, &size);
 	if (!buf)
-		die("unable to read %s", sha1_to_hex(entry->idx.sha1));
-	base_buf = read_sha1_file(entry->delta->idx.sha1, &type, &base_size);
+		die("unable to read %s", oid_to_hex(&entry->idx.oid));
+	base_buf = read_sha1_file(entry->delta->idx.oid.hash, &type,
+				  &base_size);
 	if (!base_buf)
-		die("unable to read %s", sha1_to_hex(entry->delta->idx.sha1));
+		die("unable to read %s",
+		    oid_to_hex(&entry->delta->idx.oid));
 	delta_buf = diff_delta(base_buf, base_size,
 			       buf, size, &delta_size, 0);
 	if (!delta_buf || delta_size != entry->delta_size)
@@ -239,7 +242,8 @@ static unsigned long write_no_reuse_object(struct sha1file *f, struct object_ent
 					   unsigned long limit, int usable_delta)
 {
 	unsigned long size, datalen;
-	unsigned char header[10], dheader[10];
+	unsigned char header[MAX_PACK_OBJECT_HEADER],
+		      dheader[MAX_PACK_OBJECT_HEADER];
 	unsigned hdrlen;
 	enum object_type type;
 	void *buf;
@@ -248,19 +252,20 @@ static unsigned long write_no_reuse_object(struct sha1file *f, struct object_ent
 	if (!usable_delta) {
 		if (entry->type == OBJ_BLOB &&
 		    entry->size > big_file_threshold &&
-		    (st = open_istream(entry->idx.sha1, &type, &size, NULL)) != NULL)
+		    (st = open_istream(entry->idx.oid.hash, &type, &size, NULL)) != NULL)
 			buf = NULL;
 		else {
-			buf = read_sha1_file(entry->idx.sha1, &type, &size);
+			buf = read_sha1_file(entry->idx.oid.hash, &type,
+					     &size);
 			if (!buf)
-				die(_("unable to read %s"), sha1_to_hex(entry->idx.sha1));
+				die(_("unable to read %s"),
+				    oid_to_hex(&entry->idx.oid));
 		}
 		/*
 		 * make sure no cached delta data remains from a
 		 * previous attempt before a pack split occurred.
 		 */
-		free(entry->delta_data);
-		entry->delta_data = NULL;
+		FREE_AND_NULL(entry->delta_data);
 		entry->z_delta_size = 0;
 	} else if (entry->delta_data) {
 		size = entry->delta_size;
@@ -286,7 +291,8 @@ static unsigned long write_no_reuse_object(struct sha1file *f, struct object_ent
 	 * The object header is a byte of 'type' followed by zero or
 	 * more bytes of length.
 	 */
-	hdrlen = encode_in_pack_object_header(type, size, header);
+	hdrlen = encode_in_pack_object_header(header, sizeof(header),
+					      type, size);
 
 	if (type == OBJ_OFS_DELTA) {
 		/*
@@ -320,7 +326,7 @@ static unsigned long write_no_reuse_object(struct sha1file *f, struct object_ent
 			return 0;
 		}
 		sha1write(f, header, hdrlen);
-		sha1write(f, entry->delta->idx.sha1, 20);
+		sha1write(f, entry->delta->idx.oid.hash, 20);
 		hdrlen += 20;
 	} else {
 		if (limit && hdrlen + datalen + 20 >= limit) {
@@ -332,7 +338,7 @@ static unsigned long write_no_reuse_object(struct sha1file *f, struct object_ent
 		sha1write(f, header, hdrlen);
 	}
 	if (st) {
-		datalen = write_large_blob_data(st, f, entry->idx.sha1);
+		datalen = write_large_blob_data(st, f, entry->idx.oid.hash);
 		close_istream(st);
 	} else {
 		sha1write(f, buf, datalen);
@@ -352,20 +358,23 @@ static off_t write_reuse_object(struct sha1file *f, struct object_entry *entry,
 	off_t offset;
 	enum object_type type = entry->type;
 	off_t datalen;
-	unsigned char header[10], dheader[10];
+	unsigned char header[MAX_PACK_OBJECT_HEADER],
+		      dheader[MAX_PACK_OBJECT_HEADER];
 	unsigned hdrlen;
 
 	if (entry->delta)
 		type = (allow_ofs_delta && entry->delta->idx.offset) ?
 			OBJ_OFS_DELTA : OBJ_REF_DELTA;
-	hdrlen = encode_in_pack_object_header(type, entry->size, header);
+	hdrlen = encode_in_pack_object_header(header, sizeof(header),
+					      type, entry->size);
 
 	offset = entry->in_pack_offset;
 	revidx = find_pack_revindex(p, offset);
 	datalen = revidx[1].offset - offset;
 	if (!pack_to_stdout && p->index_version > 1 &&
 	    check_pack_crc(p, &w_curs, offset, datalen, revidx->nr)) {
-		error("bad packed object CRC for %s", sha1_to_hex(entry->idx.sha1));
+		error("bad packed object CRC for %s",
+		      oid_to_hex(&entry->idx.oid));
 		unuse_pack(&w_curs);
 		return write_no_reuse_object(f, entry, limit, usable_delta);
 	}
@@ -375,7 +384,8 @@ static off_t write_reuse_object(struct sha1file *f, struct object_entry *entry,
 
 	if (!pack_to_stdout && p->index_version == 1 &&
 	    check_pack_inflate(p, &w_curs, offset, datalen, entry->size)) {
-		error("corrupt packed object for %s", sha1_to_hex(entry->idx.sha1));
+		error("corrupt packed object for %s",
+		      oid_to_hex(&entry->idx.oid));
 		unuse_pack(&w_curs);
 		return write_no_reuse_object(f, entry, limit, usable_delta);
 	}
@@ -400,7 +410,7 @@ static off_t write_reuse_object(struct sha1file *f, struct object_entry *entry,
 			return 0;
 		}
 		sha1write(f, header, hdrlen);
-		sha1write(f, entry->delta->idx.sha1, 20);
+		sha1write(f, entry->delta->idx.oid.hash, 20);
 		hdrlen += 20;
 		reused_delta++;
 	} else {
@@ -505,7 +515,7 @@ static enum write_one_status write_one(struct sha1file *f,
 	recursing = (e->idx.offset == 1);
 	if (recursing) {
 		warning("recursive delta detected for object %s",
-			sha1_to_hex(e->idx.sha1));
+			oid_to_hex(&e->idx.oid));
 		return WRITE_ONE_RECURSIVE;
 	} else if (e->idx.offset || e->preferred_base) {
 		/* offset is non zero if object is written already. */
@@ -894,24 +904,15 @@ static void write_pack_file(void)
 			written, nr_result);
 }
 
-static void setup_delta_attr_check(struct git_attr_check *check)
-{
-	static struct git_attr *attr_delta;
-
-	if (!attr_delta)
-		attr_delta = git_attr("delta");
-
-	check[0].attr = attr_delta;
-}
-
 static int no_try_delta(const char *path)
 {
-	struct git_attr_check check[1];
+	static struct attr_check *check;
 
-	setup_delta_attr_check(check);
-	if (git_check_attr(path, ARRAY_SIZE(check), check))
+	if (!check)
+		check = attr_check_initl("delta", NULL);
+	if (git_check_attr(path, check))
 		return 0;
-	if (ATTR_FALSE(check->value))
+	if (ATTR_FALSE(check->items[0].value))
 		return 1;
 	return 0;
 }
@@ -1374,12 +1375,10 @@ static void cleanup_preferred_base(void)
 		if (!pbase_tree_cache[i])
 			continue;
 		free(pbase_tree_cache[i]->tree_data);
-		free(pbase_tree_cache[i]);
-		pbase_tree_cache[i] = NULL;
+		FREE_AND_NULL(pbase_tree_cache[i]);
 	}
 
-	free(done_pbase_paths);
-	done_pbase_paths = NULL;
+	FREE_AND_NULL(done_pbase_paths);
 	done_pbase_paths_num = done_pbase_paths_alloc = 0;
 }
 
@@ -1437,7 +1436,7 @@ static void check_object(struct object_entry *entry)
 				ofs += 1;
 				if (!ofs || MSB(ofs, 7)) {
 					error("delta base offset overflow in pack for %s",
-					      sha1_to_hex(entry->idx.sha1));
+					      oid_to_hex(&entry->idx.oid));
 					goto give_up;
 				}
 				c = buf[used_0++];
@@ -1446,7 +1445,7 @@ static void check_object(struct object_entry *entry)
 			ofs = entry->in_pack_offset - ofs;
 			if (ofs <= 0 || ofs >= entry->in_pack_offset) {
 				error("delta base offset out of bound for %s",
-				      sha1_to_hex(entry->idx.sha1));
+				      oid_to_hex(&entry->idx.oid));
 				goto give_up;
 			}
 			if (reuse_delta && !entry->preferred_base) {
@@ -1503,7 +1502,7 @@ static void check_object(struct object_entry *entry)
 		unuse_pack(&w_curs);
 	}
 
-	entry->type = sha1_object_info(entry->idx.sha1, &entry->size);
+	entry->type = sha1_object_info(entry->idx.oid.hash, &entry->size);
 	/*
 	 * The error condition is checked in prepare_pack().  This is
 	 * to permit a missing preferred base object to be ignored
@@ -1519,7 +1518,7 @@ static int pack_offset_sort(const void *_a, const void *_b)
 
 	/* avoid filesystem trashing with loose objects */
 	if (!a->in_pack && !b->in_pack)
-		return hashcmp(a->idx.sha1, b->idx.sha1);
+		return oidcmp(&a->idx.oid, &b->idx.oid);
 
 	if (a->in_pack < b->in_pack)
 		return -1;
@@ -1539,6 +1538,8 @@ static int pack_offset_sort(const void *_a, const void *_b)
  *   2. Updating our size/type to the non-delta representation. These were
  *      either not recorded initially (size) or overwritten with the delta type
  *      (type) when check_object() decided to reuse the delta.
+ *
+ *   3. Resetting our delta depth, as we are now a base object.
  */
 static void drop_reused_delta(struct object_entry *entry)
 {
@@ -1552,6 +1553,7 @@ static void drop_reused_delta(struct object_entry *entry)
 			p = &(*p)->delta_sibling;
 	}
 	entry->delta = NULL;
+	entry->depth = 0;
 
 	oi.sizep = &entry->size;
 	oi.typep = &entry->type;
@@ -1562,7 +1564,8 @@ static void drop_reused_delta(struct object_entry *entry)
 		 * And if that fails, the error will be recorded in entry->type
 		 * and dealt with in prepare_pack().
 		 */
-		entry->type = sha1_object_info(entry->idx.sha1, &entry->size);
+		entry->type = sha1_object_info(entry->idx.oid.hash,
+					       &entry->size);
 	}
 }
 
@@ -1570,39 +1573,123 @@ static void drop_reused_delta(struct object_entry *entry)
  * Follow the chain of deltas from this entry onward, throwing away any links
  * that cause us to hit a cycle (as determined by the DFS state flags in
  * the entries).
+ *
+ * We also detect too-long reused chains that would violate our --depth
+ * limit.
  */
 static void break_delta_chains(struct object_entry *entry)
 {
-	/* If it's not a delta, it can't be part of a cycle. */
-	if (!entry->delta) {
-		entry->dfs_state = DFS_DONE;
-		return;
+	/*
+	 * The actual depth of each object we will write is stored as an int,
+	 * as it cannot exceed our int "depth" limit. But before we break
+	 * changes based no that limit, we may potentially go as deep as the
+	 * number of objects, which is elsewhere bounded to a uint32_t.
+	 */
+	uint32_t total_depth;
+	struct object_entry *cur, *next;
+
+	for (cur = entry, total_depth = 0;
+	     cur;
+	     cur = cur->delta, total_depth++) {
+		if (cur->dfs_state == DFS_DONE) {
+			/*
+			 * We've already seen this object and know it isn't
+			 * part of a cycle. We do need to append its depth
+			 * to our count.
+			 */
+			total_depth += cur->depth;
+			break;
+		}
+
+		/*
+		 * We break cycles before looping, so an ACTIVE state (or any
+		 * other cruft which made its way into the state variable)
+		 * is a bug.
+		 */
+		if (cur->dfs_state != DFS_NONE)
+			die("BUG: confusing delta dfs state in first pass: %d",
+			    cur->dfs_state);
+
+		/*
+		 * Now we know this is the first time we've seen the object. If
+		 * it's not a delta, we're done traversing, but we'll mark it
+		 * done to save time on future traversals.
+		 */
+		if (!cur->delta) {
+			cur->dfs_state = DFS_DONE;
+			break;
+		}
+
+		/*
+		 * Mark ourselves as active and see if the next step causes
+		 * us to cycle to another active object. It's important to do
+		 * this _before_ we loop, because it impacts where we make the
+		 * cut, and thus how our total_depth counter works.
+		 * E.g., We may see a partial loop like:
+		 *
+		 *   A -> B -> C -> D -> B
+		 *
+		 * Cutting B->C breaks the cycle. But now the depth of A is
+		 * only 1, and our total_depth counter is at 3. The size of the
+		 * error is always one less than the size of the cycle we
+		 * broke. Commits C and D were "lost" from A's chain.
+		 *
+		 * If we instead cut D->B, then the depth of A is correct at 3.
+		 * We keep all commits in the chain that we examined.
+		 */
+		cur->dfs_state = DFS_ACTIVE;
+		if (cur->delta->dfs_state == DFS_ACTIVE) {
+			drop_reused_delta(cur);
+			cur->dfs_state = DFS_DONE;
+			break;
+		}
 	}
 
-	switch (entry->dfs_state) {
-	case DFS_NONE:
-		/*
-		 * This is the first time we've seen the object. We mark it as
-		 * part of the active potential cycle and recurse.
-		 */
-		entry->dfs_state = DFS_ACTIVE;
-		break_delta_chains(entry->delta);
-		entry->dfs_state = DFS_DONE;
-		break;
+	/*
+	 * And now that we've gone all the way to the bottom of the chain, we
+	 * need to clear the active flags and set the depth fields as
+	 * appropriate. Unlike the loop above, which can quit when it drops a
+	 * delta, we need to keep going to look for more depth cuts. So we need
+	 * an extra "next" pointer to keep going after we reset cur->delta.
+	 */
+	for (cur = entry; cur; cur = next) {
+		next = cur->delta;
 
-	case DFS_DONE:
-		/* object already examined, and not part of a cycle */
-		break;
-
-	case DFS_ACTIVE:
 		/*
-		 * We found a cycle that needs broken. It would be correct to
-		 * break any link in the chain, but it's convenient to
-		 * break this one.
+		 * We should have a chain of zero or more ACTIVE states down to
+		 * a final DONE. We can quit after the DONE, because either it
+		 * has no bases, or we've already handled them in a previous
+		 * call.
 		 */
-		drop_reused_delta(entry);
-		entry->dfs_state = DFS_DONE;
-		break;
+		if (cur->dfs_state == DFS_DONE)
+			break;
+		else if (cur->dfs_state != DFS_ACTIVE)
+			die("BUG: confusing delta dfs state in second pass: %d",
+			    cur->dfs_state);
+
+		/*
+		 * If the total_depth is more than depth, then we need to snip
+		 * the chain into two or more smaller chains that don't exceed
+		 * the maximum depth. Most of the resulting chains will contain
+		 * (depth + 1) entries (i.e., depth deltas plus one base), and
+		 * the last chain (i.e., the one containing entry) will contain
+		 * whatever entries are left over, namely
+		 * (total_depth % (depth + 1)) of them.
+		 *
+		 * Since we are iterating towards decreasing depth, we need to
+		 * decrement total_depth as we go, and we need to write to the
+		 * entry what its final depth will be after all of the
+		 * snipping. Since we're snipping into chains of length (depth
+		 * + 1) entries, the final depth of an entry will be its
+		 * original depth modulo (depth + 1). Any time we encounter an
+		 * entry whose final depth is supposed to be zero, we snip it
+		 * from its delta base, thereby making it so.
+		 */
+		cur->depth = (total_depth--) % (depth + 1);
+		if (!cur->depth)
+			drop_reused_delta(cur);
+
+		cur->dfs_state = DFS_DONE;
 	}
 }
 
@@ -1770,26 +1857,29 @@ static int try_delta(struct unpacked *trg, struct unpacked *src,
 	/* Load data if not already done */
 	if (!trg->data) {
 		read_lock();
-		trg->data = read_sha1_file(trg_entry->idx.sha1, &type, &sz);
+		trg->data = read_sha1_file(trg_entry->idx.oid.hash, &type,
+					   &sz);
 		read_unlock();
 		if (!trg->data)
 			die("object %s cannot be read",
-			    sha1_to_hex(trg_entry->idx.sha1));
+			    oid_to_hex(&trg_entry->idx.oid));
 		if (sz != trg_size)
 			die("object %s inconsistent object length (%lu vs %lu)",
-			    sha1_to_hex(trg_entry->idx.sha1), sz, trg_size);
+			    oid_to_hex(&trg_entry->idx.oid), sz,
+			    trg_size);
 		*mem_usage += sz;
 	}
 	if (!src->data) {
 		read_lock();
-		src->data = read_sha1_file(src_entry->idx.sha1, &type, &sz);
+		src->data = read_sha1_file(src_entry->idx.oid.hash, &type,
+					   &sz);
 		read_unlock();
 		if (!src->data) {
 			if (src_entry->preferred_base) {
 				static int warned = 0;
 				if (!warned++)
 					warning("object %s cannot be read",
-						sha1_to_hex(src_entry->idx.sha1));
+						oid_to_hex(&src_entry->idx.oid));
 				/*
 				 * Those objects are not included in the
 				 * resulting pack.  Be resilient and ignore
@@ -1799,11 +1889,12 @@ static int try_delta(struct unpacked *trg, struct unpacked *src,
 				return 0;
 			}
 			die("object %s cannot be read",
-			    sha1_to_hex(src_entry->idx.sha1));
+			    oid_to_hex(&src_entry->idx.oid));
 		}
 		if (sz != src_size)
 			die("object %s inconsistent object length (%lu vs %lu)",
-			    sha1_to_hex(src_entry->idx.sha1), sz, src_size);
+			    oid_to_hex(&src_entry->idx.oid), sz,
+			    src_size);
 		*mem_usage += sz;
 	}
 	if (!src->index) {
@@ -1877,8 +1968,7 @@ static unsigned long free_unpacked(struct unpacked *n)
 	n->index = NULL;
 	if (n->data) {
 		freed_mem += n->entry->size;
-		free(n->data);
-		n->data = NULL;
+		FREE_AND_NULL(n->data);
 	}
 	n->entry = NULL;
 	n->depth = 0;
@@ -2255,7 +2345,7 @@ static void add_tag_chain(const struct object_id *oid)
 	if (packlist_find(&to_pack, oid->hash, NULL))
 		return;
 
-	tag = lookup_tag(oid->hash);
+	tag = lookup_tag(oid);
 	while (1) {
 		if (!tag || parse_tag(tag) || !tag->tagged)
 			die("unable to pack objects reachable from tag %s",
@@ -2324,7 +2414,7 @@ static void prepare_pack(int window, int depth)
 			nr_deltas++;
 			if (entry->type < 0)
 				die("unable to get type of object %s",
-				    sha1_to_hex(entry->idx.sha1));
+				    oid_to_hex(&entry->idx.oid));
 		} else {
 			if (entry->type < 0) {
 				/*
@@ -2390,8 +2480,10 @@ static int git_pack_config(const char *k, const char *v, void *cb)
 			die("invalid number of threads specified (%d)",
 			    delta_search_threads);
 #ifdef NO_PTHREADS
-		if (delta_search_threads != 1)
+		if (delta_search_threads != 1) {
 			warning("no threads support, ignoring %s", k);
+			delta_search_threads = 0;
+		}
 #endif
 		return 0;
 	}
@@ -2534,17 +2626,17 @@ static void add_objects_in_unpacked_packs(struct rev_info *revs)
 	free(in_pack.array);
 }
 
-static int add_loose_object(const unsigned char *sha1, const char *path,
+static int add_loose_object(const struct object_id *oid, const char *path,
 			    void *data)
 {
-	enum object_type type = sha1_object_info(sha1, NULL);
+	enum object_type type = sha1_object_info(oid->hash, NULL);
 
 	if (type < 0) {
 		warning("loose object at %s could not be examined", path);
 		return 0;
 	}
 
-	add_object_entry(sha1, type, "", 0);
+	add_object_entry(oid->hash, type, "", 0);
 	return 0;
 }
 
@@ -2590,16 +2682,16 @@ static int has_sha1_pack_kept_or_nonlocal(const unsigned char *sha1)
  *
  * This is filled by get_object_list.
  */
-static struct sha1_array recent_objects;
+static struct oid_array recent_objects;
 
-static int loosened_object_can_be_discarded(const unsigned char *sha1,
-					    unsigned long mtime)
+static int loosened_object_can_be_discarded(const struct object_id *oid,
+					    timestamp_t mtime)
 {
 	if (!unpack_unreachable_expiration)
 		return 0;
 	if (mtime > unpack_unreachable_expiration)
 		return 0;
-	if (sha1_array_lookup(&recent_objects, sha1) >= 0)
+	if (oid_array_lookup(&recent_objects, oid) >= 0)
 		return 0;
 	return 1;
 }
@@ -2608,7 +2700,7 @@ static void loosen_unused_packed_objects(struct rev_info *revs)
 {
 	struct packed_git *p;
 	uint32_t i;
-	const unsigned char *sha1;
+	struct object_id oid;
 
 	for (p = packed_git; p; p = p->next) {
 		if (!p->pack_local || p->pack_keep)
@@ -2618,11 +2710,11 @@ static void loosen_unused_packed_objects(struct rev_info *revs)
 			die("cannot open pack index");
 
 		for (i = 0; i < p->num_objects; i++) {
-			sha1 = nth_packed_object_sha1(p, i);
-			if (!packlist_find(&to_pack, sha1, NULL) &&
-			    !has_sha1_pack_kept_or_nonlocal(sha1) &&
-			    !loosened_object_can_be_discarded(sha1, p->mtime))
-				if (force_object_loose(sha1, p->mtime))
+			nth_packed_object_oid(&oid, p, i);
+			if (!packlist_find(&to_pack, oid.hash, NULL) &&
+			    !has_sha1_pack_kept_or_nonlocal(oid.hash) &&
+			    !loosened_object_can_be_discarded(&oid, p->mtime))
+				if (force_object_loose(oid.hash, p->mtime))
 					die("unable to force loose object");
 		}
 	}
@@ -2635,7 +2727,11 @@ static void loosen_unused_packed_objects(struct rev_info *revs)
  */
 static int pack_options_allow_reuse(void)
 {
-	return pack_to_stdout && allow_ofs_delta;
+	return pack_to_stdout &&
+	       allow_ofs_delta &&
+	       !ignore_packed_keep &&
+	       (!local || !have_non_local_packs) &&
+	       !incremental;
 }
 
 static int get_object_list_from_bitmap(struct rev_info *revs)
@@ -2661,12 +2757,12 @@ static void record_recent_object(struct object *obj,
 				 const char *name,
 				 void *data)
 {
-	sha1_array_append(&recent_objects, obj->oid.hash);
+	oid_array_append(&recent_objects, &obj->oid);
 }
 
 static void record_recent_commit(struct commit *commit, void *data)
 {
-	sha1_array_append(&recent_objects, commit->object.oid.hash);
+	oid_array_append(&recent_objects, &commit->object.oid);
 }
 
 static void get_object_list(int ac, const char **av)
@@ -2695,10 +2791,10 @@ static void get_object_list(int ac, const char **av)
 				continue;
 			}
 			if (starts_with(line, "--shallow ")) {
-				unsigned char sha1[20];
-				if (get_sha1_hex(line + 10, sha1))
+				struct object_id oid;
+				if (get_oid_hex(line + 10, &oid))
 					die("not an SHA-1 '%s'", line + 10);
-				register_shallow(sha1);
+				register_shallow(&oid);
 				use_bitmap_index = 0;
 				continue;
 			}
@@ -2734,7 +2830,7 @@ static void get_object_list(int ac, const char **av)
 	if (unpack_unreachable)
 		loosen_unused_packed_objects(&revs);
 
-	sha1_array_clear(&recent_objects);
+	oid_array_clear(&recent_objects);
 }
 
 static int option_parse_index_version(const struct option *opt,

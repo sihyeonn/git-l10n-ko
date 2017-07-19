@@ -4,6 +4,7 @@
  * The thieves were Alex Riesen and Johannes Schindelin, in June/July 2006
  */
 #include "cache.h"
+#include "config.h"
 #include "advice.h"
 #include "lockfile.h"
 #include "cache-tree.h"
@@ -67,7 +68,7 @@ static struct tree *shift_tree_object(struct tree *one, struct tree *two,
 	}
 	if (!oidcmp(&two->object.oid, &shifted))
 		return two;
-	return lookup_tree(shifted.hash);
+	return lookup_tree(&shifted);
 }
 
 static struct commit *make_virtual_commit(struct tree *tree, const char *comment)
@@ -304,7 +305,7 @@ struct tree *write_tree_from_memory(struct merge_options *o)
 		return NULL;
 	}
 
-	result = lookup_tree(active_cache_tree->sha1);
+	result = lookup_tree(&active_cache_tree->oid);
 
 	return result;
 }
@@ -528,7 +529,7 @@ static struct string_list *get_renames(struct merge_options *o,
 	opts.show_rename_progress = o->show_rename_progress;
 	opts.output_format = DIFF_FORMAT_NO_OUTPUT;
 	diff_setup_done(&opts);
-	diff_tree_sha1(o_tree->object.oid.hash, tree->object.oid.hash, "", &opts);
+	diff_tree_oid(&o_tree->object.oid, &tree->object.oid, "", &opts);
 	diffcore_std(&opts);
 	if (opts.needed_rename_limit > o->needed_rename_limit)
 		o->needed_rename_limit = opts.needed_rename_limit;
@@ -994,11 +995,11 @@ static int merge_file_1(struct merge_options *o,
 				return ret;
 			result->clean = (merge_status == 0);
 		} else if (S_ISGITLINK(a->mode)) {
-			result->clean = merge_submodule(result->oid.hash,
+			result->clean = merge_submodule(&result->oid,
 						       one->path,
-						       one->oid.hash,
-						       a->oid.hash,
-						       b->oid.hash,
+						       &one->oid,
+						       &a->oid,
+						       &b->oid,
 						       !o->call_depth);
 		} else if (S_ISLNK(a->mode)) {
 			oidcpy(&result->oid, &a->oid);
@@ -1061,16 +1062,20 @@ static int merge_file_one(struct merge_options *o,
 }
 
 static int handle_change_delete(struct merge_options *o,
-				 const char *path,
+				 const char *path, const char *old_path,
 				 const struct object_id *o_oid, int o_mode,
-				 const struct object_id *a_oid, int a_mode,
-				 const struct object_id *b_oid, int b_mode,
+				 const struct object_id *changed_oid,
+				 int changed_mode,
+				 const char *change_branch,
+				 const char *delete_branch,
 				 const char *change, const char *change_past)
 {
-	char *renamed = NULL;
+	char *alt_path = NULL;
+	const char *update_path = path;
 	int ret = 0;
+
 	if (dir_in_way(path, !o->call_depth, 0)) {
-		renamed = unique_path(o, path, a_oid ? o->branch1 : o->branch2);
+		update_path = alt_path = unique_path(o, path, change_branch);
 	}
 
 	if (o->call_depth) {
@@ -1081,43 +1086,43 @@ static int handle_change_delete(struct merge_options *o,
 		 */
 		ret = remove_file_from_cache(path);
 		if (!ret)
-			ret = update_file(o, 0, o_oid, o_mode,
-					  renamed ? renamed : path);
-	} else if (!a_oid) {
-		if (!renamed) {
-			output(o, 1, _("CONFLICT (%s/delete): %s deleted in %s "
-			       "and %s in %s. Version %s of %s left in tree."),
-			       change, path, o->branch1, change_past,
-			       o->branch2, o->branch2, path);
-			ret = update_file(o, 0, b_oid, b_mode, path);
-		} else {
-			output(o, 1, _("CONFLICT (%s/delete): %s deleted in %s "
-			       "and %s in %s. Version %s of %s left in tree at %s."),
-			       change, path, o->branch1, change_past,
-			       o->branch2, o->branch2, path, renamed);
-			ret = update_file(o, 0, b_oid, b_mode, renamed);
-		}
+			ret = update_file(o, 0, o_oid, o_mode, update_path);
 	} else {
-		if (!renamed) {
-			output(o, 1, _("CONFLICT (%s/delete): %s deleted in %s "
-			       "and %s in %s. Version %s of %s left in tree."),
-			       change, path, o->branch2, change_past,
-			       o->branch1, o->branch1, path);
+		if (!alt_path) {
+			if (!old_path) {
+				output(o, 1, _("CONFLICT (%s/delete): %s deleted in %s "
+				       "and %s in %s. Version %s of %s left in tree."),
+				       change, path, delete_branch, change_past,
+				       change_branch, change_branch, path);
+			} else {
+				output(o, 1, _("CONFLICT (%s/delete): %s deleted in %s "
+				       "and %s to %s in %s. Version %s of %s left in tree."),
+				       change, old_path, delete_branch, change_past, path,
+				       change_branch, change_branch, path);
+			}
 		} else {
-			output(o, 1, _("CONFLICT (%s/delete): %s deleted in %s "
-			       "and %s in %s. Version %s of %s left in tree at %s."),
-			       change, path, o->branch2, change_past,
-			       o->branch1, o->branch1, path, renamed);
-			ret = update_file(o, 0, a_oid, a_mode, renamed);
+			if (!old_path) {
+				output(o, 1, _("CONFLICT (%s/delete): %s deleted in %s "
+				       "and %s in %s. Version %s of %s left in tree at %s."),
+				       change, path, delete_branch, change_past,
+				       change_branch, change_branch, path, alt_path);
+			} else {
+				output(o, 1, _("CONFLICT (%s/delete): %s deleted in %s "
+				       "and %s to %s in %s. Version %s of %s left in tree at %s."),
+				       change, old_path, delete_branch, change_past, path,
+				       change_branch, change_branch, path, alt_path);
+			}
 		}
 		/*
-		 * No need to call update_file() on path when !renamed, since
-		 * that would needlessly touch path.  We could call
-		 * update_file_flags() with update_cache=0 and update_wd=0,
-		 * but that's a no-op.
+		 * No need to call update_file() on path when change_branch ==
+		 * o->branch1 && !alt_path, since that would needlessly touch
+		 * path.  We could call update_file_flags() with update_cache=0
+		 * and update_wd=0, but that's a no-op.
 		 */
+		if (change_branch != o->branch1 || alt_path)
+			ret = update_file(o, 0, changed_oid, changed_mode, update_path);
 	}
-	free(renamed);
+	free(alt_path);
 
 	return ret;
 }
@@ -1125,28 +1130,17 @@ static int handle_change_delete(struct merge_options *o,
 static int conflict_rename_delete(struct merge_options *o,
 				   struct diff_filepair *pair,
 				   const char *rename_branch,
-				   const char *other_branch)
+				   const char *delete_branch)
 {
 	const struct diff_filespec *orig = pair->one;
 	const struct diff_filespec *dest = pair->two;
-	const struct object_id *a_oid = NULL;
-	const struct object_id *b_oid = NULL;
-	int a_mode = 0;
-	int b_mode = 0;
-
-	if (rename_branch == o->branch1) {
-		a_oid = &dest->oid;
-		a_mode = dest->mode;
-	} else {
-		b_oid = &dest->oid;
-		b_mode = dest->mode;
-	}
 
 	if (handle_change_delete(o,
 				 o->call_depth ? orig->path : dest->path,
+				 o->call_depth ? NULL : orig->path,
 				 &orig->oid, orig->mode,
-				 a_oid, a_mode,
-				 b_oid, b_mode,
+				 &dest->oid, dest->mode,
+				 rename_branch, delete_branch,
 				 _("rename"), _("renamed")))
 		return -1;
 
@@ -1646,8 +1640,8 @@ static int blob_unchanged(struct merge_options *opt,
 	 * performed.  Comparison can be skipped if both files are
 	 * unchanged since their sha1s have already been compared.
 	 */
-	if (renormalize_buffer(path, o.buf, o.len, &o) |
-	    renormalize_buffer(path, a.buf, a.len, &a))
+	if (renormalize_buffer(&the_index, path, o.buf, o.len, &o) |
+	    renormalize_buffer(&the_index, path, a.buf, a.len, &a))
 		ret = (o.len == a.len && !memcmp(o.buf, a.buf, o.len));
 
 error_return:
@@ -1662,11 +1656,27 @@ static int handle_modify_delete(struct merge_options *o,
 				 struct object_id *a_oid, int a_mode,
 				 struct object_id *b_oid, int b_mode)
 {
+	const char *modify_branch, *delete_branch;
+	struct object_id *changed_oid;
+	int changed_mode;
+
+	if (a_oid) {
+		modify_branch = o->branch1;
+		delete_branch = o->branch2;
+		changed_oid = a_oid;
+		changed_mode = a_mode;
+	} else {
+		modify_branch = o->branch2;
+		delete_branch = o->branch1;
+		changed_oid = b_oid;
+		changed_mode = b_mode;
+	}
+
 	return handle_change_delete(o,
-				    path,
+				    path, NULL,
 				    o_oid, o_mode,
-				    a_oid, a_mode,
-				    b_oid, b_mode,
+				    changed_oid, changed_mode,
+				    modify_branch, delete_branch,
 				    _("modify"), _("modified"));
 }
 
@@ -2033,7 +2043,7 @@ int merge_recursive(struct merge_options *o,
 		/* if there is no common ancestor, use an empty tree */
 		struct tree *tree;
 
-		tree = lookup_tree(EMPTY_TREE_SHA1_BIN);
+		tree = lookup_tree(&empty_tree_oid);
 		merged_common_ancestors = make_virtual_commit(tree, "ancestor");
 	}
 
@@ -2094,7 +2104,7 @@ static struct commit *get_ref(const struct object_id *oid, const char *name)
 {
 	struct object *object;
 
-	object = deref_tag(parse_object(oid->hash), name, strlen(name));
+	object = deref_tag(parse_object(oid), name, strlen(name));
 	if (!object)
 		return NULL;
 	if (object->type == OBJ_TREE)
@@ -2200,11 +2210,11 @@ int parse_merge_opt(struct merge_options *o, const char *s)
 		o->xdl_opts |= value;
 	}
 	else if (!strcmp(s, "ignore-space-change"))
-		o->xdl_opts |= XDF_IGNORE_WHITESPACE_CHANGE;
+		DIFF_XDL_SET(o, IGNORE_WHITESPACE_CHANGE);
 	else if (!strcmp(s, "ignore-all-space"))
-		o->xdl_opts |= XDF_IGNORE_WHITESPACE;
+		DIFF_XDL_SET(o, IGNORE_WHITESPACE);
 	else if (!strcmp(s, "ignore-space-at-eol"))
-		o->xdl_opts |= XDF_IGNORE_WHITESPACE_AT_EOL;
+		DIFF_XDL_SET(o, IGNORE_WHITESPACE_AT_EOL);
 	else if (!strcmp(s, "renormalize"))
 		o->renormalize = 1;
 	else if (!strcmp(s, "no-renormalize"))

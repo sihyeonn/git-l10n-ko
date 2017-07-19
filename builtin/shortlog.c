@@ -1,5 +1,6 @@
 #include "builtin.h"
 #include "cache.h"
+#include "config.h"
 #include "commit.h"
 #include "diff.h"
 #include "string-list.h"
@@ -148,8 +149,7 @@ void shortlog_add_commit(struct shortlog *log, struct commit *commit)
 
 	ctx.fmt = CMIT_FMT_USERFORMAT;
 	ctx.abbrev = log->abbrev;
-	ctx.subject = "";
-	ctx.after_subject = "";
+	ctx.print_email_subject = 1;
 	ctx.date_mode.type = DATE_NORMAL;
 	ctx.output_encoding = get_log_output_encoding();
 
