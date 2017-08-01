@@ -1888,7 +1888,9 @@ msgid ""
 msgid_plural ""
 "\n"
 "The most similar commands are"
-msgstr[0] "\n가장 비슷한 명령은"
+msgstr[0] ""
+"\n"
+"가장 비슷한 명령은"
 
 #: help.c:395
 msgid "git version [<options>]"
@@ -2081,7 +2083,9 @@ msgstr ""
 msgid ""
 "CONFLICT (%s/delete): %s deleted in %s and %s to %s in %s. Version %s of %s "
 "left in tree."
-msgstr "충돌! (%s/삭제): %s (위치 %s) 삭제, %s에서 %s(으)로 (위치 %s). %s 버전의 %s 트리에 남음."
+msgstr ""
+"충돌! (%s/삭제): %s (위치 %s) 삭제, %s에서 %s(으)로 (위치 %s). %s 버전의 %s "
+"트리에 남음."
 
 #: merge-recursive.c:1105
 #, c-format
@@ -2097,7 +2101,9 @@ msgstr ""
 msgid ""
 "CONFLICT (%s/delete): %s deleted in %s and %s to %s in %s. Version %s of %s "
 "left in tree at %s."
-msgstr "충돌! (%s/삭제): %s (위치 %s) 삭제, %s에서 %s(으)로 (위치 %s). %s 버전의 %s 트리에 남음 (위치 %s)."
+msgstr ""
+"충돌! (%s/삭제): %s (위치 %s) 삭제, %s에서 %s(으)로 (위치 %s). %s 버전의 %s "
+"트리에 남음 (위치 %s)."
 
 #: merge-recursive.c:1144
 msgid "rename"
@@ -4688,7 +4694,8 @@ msgid ""
 "See \"git help submodule\" for more information."
 msgstr ""
 "현재 저장소 안에 또 다른 깃 저장소를 추가했습니다. 외부 저장소를 복제해도\n"
-"내장된 저장소의 내용을 복제하진 않고 어떻게 내장된 저장소 내용을 얻을지 정보도\n"
+"내장된 저장소의 내용을 복제하진 않고 어떻게 내장된 저장소 내용을 얻을지 정보"
+"도\n"
 "없습니다. 하위 모듈을 추가하려면, 다음 명령을 사용하십시오:\n"
 "\n"
 "\tgit submodule add <url> %s\n"
@@ -12955,7 +12962,8 @@ msgstr ".gitmodules에서 하위 모듈 경로 '%s'에 대한 URL이 없습니�
 msgid ""
 "could not lookup configuration '%s'. Assuming this repository is its own "
 "authoritative upstream."
-msgstr "'%s' 설정을 찾아볼 수 없습니다. 이 저장소가 자체 업스트림이라고 가정합니다."
+msgstr ""
+"'%s' 설정을 찾아볼 수 없습니다. 이 저장소가 자체 업스트림이라고 가정합니다."
 
 #: builtin/submodule--helper.c:406
 #, c-format
@@ -13185,7 +13193,8 @@ msgid ""
 "points-at <object>]\n"
 "\t\t[--format=<format>] [--[no-]merged [<commit>]] [<pattern>...]"
 msgstr ""
-"git tag -l [-n[<번호>]] [--contains <커밋>] [--no-contains <커밋>] [--points-at <오브젝트>]\n"
+"git tag -l [-n[<번호>]] [--contains <커밋>] [--no-contains <커밋>] [--points-"
+"at <오브젝트>]\n"
 "\t\t[--format=<형식>] [--[no-]merged [<커밋>]] [<패턴>...]"
 
 #: builtin/tag.c:28
@@ -13556,19 +13565,25 @@ msgstr "파일 시스템 시험 없이 추적하지 않는 캐시를 사용합�
 msgid ""
 "core.splitIndex is set to false; remove or change it, if you really want to "
 "enable split index"
-msgstr "core.splitIndex 값이 거짓입니다. 정말로 스플릿 인덱스를 사용하려면 이 값을 제거하거나 바꾸십시오."
+msgstr ""
+"core.splitIndex 값이 거짓입니다. 정말로 스플릿 인덱스를 사용하려면 이 값을 제"
+"거하거나 바꾸십시오."
 
 #: builtin/update-index.c:1117
 msgid ""
 "core.splitIndex is set to true; remove or change it, if you really want to "
 "disable split index"
-msgstr "core.splitIndex 값이 참입니다. 정말로 스플릿 인덱스를 사용하지 않으려면 이 값을 제거하거나 바꾸십시오."
+msgstr ""
+"core.splitIndex 값이 참입니다. 정말로 스플릿 인덱스를 사용하지 않으려면 이 값"
+"을 제거하거나 바꾸십시오."
 
 #: builtin/update-index.c:1128
 msgid ""
 "core.untrackedCache is set to true; remove or change it, if you really want "
 "to disable the untracked cache"
-msgstr "core.untrackedCache 값이 참입니다. 정말로 추적하지 않는 캐시를 사용하지 않으려면 이 값을 제거하거나 바꾸십시오."
+msgstr ""
+"core.untrackedCache 값이 참입니다. 정말로 추적하지 않는 캐시를 사용하지 않으"
+"려면 이 값을 제거하거나 바꾸십시오."
 
 #: builtin/update-index.c:1132
 msgid "Untracked cache disabled"
@@ -13578,7 +13593,9 @@ msgstr "추적되지 않는 파일 캐시를 사용하지 않습니다"
 msgid ""
 "core.untrackedCache is set to false; remove or change it, if you really want "
 "to enable the untracked cache"
-msgstr "core.untrackedCache 값이 거짓입니다. 정말로 추적하지 않는 캐시를 사용하려면 이 값을 제거하거나 바꾸십시오."
+msgstr ""
+"core.untrackedCache 값이 거짓입니다. 정말로 추적하지 않는 캐시를 사용하려면 "
+"이 값을 제거하거나 바꾸십시오."
 
 #: builtin/update-index.c:1144
 #, c-format
