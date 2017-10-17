@@ -80,7 +80,6 @@ int init_apply_state(struct apply_state *state,
 {
 	memset(state, 0, sizeof(*state));
 	state->prefix = prefix;
-	state->prefix_length = state->prefix ? strlen(state->prefix) : 0;
 	state->lock_file = lock_file;
 	state->newfd = -1;
 	state->apply = 1;
@@ -220,6 +219,7 @@ struct patch {
 	unsigned int recount:1;
 	unsigned int conflicted_threeway:1;
 	unsigned int direct_to_threeway:1;
+	unsigned int crlf_in_old:1;
 	struct fragment *fragments;
 	char *result;
 	size_t resultsize;
@@ -786,11 +786,11 @@ static int guess_p_value(struct apply_state *state, const char *nameline)
 		 * Does it begin with "a/$our-prefix" and such?  Then this is
 		 * very likely to apply to our directory.
 		 */
-		if (!strncmp(name, state->prefix, state->prefix_length))
+		if (starts_with(name, state->prefix))
 			val = count_slashes(state->prefix);
 		else {
 			cp++;
-			if (!strncmp(cp, state->prefix, state->prefix_length))
+			if (starts_with(cp, state->prefix))
 				val = count_slashes(state->prefix) + 1;
 		}
 	}
@@ -812,16 +812,13 @@ static int has_epoch_timestamp(const char *nameline)
 	 * 1970-01-01, and the seconds part must be "00".
 	 */
 	const char stamp_regexp[] =
-		"^(1969-12-31|1970-01-01)"
-		" "
-		"[0-2][0-9]:[0-5][0-9]:00(\\.0+)?"
+		"^[0-2][0-9]:([0-5][0-9]):00(\\.0+)?"
 		" "
 		"([-+][0-2][0-9]:?[0-5][0-9])\n";
 	const char *timestamp = NULL, *cp, *colon;
 	static regex_t *stamp;
 	regmatch_t m[10];
-	int zoneoffset;
-	int hourminute;
+	int zoneoffset, epoch_hour, hour, minute;
 	int status;
 
 	for (cp = nameline; *cp != '\n'; cp++) {
@@ -830,6 +827,18 @@ static int has_epoch_timestamp(const char *nameline)
 	}
 	if (!timestamp)
 		return 0;
+
+	/*
+	 * YYYY-MM-DD hh:mm:ss must be from either 1969-12-31
+	 * (west of GMT) or 1970-01-01 (east of GMT)
+	 */
+	if (skip_prefix(timestamp, "1969-12-31 ", &timestamp))
+		epoch_hour = 24;
+	else if (skip_prefix(timestamp, "1970-01-01 ", &timestamp))
+		epoch_hour = 0;
+	else
+		return 0;
+
 	if (!stamp) {
 		stamp = xmalloc(sizeof(*stamp));
 		if (regcomp(stamp, stamp_regexp, REG_EXTENDED)) {
@@ -847,6 +856,9 @@ static int has_epoch_timestamp(const char *nameline)
 		return 0;
 	}
 
+	hour = strtol(timestamp, NULL, 10);
+	minute = strtol(timestamp + m[1].rm_so, NULL, 10);
+
 	zoneoffset = strtol(timestamp + m[3].rm_so + 1, (char **) &colon, 10);
 	if (*colon == ':')
 		zoneoffset = zoneoffset * 60 + strtol(colon + 1, NULL, 10);
@@ -855,20 +867,7 @@ static int has_epoch_timestamp(const char *nameline)
 	if (timestamp[m[3].rm_so] == '-')
 		zoneoffset = -zoneoffset;
 
-	/*
-	 * YYYY-MM-DD hh:mm:ss must be from either 1969-12-31
-	 * (west of GMT) or 1970-01-01 (east of GMT)
-	 */
-	if ((zoneoffset < 0 && memcmp(timestamp, "1969-12-31", 10)) ||
-	    (0 <= zoneoffset && memcmp(timestamp, "1970-01-01", 10)))
-		return 0;
-
-	hourminute = (strtol(timestamp + 11, NULL, 10) * 60 +
-		      strtol(timestamp + 14, NULL, 10) -
-		      zoneoffset);
-
-	return ((zoneoffset < 0 && hourminute == 1440) ||
-		(0 <= zoneoffset && !hourminute));
+	return hour * 60 + minute - zoneoffset == epoch_hour * 60;
 }
 
 /*
@@ -1663,6 +1662,19 @@ static void check_whitespace(struct apply_state *state,
 }
 
 /*
+ * Check if the patch has context lines with CRLF or
+ * the patch wants to remove lines with CRLF.
+ */
+static void check_old_for_crlf(struct patch *patch, const char *line, int len)
+{
+	if (len >= 2 && line[len-1] == '\n' && line[len-2] == '\r') {
+		patch->ws_rule |= WS_CR_AT_EOL;
+		patch->crlf_in_old = 1;
+	}
+}
+
+
+/*
  * Parse a unified diff. Note that this really needs to parse each
  * fragment separately, since the only way to know the difference
  * between a "---" that is part of a patch, and a "---" that starts
@@ -1712,11 +1724,14 @@ static int parse_fragment(struct apply_state *state,
 			if (!deleted && !added)
 				leading++;
 			trailing++;
+			check_old_for_crlf(patch, line, len);
 			if (!state->apply_in_reverse &&
 			    state->ws_error_action == correct_ws_error)
 				check_whitespace(state, line, len, patch->ws_rule);
 			break;
 		case '-':
+			if (!state->apply_in_reverse)
+				check_old_for_crlf(patch, line, len);
 			if (state->apply_in_reverse &&
 			    state->ws_error_action != nowarn_ws_error)
 				check_whitespace(state, line, len, patch->ws_rule);
@@ -1725,6 +1740,8 @@ static int parse_fragment(struct apply_state *state,
 			trailing = 0;
 			break;
 		case '+':
+			if (state->apply_in_reverse)
+				check_old_for_crlf(patch, line, len);
 			if (!state->apply_in_reverse &&
 			    state->ws_error_action != nowarn_ws_error)
 				check_whitespace(state, line, len, patch->ws_rule);
@@ -2089,10 +2106,9 @@ static int use_patch(struct apply_state *state, struct patch *p)
 	int i;
 
 	/* Paths outside are not touched regardless of "--include" */
-	if (0 < state->prefix_length) {
-		int pathlen = strlen(pathname);
-		if (pathlen <= state->prefix_length ||
-		    memcmp(state->prefix, pathname, state->prefix_length))
+	if (state->prefix && *state->prefix) {
+		const char *rest;
+		if (!skip_prefix(pathname, state->prefix, &rest) || !*rest)
 			return 0;
 	}
 
@@ -2268,8 +2284,11 @@ static void show_stats(struct apply_state *state, struct patch *patch)
 		add, pluses, del, minuses);
 }
 
-static int read_old_data(struct stat *st, const char *path, struct strbuf *buf)
+static int read_old_data(struct stat *st, struct patch *patch,
+			 const char *path, struct strbuf *buf)
 {
+	enum safe_crlf safe_crlf = patch->crlf_in_old ?
+		SAFE_CRLF_KEEP_CRLF : SAFE_CRLF_RENORMALIZE;
 	switch (st->st_mode & S_IFMT) {
 	case S_IFLNK:
 		if (strbuf_readlink(buf, path, st->st_size) < 0)
@@ -2278,7 +2297,15 @@ static int read_old_data(struct stat *st, const char *path, struct strbuf *buf)
 	case S_IFREG:
 		if (strbuf_read_file(buf, path, st->st_size) != st->st_size)
 			return error(_("unable to open or read %s"), path);
-		convert_to_git(&the_index, path, buf->buf, buf->len, buf, 0);
+		/*
+		 * "git apply" without "--index/--cached" should never look
+		 * at the index; the target file may not have been added to
+		 * the index yet, and we may not even be in any Git repository.
+		 * Pass NULL to convert_to_git() to stress this; the function
+		 * should never look at the index when explicit crlf option
+		 * is given.
+		 */
+		convert_to_git(NULL, path, buf->buf, buf->len, buf, safe_crlf);
 		return 0;
 	default:
 		return -1;
@@ -2809,13 +2836,10 @@ static void update_image(struct apply_state *state,
 		img->line_allocated = img->line;
 	}
 	if (preimage_limit != postimage->nr)
-		memmove(img->line + applied_pos + postimage->nr,
-			img->line + applied_pos + preimage_limit,
-			(img->nr - (applied_pos + preimage_limit)) *
-			sizeof(*img->line));
-	memcpy(img->line + applied_pos,
-	       postimage->line,
-	       postimage->nr * sizeof(*img->line));
+		MOVE_ARRAY(img->line + applied_pos + postimage->nr,
+			   img->line + applied_pos + preimage_limit,
+			   img->nr - (applied_pos + preimage_limit));
+	COPY_ARRAY(img->line + applied_pos, postimage->line, postimage->nr);
 	if (!state->allow_overlap)
 		for (i = 0; i < postimage->nr; i++)
 			img->line[applied_pos + i].flag |= LINE_PATCHED;
@@ -2896,6 +2920,7 @@ static int apply_one_fragment(struct apply_state *state,
 			if (plen && (ws_rule & WS_BLANK_AT_EOF) &&
 			    ws_blank_line(patch + 1, plen, ws_rule))
 				is_blank_context = 1;
+			/* fallthrough */
 		case '-':
 			memcpy(old, patch + 1, plen);
 			add_line_info(&preimage, old, plen,
@@ -2903,7 +2928,7 @@ static int apply_one_fragment(struct apply_state *state,
 			old += plen;
 			if (first == '-')
 				break;
-		/* Fall-through for ' ' */
+			/* fallthrough */
 		case '+':
 			/* --no-add does not add new lines */
 			if (first == '+' && state->no_add)
@@ -3384,6 +3409,7 @@ static int load_patch_target(struct apply_state *state,
 			     struct strbuf *buf,
 			     const struct cache_entry *ce,
 			     struct stat *st,
+			     struct patch *patch,
 			     const char *name,
 			     unsigned expected_mode)
 {
@@ -3399,7 +3425,7 @@ static int load_patch_target(struct apply_state *state,
 		} else if (has_symlink_leading_path(name, strlen(name))) {
 			return error(_("reading from '%s' beyond a symbolic link"), name);
 		} else {
-			if (read_old_data(st, name, buf))
+			if (read_old_data(st, patch, name, buf))
 				return error(_("failed to read %s"), name);
 		}
 	}
@@ -3432,7 +3458,7 @@ static int load_preimage(struct apply_state *state,
 		/* We have a patched copy in memory; use that. */
 		strbuf_add(&buf, previous->result, previous->resultsize);
 	} else {
-		status = load_patch_target(state, &buf, ce, st,
+		status = load_patch_target(state, &buf, ce, st, patch,
 					   patch->old_name, patch->old_mode);
 		if (status < 0)
 			return status;
@@ -3520,7 +3546,7 @@ static int load_current(struct apply_state *state,
 	if (verify_index_match(ce, &st))
 		return error(_("%s: does not match index"), name);
 
-	status = load_patch_target(state, &buf, ce, &st, name, mode);
+	status = load_patch_target(state, &buf, ce, &st, patch, name, mode);
 	if (status < 0)
 		return status;
 	else if (status)
@@ -3551,7 +3577,7 @@ static int try_threeway(struct apply_state *state,
 	/* Preimage the patch was prepared for */
 	if (patch->is_new)
 		write_sha1_file("", 0, blob_type, pre_oid.hash);
-	else if (get_sha1(patch->old_sha1_prefix, pre_oid.hash) ||
+	else if (get_oid(patch->old_sha1_prefix, &pre_oid) ||
 		 read_blob_object(&buf, &pre_oid, patch->old_mode))
 		return error(_("repository lacks the necessary blob to fall back on 3-way merge."));
 
@@ -4075,7 +4101,7 @@ static int build_fake_ancestor(struct apply_state *state, struct patch *list)
 			else
 				return error(_("sha1 information is lacking or "
 					       "useless for submodule %s"), name);
-		} else if (!get_sha1_blob(patch->old_sha1_prefix, oid.hash)) {
+		} else if (!get_oid_blob(patch->old_sha1_prefix, &oid)) {
 			; /* ok */
 		} else if (!patch->lines_added && !patch->lines_deleted) {
 			/* mode-only change: update the current */

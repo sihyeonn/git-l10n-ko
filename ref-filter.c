@@ -82,6 +82,7 @@ static struct used_atom {
 		} remote_ref;
 		struct {
 			enum { C_BARE, C_BODY, C_BODY_DEP, C_LINES, C_SIG, C_SUB, C_TRAILERS } option;
+			struct process_trailer_options trailer_opts;
 			unsigned int nlines;
 		} contents;
 		struct {
@@ -97,14 +98,19 @@ static struct used_atom {
 	} u;
 } *used_atom;
 static int used_atom_cnt, need_tagged, need_symref;
-static int need_color_reset_at_eol;
 
-static void color_atom_parser(struct used_atom *atom, const char *color_value)
+static void color_atom_parser(const struct ref_format *format, struct used_atom *atom, const char *color_value)
 {
 	if (!color_value)
 		die(_("expected format: %%(color:<color>)"));
 	if (color_parse(color_value, atom->u.color) < 0)
 		die(_("unrecognized color: %%(color:%s)"), color_value);
+	/*
+	 * We check this after we've parsed the color, which lets us complain
+	 * about syntactically bogus color names even if they won't be used.
+	 */
+	if (!want_color(format->use_color))
+		color_parse("", atom->u.color);
 }
 
 static void refname_atom_parser_internal(struct refname_atom *atom,
@@ -127,7 +133,7 @@ static void refname_atom_parser_internal(struct refname_atom *atom,
 		die(_("unrecognized %%(%s) argument: %s"), name, arg);
 }
 
-static void remote_ref_atom_parser(struct used_atom *atom, const char *arg)
+static void remote_ref_atom_parser(const struct ref_format *format, struct used_atom *atom, const char *arg)
 {
 	struct string_list params = STRING_LIST_INIT_DUP;
 	int i;
@@ -161,28 +167,42 @@ static void remote_ref_atom_parser(struct used_atom *atom, const char *arg)
 	string_list_clear(&params, 0);
 }
 
-static void body_atom_parser(struct used_atom *atom, const char *arg)
+static void body_atom_parser(const struct ref_format *format, struct used_atom *atom, const char *arg)
 {
 	if (arg)
 		die(_("%%(body) does not take arguments"));
 	atom->u.contents.option = C_BODY_DEP;
 }
 
-static void subject_atom_parser(struct used_atom *atom, const char *arg)
+static void subject_atom_parser(const struct ref_format *format, struct used_atom *atom, const char *arg)
 {
 	if (arg)
 		die(_("%%(subject) does not take arguments"));
 	atom->u.contents.option = C_SUB;
 }
 
-static void trailers_atom_parser(struct used_atom *atom, const char *arg)
+static void trailers_atom_parser(const struct ref_format *format, struct used_atom *atom, const char *arg)
 {
-	if (arg)
-		die(_("%%(trailers) does not take arguments"));
+	struct string_list params = STRING_LIST_INIT_DUP;
+	int i;
+
+	if (arg) {
+		string_list_split(&params, arg, ',', -1);
+		for (i = 0; i < params.nr; i++) {
+			const char *s = params.items[i].string;
+			if (!strcmp(s, "unfold"))
+				atom->u.contents.trailer_opts.unfold = 1;
+			else if (!strcmp(s, "only"))
+				atom->u.contents.trailer_opts.only_trailers = 1;
+			else
+				die(_("unknown %%(trailers) argument: %s"), s);
+		}
+	}
 	atom->u.contents.option = C_TRAILERS;
+	string_list_clear(&params, 0);
 }
 
-static void contents_atom_parser(struct used_atom *atom, const char *arg)
+static void contents_atom_parser(const struct ref_format *format, struct used_atom *atom, const char *arg)
 {
 	if (!arg)
 		atom->u.contents.option = C_BARE;
@@ -192,9 +212,10 @@ static void contents_atom_parser(struct used_atom *atom, const char *arg)
 		atom->u.contents.option = C_SIG;
 	else if (!strcmp(arg, "subject"))
 		atom->u.contents.option = C_SUB;
-	else if (!strcmp(arg, "trailers"))
-		atom->u.contents.option = C_TRAILERS;
-	else if (skip_prefix(arg, "lines=", &arg)) {
+	else if (skip_prefix(arg, "trailers", &arg)) {
+		skip_prefix(arg, ":", &arg);
+		trailers_atom_parser(format, atom, *arg ? arg : NULL);
+	} else if (skip_prefix(arg, "lines=", &arg)) {
 		atom->u.contents.option = C_LINES;
 		if (strtoul_ui(arg, 10, &atom->u.contents.nlines))
 			die(_("positive value expected contents:lines=%s"), arg);
@@ -202,7 +223,7 @@ static void contents_atom_parser(struct used_atom *atom, const char *arg)
 		die(_("unrecognized %%(contents) argument: %s"), arg);
 }
 
-static void objectname_atom_parser(struct used_atom *atom, const char *arg)
+static void objectname_atom_parser(const struct ref_format *format, struct used_atom *atom, const char *arg)
 {
 	if (!arg)
 		atom->u.objectname.option = O_FULL;
@@ -219,7 +240,7 @@ static void objectname_atom_parser(struct used_atom *atom, const char *arg)
 		die(_("unrecognized %%(objectname) argument: %s"), arg);
 }
 
-static void refname_atom_parser(struct used_atom *atom, const char *arg)
+static void refname_atom_parser(const struct ref_format *format, struct used_atom *atom, const char *arg)
 {
 	refname_atom_parser_internal(&atom->u.refname, arg, atom->name);
 }
@@ -235,7 +256,7 @@ static align_type parse_align_position(const char *s)
 	return -1;
 }
 
-static void align_atom_parser(struct used_atom *atom, const char *arg)
+static void align_atom_parser(const struct ref_format *format, struct used_atom *atom, const char *arg)
 {
 	struct align *align = &atom->u.align;
 	struct string_list params = STRING_LIST_INIT_DUP;
@@ -274,7 +295,7 @@ static void align_atom_parser(struct used_atom *atom, const char *arg)
 	string_list_clear(&params, 0);
 }
 
-static void if_atom_parser(struct used_atom *atom, const char *arg)
+static void if_atom_parser(const struct ref_format *format, struct used_atom *atom, const char *arg)
 {
 	if (!arg) {
 		atom->u.if_then_else.cmp_status = COMPARE_NONE;
@@ -288,17 +309,15 @@ static void if_atom_parser(struct used_atom *atom, const char *arg)
 	}
 }
 
-static void head_atom_parser(struct used_atom *atom, const char *arg)
+static void head_atom_parser(const struct ref_format *format, struct used_atom *atom, const char *arg)
 {
-	struct object_id unused;
-
-	atom->u.head = resolve_refdup("HEAD", RESOLVE_REF_READING, unused.hash, NULL);
+	atom->u.head = resolve_refdup("HEAD", RESOLVE_REF_READING, NULL, NULL);
 }
 
 static struct {
 	const char *name;
 	cmp_type cmp_type;
-	void (*parser)(struct used_atom *atom, const char *arg);
+	void (*parser)(const struct ref_format *format, struct used_atom *atom, const char *arg);
 } valid_atom[] = {
 	{ "refname" , FIELD_STR, refname_atom_parser },
 	{ "objecttype" },
@@ -365,7 +384,8 @@ struct atom_value {
 /*
  * Used to parse format string and sort specifiers
  */
-int parse_ref_filter_atom(const char *atom, const char *ep)
+static int parse_ref_filter_atom(const struct ref_format *format,
+				 const char *atom, const char *ep)
 {
 	const char *sp;
 	const char *arg;
@@ -409,11 +429,19 @@ int parse_ref_filter_atom(const char *atom, const char *ep)
 	REALLOC_ARRAY(used_atom, used_atom_cnt);
 	used_atom[at].name = xmemdupz(atom, ep - atom);
 	used_atom[at].type = valid_atom[i].cmp_type;
-	if (arg)
+	if (arg) {
 		arg = used_atom[at].name + (arg - atom) + 1;
+		if (!*arg) {
+			/*
+			 * Treat empty sub-arguments list as NULL (i.e.,
+			 * "%(atom:)" is equivalent to "%(atom)").
+			 */
+			arg = NULL;
+		}
+	}
 	memset(&used_atom[at].u, 0, sizeof(used_atom[at].u));
 	if (valid_atom[i].parser)
-		valid_atom[i].parser(&used_atom[at], arg);
+		valid_atom[i].parser(format, &used_atom[at], arg);
 	if (*atom == '*')
 		need_tagged = 1;
 	if (!strcmp(valid_atom[i].name, "symref"))
@@ -657,24 +685,26 @@ static const char *find_next(const char *cp)
  * Make sure the format string is well formed, and parse out
  * the used atoms.
  */
-int verify_ref_format(const char *format)
+int verify_ref_format(struct ref_format *format)
 {
 	const char *cp, *sp;
 
-	need_color_reset_at_eol = 0;
-	for (cp = format; *cp && (sp = find_next(cp)); ) {
+	format->need_color_reset_at_eol = 0;
+	for (cp = format->format; *cp && (sp = find_next(cp)); ) {
 		const char *color, *ep = strchr(sp, ')');
 		int at;
 
 		if (!ep)
 			return error(_("malformed format string %s"), sp);
 		/* sp points at "%(" and ep points at the closing ")" */
-		at = parse_ref_filter_atom(sp + 2, ep);
+		at = parse_ref_filter_atom(format, sp + 2, ep);
 		cp = ep + 1;
 
 		if (skip_prefix(used_atom[at].name, "color:", &color))
-			need_color_reset_at_eol = !!strcmp(color, "reset");
+			format->need_color_reset_at_eol = !!strcmp(color, "reset");
 	}
+	if (format->need_color_reset_at_eol && !want_color(format->use_color))
+		format->need_color_reset_at_eol = 0;
 	return 0;
 }
 
@@ -1034,7 +1064,7 @@ static void grab_sub_body_contents(struct atom_value *val, int deref, struct obj
 			name++;
 		if (strcmp(name, "subject") &&
 		    strcmp(name, "body") &&
-		    strcmp(name, "trailers") &&
+		    !starts_with(name, "trailers") &&
 		    !starts_with(name, "contents"))
 			continue;
 		if (!subpos)
@@ -1059,13 +1089,12 @@ static void grab_sub_body_contents(struct atom_value *val, int deref, struct obj
 			append_lines(&s, subpos, contents_end - subpos, atom->u.contents.nlines);
 			v->s = strbuf_detach(&s, NULL);
 		} else if (atom->u.contents.option == C_TRAILERS) {
-			struct trailer_info info;
+			struct strbuf s = STRBUF_INIT;
 
-			/* Search for trailer info */
-			trailer_info_get(&info, subpos);
-			v->s = xmemdupz(info.trailer_start,
-					info.trailer_end - info.trailer_start);
-			trailer_info_release(&info);
+			/* Format the trailer info according to the trailer_opts given */
+			format_trailers_from_commit(&s, subpos, &atom->u.contents.trailer_opts);
+
+			v->s = strbuf_detach(&s, NULL);
 		} else if (atom->u.contents.option == C_BARE)
 			v->s = xstrdup(subpos);
 	}
@@ -1309,9 +1338,8 @@ static void populate_value(struct ref_array_item *ref)
 	ref->value = xcalloc(used_atom_cnt, sizeof(struct atom_value));
 
 	if (need_symref && (ref->flag & REF_ISSYMREF) && !ref->symref) {
-		struct object_id unused1;
 		ref->symref = resolve_refdup(ref->refname, RESOLVE_REF_READING,
-					     unused1.hash, NULL);
+					     NULL, NULL);
 		if (!ref->symref)
 			ref->symref = "";
 	}
@@ -2060,35 +2088,34 @@ static void append_literal(const char *cp, const char *ep, struct ref_formatting
 	}
 }
 
-void format_ref_array_item(struct ref_array_item *info, const char *format,
-			   int quote_style, struct strbuf *final_buf)
+void format_ref_array_item(struct ref_array_item *info,
+			   const struct ref_format *format,
+			   struct strbuf *final_buf)
 {
 	const char *cp, *sp, *ep;
 	struct ref_formatting_state state = REF_FORMATTING_STATE_INIT;
 
-	state.quote_style = quote_style;
+	state.quote_style = format->quote_style;
 	push_stack_element(&state.stack);
 
-	for (cp = format; *cp && (sp = find_next(cp)); cp = ep + 1) {
+	for (cp = format->format; *cp && (sp = find_next(cp)); cp = ep + 1) {
 		struct atom_value *atomv;
 
 		ep = strchr(sp, ')');
 		if (cp < sp)
 			append_literal(cp, sp, &state);
-		get_ref_atom_value(info, parse_ref_filter_atom(sp + 2, ep), &atomv);
+		get_ref_atom_value(info,
+				   parse_ref_filter_atom(format, sp + 2, ep),
+				   &atomv);
 		atomv->handler(atomv, &state);
 	}
 	if (*cp) {
 		sp = cp + strlen(cp);
 		append_literal(cp, sp, &state);
 	}
-	if (need_color_reset_at_eol) {
+	if (format->need_color_reset_at_eol) {
 		struct atom_value resetv;
-		char color[COLOR_MAXLEN] = "";
-
-		if (color_parse("reset", color) < 0)
-			die("BUG: couldn't parse 'reset' as a color");
-		resetv.s = color;
+		resetv.s = GIT_COLOR_RESET;
 		append_atom(&resetv, &state);
 	}
 	if (state.stack->prev)
@@ -2097,24 +2124,36 @@ void format_ref_array_item(struct ref_array_item *info, const char *format,
 	pop_stack_element(&state.stack);
 }
 
-void show_ref_array_item(struct ref_array_item *info, const char *format, int quote_style)
+void show_ref_array_item(struct ref_array_item *info,
+			 const struct ref_format *format)
 {
 	struct strbuf final_buf = STRBUF_INIT;
 
-	format_ref_array_item(info, format, quote_style, &final_buf);
+	format_ref_array_item(info, format, &final_buf);
 	fwrite(final_buf.buf, 1, final_buf.len, stdout);
 	strbuf_release(&final_buf);
 	putchar('\n');
 }
 
 void pretty_print_ref(const char *name, const unsigned char *sha1,
-		const char *format)
+		      const struct ref_format *format)
 {
 	struct ref_array_item *ref_item;
 	ref_item = new_ref_array_item(name, sha1, 0);
 	ref_item->kind = ref_kind_from_refname(name);
-	show_ref_array_item(ref_item, format, 0);
+	show_ref_array_item(ref_item, format);
 	free_array_item(ref_item);
+}
+
+static int parse_sorting_atom(const char *atom)
+{
+	/*
+	 * This parses an atom using a dummy ref_format, since we don't
+	 * actually care about the formatting details.
+	 */
+	struct ref_format dummy = REF_FORMAT_INIT;
+	const char *end = atom + strlen(atom);
+	return parse_ref_filter_atom(&dummy, atom, end);
 }
 
 /*  If no sorting option is given, use refname to sort as default */
@@ -2125,18 +2164,13 @@ struct ref_sorting *ref_default_sorting(void)
 	struct ref_sorting *sorting = xcalloc(1, sizeof(*sorting));
 
 	sorting->next = NULL;
-	sorting->atom = parse_ref_filter_atom(cstr_name, cstr_name + strlen(cstr_name));
+	sorting->atom = parse_sorting_atom(cstr_name);
 	return sorting;
 }
 
-int parse_opt_ref_sorting(const struct option *opt, const char *arg, int unset)
+void parse_ref_sorting(struct ref_sorting **sorting_tail, const char *arg)
 {
-	struct ref_sorting **sorting_tail = opt->value;
 	struct ref_sorting *s;
-	int len;
-
-	if (!arg) /* should --no-sort void the list ? */
-		return -1;
 
 	s = xcalloc(1, sizeof(*s));
 	s->next = *sorting_tail;
@@ -2149,8 +2183,14 @@ int parse_opt_ref_sorting(const struct option *opt, const char *arg, int unset)
 	if (skip_prefix(arg, "version:", &arg) ||
 	    skip_prefix(arg, "v:", &arg))
 		s->version = 1;
-	len = strlen(arg);
-	s->atom = parse_ref_filter_atom(arg, arg+len);
+	s->atom = parse_sorting_atom(arg);
+}
+
+int parse_opt_ref_sorting(const struct option *opt, const char *arg, int unset)
+{
+	if (!arg) /* should --no-sort void the list ? */
+		return -1;
+	parse_ref_sorting(opt->value, arg);
 	return 0;
 }
 

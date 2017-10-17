@@ -15,10 +15,13 @@
 #include "progress.h"
 #include "streaming.h"
 #include "decorate.h"
+#include "packfile.h"
 
 #define REACHABLE 0x0001
 #define SEEN      0x0002
 #define HAS_OBJ   0x0004
+/* This flag is set if something points to this object. */
+#define USED      0x0008
 
 static int show_root;
 static int show_tags;
@@ -168,18 +171,7 @@ static void mark_object_reachable(struct object *obj)
 
 static int traverse_one_object(struct object *obj)
 {
-	int result;
-	struct tree *tree = NULL;
-
-	if (obj->type == OBJ_TREE) {
-		tree = (struct tree *)obj;
-		if (parse_tree(tree) < 0)
-			return 1; /* error already displayed */
-	}
-	result = fsck_walk(obj, obj, &fsck_walk_options);
-	if (tree)
-		free_tree_buffer(tree);
-	return result;
+	return fsck_walk(obj, obj, &fsck_walk_options);
 }
 
 static int traverse_reachable(void)
@@ -188,14 +180,9 @@ static int traverse_reachable(void)
 	unsigned int nr = 0;
 	int result = 0;
 	if (show_progress)
-		progress = start_progress_delay(_("Checking connectivity"), 0, 0, 2);
+		progress = start_delayed_progress(_("Checking connectivity"), 0);
 	while (pending.nr) {
-		struct object_array_entry *entry;
-		struct object *obj;
-
-		entry = pending.objects + --pending.nr;
-		obj = entry->item;
-		result |= traverse_one_object(obj);
+		result |= traverse_one_object(object_array_pop(&pending));
 		display_progress(progress, ++nr);
 	}
 	stop_progress(&progress);
@@ -206,7 +193,7 @@ static int mark_used(struct object *obj, int type, void *data, struct fsck_optio
 {
 	if (!obj)
 		return 1;
-	obj->used = 1;
+	obj->flags |= USED;
 	return 0;
 }
 
@@ -255,7 +242,7 @@ static void check_unreachable_object(struct object *obj)
 	}
 
 	/*
-	 * "!used" means that nothing at all points to it, including
+	 * "!USED" means that nothing at all points to it, including
 	 * other unreachable objects. In other words, it's the "tip"
 	 * of some set of unreachable objects, usually a commit that
 	 * got dropped.
@@ -266,7 +253,7 @@ static void check_unreachable_object(struct object *obj)
 	 * deleted a branch by mistake, this is a prime candidate to
 	 * start looking at, for example.
 	 */
-	if (!obj->used) {
+	if (!(obj->flags & USED)) {
 		if (show_dangling)
 			printf("dangling %s %s\n", printable_type(obj),
 			       describe_object(obj));
@@ -335,6 +322,8 @@ static void check_connectivity(void)
 
 static int fsck_obj(struct object *obj)
 {
+	int err;
+
 	if (obj->flags & SEEN)
 		return 0;
 	obj->flags |= SEEN;
@@ -345,19 +334,12 @@ static int fsck_obj(struct object *obj)
 
 	if (fsck_walk(obj, NULL, &fsck_obj_options))
 		objerror(obj, "broken links");
-	if (fsck_object(obj, NULL, 0, &fsck_obj_options))
-		return -1;
-
-	if (obj->type == OBJ_TREE) {
-		struct tree *item = (struct tree *) obj;
-
-		free_tree_buffer(item);
-	}
+	err = fsck_object(obj, NULL, 0, &fsck_obj_options);
+	if (err)
+		goto out;
 
 	if (obj->type == OBJ_COMMIT) {
 		struct commit *commit = (struct commit *) obj;
-
-		free_commit_buffer(commit);
 
 		if (!commit->parents && show_root)
 			printf("root %s\n", describe_object(&commit->object));
@@ -374,7 +356,12 @@ static int fsck_obj(struct object *obj)
 		}
 	}
 
-	return 0;
+out:
+	if (obj->type == OBJ_TREE)
+		free_tree_buffer((struct tree *)obj);
+	if (obj->type == OBJ_COMMIT)
+		free_commit_buffer((struct commit *)obj);
+	return err;
 }
 
 static int fsck_obj_buffer(const struct object_id *oid, enum object_type type,
@@ -390,7 +377,8 @@ static int fsck_obj_buffer(const struct object_id *oid, enum object_type type,
 		errors_found |= ERROR_OBJECT;
 		return error("%s: object corrupt or missing", oid_to_hex(oid));
 	}
-	obj->flags = HAS_OBJ;
+	obj->flags &= ~(REACHABLE | SEEN);
+	obj->flags |= HAS_OBJ;
 	return fsck_obj(obj);
 }
 
@@ -408,7 +396,7 @@ static void fsck_handle_reflog_oid(const char *refname, struct object_id *oid,
 				add_decoration(fsck_walk_options.object_names,
 					obj,
 					xstrfmt("%s@{%"PRItime"}", refname, timestamp));
-			obj->used = 1;
+			obj->flags |= USED;
 			mark_object_reachable(obj);
 		} else {
 			error("%s: invalid reflog entry %s", refname, oid_to_hex(oid));
@@ -456,7 +444,7 @@ static int fsck_handle_ref(const char *refname, const struct object_id *oid,
 		errors_found |= ERROR_REFS;
 	}
 	default_refs++;
-	obj->used = 1;
+	obj->flags |= USED;
 	if (name_objects)
 		add_decoration(fsck_walk_options.object_names,
 			obj, xstrdup(refname));
@@ -524,7 +512,8 @@ static int fsck_loose(const struct object_id *oid, const char *path, void *data)
 		return 0; /* keep checking other objects */
 	}
 
-	obj->flags = HAS_OBJ;
+	obj->flags &= ~(REACHABLE | SEEN);
+	obj->flags |= HAS_OBJ;
 	if (fsck_obj(obj))
 		errors_found |= ERROR_OBJECT;
 	return 0;
@@ -606,7 +595,7 @@ static int fsck_cache_tree(struct cache_tree *it)
 			errors_found |= ERROR_REFS;
 			return 1;
 		}
-		obj->used = 1;
+		obj->flags |= USED;
 		if (name_objects)
 			add_decoration(fsck_walk_options.object_names,
 				obj, xstrdup(":"));
@@ -667,7 +656,7 @@ static struct option fsck_opts[] = {
 
 int cmd_fsck(int argc, const char **argv, const char *prefix)
 {
-	int i, heads;
+	int i;
 	struct alternate_object_database *alt;
 
 	errors_found = 0;
@@ -735,25 +724,23 @@ int cmd_fsck(int argc, const char **argv, const char *prefix)
 		}
 	}
 
-	heads = 0;
 	for (i = 0; i < argc; i++) {
 		const char *arg = argv[i];
-		unsigned char sha1[20];
-		if (!get_sha1(arg, sha1)) {
-			struct object *obj = lookup_object(sha1);
+		struct object_id oid;
+		if (!get_oid(arg, &oid)) {
+			struct object *obj = lookup_object(oid.hash);
 
 			if (!obj || !(obj->flags & HAS_OBJ)) {
-				error("%s: object missing", sha1_to_hex(sha1));
+				error("%s: object missing", oid_to_hex(&oid));
 				errors_found |= ERROR_OBJECT;
 				continue;
 			}
 
-			obj->used = 1;
+			obj->flags |= USED;
 			if (name_objects)
 				add_decoration(fsck_walk_options.object_names,
 					obj, xstrdup(arg));
 			mark_object_reachable(obj);
-			heads++;
 			continue;
 		}
 		error("invalid parameter: expected sha1, got '%s'", arg);
@@ -785,7 +772,7 @@ int cmd_fsck(int argc, const char **argv, const char *prefix)
 			if (!blob)
 				continue;
 			obj = &blob->object;
-			obj->used = 1;
+			obj->flags |= USED;
 			if (name_objects)
 				add_decoration(fsck_walk_options.object_names,
 					obj,

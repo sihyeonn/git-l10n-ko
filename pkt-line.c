@@ -94,9 +94,9 @@ void packet_flush(int fd)
 int packet_flush_gently(int fd)
 {
 	packet_trace("0000", 4, 1);
-	if (write_in_full(fd, "0000", 4) == 4)
-		return 0;
-	return error("flush packet write failed");
+	if (write_in_full(fd, "0000", 4) < 0)
+		return error("flush packet write failed");
+	return 0;
 }
 
 void packet_buf_flush(struct strbuf *buf)
@@ -136,19 +136,19 @@ static void format_packet(struct strbuf *out, const char *fmt, va_list args)
 static int packet_write_fmt_1(int fd, int gently,
 			      const char *fmt, va_list args)
 {
-	struct strbuf buf = STRBUF_INIT;
-	ssize_t count;
+	static struct strbuf buf = STRBUF_INIT;
 
+	strbuf_reset(&buf);
 	format_packet(&buf, fmt, args);
-	count = write_in_full(fd, buf.buf, buf.len);
-	if (count == buf.len)
-		return 0;
-
-	if (!gently) {
-		check_pipe(errno);
-		die_errno("packet write with format failed");
+	if (write_in_full(fd, buf.buf, buf.len) < 0) {
+		if (!gently) {
+			check_pipe(errno);
+			die_errno("packet write with format failed");
+		}
+		return error("packet write with format failed");
 	}
-	return error("packet write with format failed");
+
+	return 0;
 }
 
 void packet_write_fmt(int fd, const char *fmt, ...)
@@ -171,25 +171,6 @@ int packet_write_fmt_gently(int fd, const char *fmt, ...)
 	return status;
 }
 
-int packet_writel(int fd, const char *line, ...)
-{
-	va_list args;
-	int err;
-	va_start(args, line);
-	for (;;) {
-		if (!line)
-			break;
-		if (strlen(line) > LARGE_PACKET_DATA_MAX)
-			return -1;
-		err = packet_write_fmt_gently(fd, "%s\n", line);
-		if (err)
-			return err;
-		line = va_arg(args, const char*);
-	}
-	va_end(args);
-	return packet_flush_gently(fd);
-}
-
 static int packet_write_gently(const int fd_out, const char *buf, size_t size)
 {
 	static char packet_write_buffer[LARGE_PACKET_MAX];
@@ -202,9 +183,9 @@ static int packet_write_gently(const int fd_out, const char *buf, size_t size)
 	packet_size = size + 4;
 	set_packet_header(packet_write_buffer, packet_size);
 	memcpy(packet_write_buffer + 4, buf, size);
-	if (write_in_full(fd_out, packet_write_buffer, packet_size) == packet_size)
-		return 0;
-	return error("packet write failed");
+	if (write_in_full(fd_out, packet_write_buffer, packet_size) < 0)
+		return error("packet write failed");
+	return 0;
 }
 
 void packet_buf_write(struct strbuf *buf, const char *fmt, ...)
@@ -277,7 +258,7 @@ static int get_packet_data(int fd, char **src_buf, size_t *src_size,
 	}
 
 	/* And complain if we didn't get enough bytes to satisfy the read. */
-	if (ret < size) {
+	if (ret != size) {
 		if (options & PACKET_READ_GENTLE_ON_EOF)
 			return -1;
 

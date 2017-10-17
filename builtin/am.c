@@ -31,6 +31,7 @@
 #include "mailinfo.h"
 #include "apply.h"
 #include "string-list.h"
+#include "packfile.h"
 
 /**
  * Returns 1 if the file is empty or does not exist, 0 otherwise.
@@ -431,6 +432,14 @@ static void am_load(struct am_state *state)
 	read_state_file(&sb, state, "utf8", 1);
 	state->utf8 = !strcmp(sb.buf, "t");
 
+	if (file_exists(am_path(state, "rerere-autoupdate"))) {
+		read_state_file(&sb, state, "rerere-autoupdate", 1);
+		state->allow_rerere_autoupdate = strcmp(sb.buf, "t") ?
+			RERERE_NOAUTOUPDATE : RERERE_AUTOUPDATE;
+	} else {
+		state->allow_rerere_autoupdate = 0;
+	}
+
 	read_state_file(&sb, state, "keep", 1);
 	if (!strcmp(sb.buf, "t"))
 		state->keep = KEEP_TRUE;
@@ -662,9 +671,7 @@ static int detect_patch_format(const char **paths)
 		goto done;
 	}
 
-	strbuf_reset(&l2);
 	strbuf_getline(&l2, fp);
-	strbuf_reset(&l3);
 	strbuf_getline(&l3, fp);
 
 	/*
@@ -687,6 +694,8 @@ static int detect_patch_format(const char **paths)
 done:
 	fclose(fp);
 	strbuf_release(&l1);
+	strbuf_release(&l2);
+	strbuf_release(&l3);
 	return ret;
 }
 
@@ -872,6 +881,7 @@ static int split_mail_stgit_series(struct am_state *state, const char **paths,
 static int hg_patch_to_mail(FILE *out, FILE *in, int keep_cr)
 {
 	struct strbuf sb = STRBUF_INIT;
+	int rc = 0;
 
 	while (!strbuf_getline_lf(&sb, in)) {
 		const char *str;
@@ -885,19 +895,27 @@ static int hg_patch_to_mail(FILE *out, FILE *in, int keep_cr)
 
 			errno = 0;
 			timestamp = parse_timestamp(str, &end, 10);
-			if (errno)
-				return error(_("invalid timestamp"));
+			if (errno) {
+				rc = error(_("invalid timestamp"));
+				goto exit;
+			}
 
-			if (!skip_prefix(end, " ", &str))
-				return error(_("invalid Date line"));
+			if (!skip_prefix(end, " ", &str)) {
+				rc = error(_("invalid Date line"));
+				goto exit;
+			}
 
 			errno = 0;
 			tz = strtol(str, &end, 10);
-			if (errno)
-				return error(_("invalid timezone offset"));
+			if (errno) {
+				rc = error(_("invalid timezone offset"));
+				goto exit;
+			}
 
-			if (*end)
-				return error(_("invalid Date line"));
+			if (*end) {
+				rc = error(_("invalid Date line"));
+				goto exit;
+			}
 
 			/*
 			 * mercurial's timezone is in seconds west of UTC,
@@ -922,9 +940,9 @@ static int hg_patch_to_mail(FILE *out, FILE *in, int keep_cr)
 		fwrite(sb.buf, 1, sb.len, out);
 		strbuf_reset(&sb);
 	}
-
+exit:
 	strbuf_release(&sb);
-	return 0;
+	return rc;
 }
 
 /**
@@ -1002,6 +1020,10 @@ static void am_setup(struct am_state *state, enum patch_format patch_format,
 	write_state_bool(state, "quiet", state->quiet);
 	write_state_bool(state, "sign", state->signoff);
 	write_state_bool(state, "utf8", state->utf8);
+
+	if (state->allow_rerere_autoupdate)
+		write_state_bool(state, "rerere-autoupdate",
+			 state->allow_rerere_autoupdate == RERERE_AUTOUPDATE);
 
 	switch (state->keep) {
 	case KEEP_FALSE:
@@ -1131,7 +1153,7 @@ static int index_has_changes(struct strbuf *sb)
 	struct object_id head;
 	int i;
 
-	if (!get_sha1_tree("HEAD", head.hash)) {
+	if (!get_oid_tree("HEAD", &head)) {
 		struct diff_options opt;
 
 		diff_setup(&opt);
@@ -1181,34 +1203,10 @@ static void NORETURN die_user_resolve(const struct am_state *state)
  */
 static void am_append_signoff(struct am_state *state)
 {
-	char *cp;
-	struct strbuf mine = STRBUF_INIT;
 	struct strbuf sb = STRBUF_INIT;
 
 	strbuf_attach(&sb, state->msg, state->msg_len, state->msg_len);
-
-	/* our sign-off */
-	strbuf_addf(&mine, "\n%s%s\n",
-		    sign_off_header,
-		    fmt_name(getenv("GIT_COMMITTER_NAME"),
-			     getenv("GIT_COMMITTER_EMAIL")));
-
-	/* Does sb end with it already? */
-	if (mine.len < sb.len &&
-	    !strcmp(mine.buf, sb.buf + sb.len - mine.len))
-		goto exit; /* no need to duplicate */
-
-	/* Does it have any Signed-off-by: in the text */
-	for (cp = sb.buf;
-	     cp && *cp && (cp = strstr(cp, sign_off_header)) != NULL;
-	     cp = strchr(cp, '\n')) {
-		if (sb.buf == cp || cp[-1] == '\n')
-			break;
-	}
-
-	strbuf_addstr(&sb, mine.buf + !!cp);
-exit:
-	strbuf_release(&mine);
+	append_signoff(&sb, 0, 0);
 	state->msg = strbuf_detach(&sb, &state->msg_len);
 }
 
@@ -1432,7 +1430,7 @@ static void write_index_patch(const struct am_state *state)
 	struct rev_info rev_info;
 	FILE *fp;
 
-	if (!get_sha1_tree("HEAD", head.hash))
+	if (!get_oid_tree("HEAD", &head))
 		tree = lookup_tree(&head);
 	else
 		tree = lookup_tree(&empty_tree_oid);
@@ -1661,7 +1659,7 @@ static void do_commit(const struct am_state *state)
 	if (write_cache_as_tree(tree.hash, 0, NULL))
 		die(_("git write-tree failed to write a tree"));
 
-	if (!get_sha1_commit("HEAD", parent.hash)) {
+	if (!get_oid_commit("HEAD", &parent)) {
 		old_oid = &parent;
 		commit_list_insert(lookup_commit(&parent), &parents);
 	} else {
@@ -2107,6 +2105,7 @@ static int safe_to_abort(const struct am_state *state)
 			die(_("could not parse %s"), am_path(state, "abort-safety"));
 	} else
 		oidclr(&abort_safety);
+	strbuf_release(&sb);
 
 	if (get_oid("HEAD", &head))
 		oidclr(&head);

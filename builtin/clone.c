@@ -25,6 +25,7 @@
 #include "remote.h"
 #include "run-command.h"
 #include "connected.h"
+#include "packfile.h"
 
 /*
  * Overall FIXMEs:
@@ -506,8 +507,8 @@ static void remove_junk(void)
 	if (junk_work_tree) {
 		strbuf_addstr(&sb, junk_work_tree);
 		remove_dir_recursively(&sb, 0);
-		strbuf_reset(&sb);
 	}
+	strbuf_release(&sb);
 }
 
 static void remove_junk_on_signal(int signo)
@@ -767,6 +768,9 @@ static int checkout(int submodule_progress)
 
 		if (submodule_progress)
 			argv_array_push(&args, "--progress");
+
+		if (option_verbosity < 0)
+			argv_array_push(&args, "--quiet");
 
 		err = run_command_v_opt(args.argv, RUN_GIT_CMD);
 		argv_array_clear(&args);

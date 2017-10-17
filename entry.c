@@ -3,6 +3,7 @@
 #include "dir.h"
 #include "streaming.h"
 #include "submodule.h"
+#include "progress.h"
 
 static void create_directories(const char *path, int path_len,
 			       const struct checkout *state)
@@ -137,15 +138,128 @@ static int streaming_write_entry(const struct cache_entry *ce, char *path,
 	return result;
 }
 
+void enable_delayed_checkout(struct checkout *state)
+{
+	if (!state->delayed_checkout) {
+		state->delayed_checkout = xmalloc(sizeof(*state->delayed_checkout));
+		state->delayed_checkout->state = CE_CAN_DELAY;
+		string_list_init(&state->delayed_checkout->filters, 0);
+		string_list_init(&state->delayed_checkout->paths, 0);
+	}
+}
+
+static int remove_available_paths(struct string_list_item *item, void *cb_data)
+{
+	struct string_list *available_paths = cb_data;
+	struct string_list_item *available;
+
+	available = string_list_lookup(available_paths, item->string);
+	if (available)
+		available->util = (void *)item->string;
+	return !available;
+}
+
+int finish_delayed_checkout(struct checkout *state)
+{
+	int errs = 0;
+	unsigned delayed_object_count;
+	off_t filtered_bytes = 0;
+	struct string_list_item *filter, *path;
+	struct progress *progress;
+	struct delayed_checkout *dco = state->delayed_checkout;
+
+	if (!state->delayed_checkout)
+		return errs;
+
+	dco->state = CE_RETRY;
+	delayed_object_count = dco->paths.nr;
+	progress = start_delayed_progress(_("Filtering content"), delayed_object_count);
+	while (dco->filters.nr > 0) {
+		for_each_string_list_item(filter, &dco->filters) {
+			struct string_list available_paths = STRING_LIST_INIT_NODUP;
+			display_progress(progress, delayed_object_count - dco->paths.nr);
+
+			if (!async_query_available_blobs(filter->string, &available_paths)) {
+				/* Filter reported an error */
+				errs = 1;
+				filter->string = "";
+				continue;
+			}
+			if (available_paths.nr <= 0) {
+				/*
+				 * Filter responded with no entries. That means
+				 * the filter is done and we can remove the
+				 * filter from the list (see
+				 * "string_list_remove_empty_items" call below).
+				 */
+				filter->string = "";
+				continue;
+			}
+
+			/*
+			 * In dco->paths we store a list of all delayed paths.
+			 * The filter just send us a list of available paths.
+			 * Remove them from the list.
+			 */
+			filter_string_list(&dco->paths, 0,
+				&remove_available_paths, &available_paths);
+
+			for_each_string_list_item(path, &available_paths) {
+				struct cache_entry* ce;
+
+				if (!path->util) {
+					error("external filter '%s' signaled that '%s' "
+					      "is now available although it has not been "
+					      "delayed earlier",
+					      filter->string, path->string);
+					errs |= 1;
+
+					/*
+					 * Do not ask the filter for available blobs,
+					 * again, as the filter is likely buggy.
+					 */
+					filter->string = "";
+					continue;
+				}
+				ce = index_file_exists(state->istate, path->string,
+						       strlen(path->string), 0);
+				if (ce) {
+					errs |= checkout_entry(ce, state, NULL);
+					filtered_bytes += ce->ce_stat_data.sd_size;
+					display_throughput(progress, filtered_bytes);
+				} else
+					errs = 1;
+			}
+		}
+		string_list_remove_empty_items(&dco->filters, 0);
+	}
+	stop_progress(&progress);
+	string_list_clear(&dco->filters, 0);
+
+	/* At this point we should not have any delayed paths anymore. */
+	errs |= dco->paths.nr;
+	for_each_string_list_item(path, &dco->paths) {
+		error("'%s' was not filtered properly", path->string);
+	}
+	string_list_clear(&dco->paths, 0);
+
+	free(dco);
+	state->delayed_checkout = NULL;
+
+	return errs;
+}
+
 static int write_entry(struct cache_entry *ce,
 		       char *path, const struct checkout *state, int to_tempfile)
 {
 	unsigned int ce_mode_s_ifmt = ce->ce_mode & S_IFMT;
+	struct delayed_checkout *dco = state->delayed_checkout;
 	int fd, ret, fstat_done = 0;
 	char *new;
 	struct strbuf buf = STRBUF_INIT;
 	unsigned long size;
-	size_t wrote, newsize = 0;
+	ssize_t wrote;
+	size_t newsize = 0;
 	struct stat st;
 	const struct submodule *sub;
 
@@ -160,32 +274,65 @@ static int write_entry(struct cache_entry *ce,
 	}
 
 	switch (ce_mode_s_ifmt) {
-	case S_IFREG:
 	case S_IFLNK:
 		new = read_blob_entry(ce, &size);
 		if (!new)
 			return error("unable to read sha1 file of %s (%s)",
-				path, oid_to_hex(&ce->oid));
+				     path, oid_to_hex(&ce->oid));
 
-		if (ce_mode_s_ifmt == S_IFLNK && has_symlinks && !to_tempfile) {
-			ret = symlink(new, path);
-			free(new);
-			if (ret)
-				return error_errno("unable to create symlink %s",
-						   path);
-			break;
+		/*
+		 * We can't make a real symlink; write out a regular file entry
+		 * with the symlink destination as its contents.
+		 */
+		if (!has_symlinks || to_tempfile)
+			goto write_file_entry;
+
+		ret = symlink(new, path);
+		free(new);
+		if (ret)
+			return error_errno("unable to create symlink %s", path);
+		break;
+
+	case S_IFREG:
+		/*
+		 * We do not send the blob in case of a retry, so do not
+		 * bother reading it at all.
+		 */
+		if (dco && dco->state == CE_RETRY) {
+			new = NULL;
+			size = 0;
+		} else {
+			new = read_blob_entry(ce, &size);
+			if (!new)
+				return error("unable to read sha1 file of %s (%s)",
+					     path, oid_to_hex(&ce->oid));
 		}
 
 		/*
 		 * Convert from git internal format to working tree format
 		 */
-		if (ce_mode_s_ifmt == S_IFREG &&
-		    convert_to_working_tree(ce->name, new, size, &buf)) {
+		if (dco && dco->state != CE_NO_DELAY) {
+			ret = async_convert_to_working_tree(ce->name, new,
+							    size, &buf, dco);
+			if (ret && string_list_has_string(&dco->paths, ce->name)) {
+				free(new);
+				goto delayed;
+			}
+		} else
+			ret = convert_to_working_tree(ce->name, new, size, &buf);
+
+		if (ret) {
 			free(new);
 			new = strbuf_detach(&buf, &newsize);
 			size = newsize;
 		}
+		/*
+		 * No "else" here as errors from convert are OK at this
+		 * point. If the error would have been fatal (e.g.
+		 * filter is required), then we would have died already.
+		 */
 
+	write_file_entry:
 		fd = open_output_fd(path, ce, to_tempfile);
 		if (fd < 0) {
 			free(new);
@@ -197,9 +344,10 @@ static int write_entry(struct cache_entry *ce,
 			fstat_done = fstat_output(fd, state, &st);
 		close(fd);
 		free(new);
-		if (wrote != size)
+		if (wrote < 0)
 			return error("unable to write file %s", path);
 		break;
+
 	case S_IFGITLINK:
 		if (to_tempfile)
 			return error("cannot create temporary submodule %s", path);
@@ -211,6 +359,7 @@ static int write_entry(struct cache_entry *ce,
 				NULL, oid_to_hex(&ce->oid),
 				state->force ? SUBMODULE_MOVE_HEAD_FORCE : 0);
 		break;
+
 	default:
 		return error("unknown file mode for %s in index", path);
 	}
@@ -219,11 +368,14 @@ finish:
 	if (state->refresh_cache) {
 		assert(state->istate);
 		if (!fstat_done)
-			lstat(ce->name, &st);
+			if (lstat(ce->name, &st) < 0)
+				return error_errno("unable to stat just-written file %s",
+						   ce->name);
 		fill_stat_cache_info(ce, &st);
 		ce->ce_flags |= CE_UPDATE_IN_BASE;
 		state->istate->cache_changed |= CE_ENTRY_CHANGED;
 	}
+delayed:
 	return 0;
 }
 

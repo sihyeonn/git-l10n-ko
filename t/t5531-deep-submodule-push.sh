@@ -298,6 +298,16 @@ test_expect_success 'push succeeds if submodule commit disabling recursion from 
 	)
 '
 
+test_expect_success 'submodule entry pointing at a tag is error' '
+	git -C work/gar/bage tag -a test1 -m "tag" &&
+	tag=$(git -C work/gar/bage rev-parse test1^{tag}) &&
+	git -C work update-index --cacheinfo 160000 "$tag" gar/bage &&
+	git -C work commit -m "bad commit" &&
+	test_when_finished "git -C work reset --hard HEAD^" &&
+	test_must_fail git -C work push --recurse-submodules=on-demand ../pub.git master 2>err &&
+	test_i18ngrep "is a tag, not a commit" err
+'
+
 test_expect_success 'push fails if recurse submodules option passed as yes' '
 	(
 		cd work/gar/bage &&
@@ -533,12 +543,35 @@ test_expect_success 'push propagating refspec to a submodule' '
 	# Fails when refspec includes an object id
 	test_must_fail git -C work push --recurse-submodules=on-demand origin \
 		"$(git -C work rev-parse branch2):refs/heads/branch2" &&
-	# Fails when refspec includes 'HEAD' as it is unsupported at this time
+	# Fails when refspec includes HEAD and parent and submodule do not
+	# have the same named branch checked out
 	test_must_fail git -C work push --recurse-submodules=on-demand origin \
 		HEAD:refs/heads/branch2 &&
 
 	git -C work/gar/bage branch branch2 master &&
 	git -C work push --recurse-submodules=on-demand origin branch2 &&
+
+	git -C submodule.git rev-parse branch2 >actual_submodule &&
+	git -C pub.git rev-parse branch2 >actual_pub &&
+	git -C work/gar/bage rev-parse branch2 >expected_submodule &&
+	git -C work rev-parse branch2 >expected_pub &&
+	test_cmp expected_submodule actual_submodule &&
+	test_cmp expected_pub actual_pub
+'
+
+test_expect_success 'push propagating HEAD refspec to a submodule' '
+	git -C work/gar/bage checkout branch2 &&
+	> work/gar/bage/junk12 &&
+	git -C work/gar/bage add junk12 &&
+	git -C work/gar/bage commit -m "Twelfth junk" &&
+
+	git -C work checkout branch2 &&
+	git -C work add gar/bage &&
+	git -C work commit -m "updating gar/bage in branch2" &&
+
+	# Passes since the superproject and submodules HEAD are both on branch2
+	git -C work push --recurse-submodules=on-demand origin \
+		HEAD:refs/heads/branch2 &&
 
 	git -C submodule.git rev-parse branch2 >actual_submodule &&
 	git -C pub.git rev-parse branch2 >actual_pub &&

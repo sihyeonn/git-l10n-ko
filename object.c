@@ -141,7 +141,6 @@ void *create_object(const unsigned char *sha1, void *o)
 	struct object *obj = o;
 
 	obj->parsed = 0;
-	obj->used = 0;
 	obj->flags = 0;
 	hashcpy(obj->oid.hash, sha1);
 
@@ -352,6 +351,19 @@ static void object_array_release_entry(struct object_array_entry *ent)
 	if (ent->name != object_array_slopbuf)
 		free(ent->name);
 	free(ent->path);
+}
+
+struct object *object_array_pop(struct object_array *array)
+{
+	struct object *ret;
+
+	if (!array->nr)
+		return NULL;
+
+	ret = array->objects[array->nr - 1].item;
+	object_array_release_entry(&array->objects[array->nr - 1]);
+	array->nr--;
+	return ret;
 }
 
 void object_array_filter(struct object_array *array,

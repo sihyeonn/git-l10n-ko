@@ -750,7 +750,7 @@ test_expect_success 'log.decorate config parsing' '
 '
 
 test_expect_success TTY 'log output on a TTY' '
-	git log --oneline --decorate >expect.short &&
+	git log --color --oneline --decorate >expect.short &&
 
 	test_terminal git log --oneline >actual &&
 	test_cmp expect.short actual
@@ -1521,6 +1521,12 @@ test_expect_success 'log diagnoses bogus HEAD' '
 	test_i18ngrep broken stderr &&
 	test_must_fail git -C empty log --default totally-bogus 2>stderr &&
 	test_i18ngrep broken stderr
+'
+
+test_expect_success 'log does not default to HEAD when rev input is given' '
+	>expect &&
+	git log --branches=does-not-exist >actual &&
+	test_cmp expect actual
 '
 
 test_expect_success 'set up --source tests' '

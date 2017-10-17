@@ -16,7 +16,7 @@ static int get_entry_index(const struct string_list *list, const char *string,
 	compare_strings_fn cmp = list->cmp ? list->cmp : strcmp;
 
 	while (left + 1 < right) {
-		int middle = (left + right) / 2;
+		int middle = left + (right - left) / 2;
 		int compare = cmp(string, list->items[middle].string);
 		if (compare < 0)
 			right = middle;
@@ -43,9 +43,8 @@ static int add_entry(int insert_at, struct string_list *list, const char *string
 
 	ALLOC_GROW(list->items, list->nr+1, list->alloc);
 	if (index < list->nr)
-		memmove(list->items + index + 1, list->items + index,
-				(list->nr - index)
-				* sizeof(struct string_list_item));
+		MOVE_ARRAY(list->items + index + 1, list->items + index,
+			   list->nr - index);
 	list->items[index].string = list->strdup_strings ?
 		xstrdup(string) : (char *)string;
 	list->items[index].util = NULL;
@@ -77,8 +76,7 @@ void string_list_remove(struct string_list *list, const char *string,
 			free(list->items[i].util);
 
 		list->nr--;
-		memmove(list->items + i, list->items + i + 1,
-			(list->nr - i) * sizeof(struct string_list_item));
+		MOVE_ARRAY(list->items + i, list->items + i + 1, list->nr - i);
 	}
 }
 

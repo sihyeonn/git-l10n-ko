@@ -71,6 +71,13 @@ struct rev_info {
 	const char *def;
 	struct pathspec prune_data;
 
+	/*
+	 * Whether the arguments parsed by setup_revisions() included any
+	 * "input" revisions that might still have yielded an empty pending
+	 * list (e.g., patterns like "--all" or "--glob").
+	 */
+	int rev_input_given;
+
 	/* topo-sort */
 	enum rev_sort_order sort_order;
 
@@ -89,6 +96,7 @@ struct rev_info {
 			topo_order:1,
 			simplify_merges:1,
 			simplify_by_decoration:1,
+			single_worktree:1,
 			tag_objects:1,
 			tree_objects:1,
 			blob_objects:1,
@@ -142,6 +150,17 @@ struct rev_info {
 			date_mode_explicit:1,
 			preserve_subject:1;
 	unsigned int	disable_stdin:1;
+	/*
+	 * Set `leak_pending` to prevent `prepare_revision_walk()` from clearing
+	 * the array of pending objects (`pending`). It will still forget about
+	 * the array and its entries, so they really are leaked. This can be
+	 * useful if the `struct object_array` `pending` is copied before
+	 * calling `prepare_revision_walk()`. By setting `leak_pending`, you
+	 * effectively claim ownership of the old array, so you should most
+	 * likely call `object_array_clear(&pending_copy)` once you are done.
+	 * Observe that this is about ownership of the array and its entries,
+	 * not the commits referenced by those entries.
+	 */
 	unsigned int	leak_pending:1;
 	/* --show-linear-break */
 	unsigned int	track_linear:1,

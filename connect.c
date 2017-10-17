@@ -578,6 +578,11 @@ static struct child_process *git_proxy_connect(int fd[2], char *host)
 
 	get_host_and_port(&host, &port);
 
+	if (looks_like_command_line_option(host))
+		die("strange hostname '%s' blocked", host);
+	if (looks_like_command_line_option(port))
+		die("strange port '%s' blocked", port);
+
 	proxy = xmalloc(sizeof(*proxy));
 	child_process_init(proxy);
 	argv_array_push(&proxy->args, git_proxy_command);
@@ -773,7 +778,6 @@ struct child_process *git_connect(int fd[2], const char *url,
 	char *hostandport, *path;
 	struct child_process *conn = &no_fork;
 	enum protocol protocol;
-	struct strbuf cmd = STRBUF_INIT;
 
 	/* Without this we cannot rely on waitpid() to tell
 	 * what happened to our children.
@@ -821,8 +825,13 @@ struct child_process *git_connect(int fd[2], const char *url,
 			     target_host, 0);
 		free(target_host);
 	} else {
+		struct strbuf cmd = STRBUF_INIT;
+
 		conn = xmalloc(sizeof(*conn));
 		child_process_init(conn);
+
+		if (looks_like_command_line_option(path))
+			die("strange pathname '%s' blocked", path);
 
 		strbuf_addstr(&cmd, prog);
 		strbuf_addch(&cmd, ' ');
@@ -854,8 +863,12 @@ struct child_process *git_connect(int fd[2], const char *url,
 				free(hostandport);
 				free(path);
 				free(conn);
+				strbuf_release(&cmd);
 				return NULL;
 			}
+
+			if (looks_like_command_line_option(ssh_host))
+				die("strange hostname '%s' blocked", ssh_host);
 
 			ssh = get_ssh_command();
 			if (ssh)

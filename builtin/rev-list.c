@@ -11,6 +11,7 @@
 #include "graph.h"
 #include "bisect.h"
 #include "progress.h"
+#include "reflog-walk.h"
 
 static const char rev_list_usage[] =
 "git rev-list [OPTION] <commit-id>... [ -- paths... ]\n"
@@ -122,6 +123,7 @@ static void show_commit(struct commit *commit, void *data)
 		ctx.date_mode_explicit = revs->date_mode_explicit;
 		ctx.fmt = revs->commit_format;
 		ctx.output_encoding = get_log_output_encoding();
+		ctx.color = revs->diffopt.use_color;
 		pretty_print_commit(&ctx, commit, &buf);
 		if (buf.len) {
 			if (revs->commit_format != CMIT_FMT_ONELINE)
@@ -348,9 +350,10 @@ int cmd_rev_list(int argc, const char **argv, const char *prefix)
 		/* Only --header was specified */
 		revs.commit_format = CMIT_FMT_RAW;
 
-	if ((!revs.commits &&
+	if ((!revs.commits && reflog_walk_empty(revs.reflog_info) &&
 	     (!(revs.tag_objects || revs.tree_objects || revs.blob_objects) &&
-	      !revs.pending.nr)) ||
+	      !revs.pending.nr) &&
+	     !revs.rev_input_given) ||
 	    revs.diff)
 		usage(rev_list_usage);
 
@@ -364,7 +367,7 @@ int cmd_rev_list(int argc, const char **argv, const char *prefix)
 		revs.limited = 1;
 
 	if (show_progress)
-		progress = start_progress_delay(show_progress, 0, 0, 2);
+		progress = start_delayed_progress(show_progress, 0);
 
 	if (use_bitmap_index && !revs.prune) {
 		if (revs.count && !revs.left_right && !revs.cherry_mark) {
