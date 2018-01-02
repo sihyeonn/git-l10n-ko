@@ -347,7 +347,7 @@ static int read_oneliner(struct strbuf *buf,
 
 static struct tree *empty_tree(void)
 {
-	return lookup_tree(&empty_tree_oid);
+	return lookup_tree(the_hash_algo->empty_tree);
 }
 
 static int error_dirty_index(struct replay_opts *opts)
@@ -393,7 +393,7 @@ static int fast_forward_to(const struct object_id *to, const struct object_id *f
 	transaction = ref_transaction_begin(&err);
 	if (!transaction ||
 	    ref_transaction_update(transaction, "HEAD",
-				   to->hash, unborn ? null_sha1 : from->hash,
+				   to, unborn ? &null_oid : from,
 				   0, sb.buf, &err) ||
 	    ref_transaction_commit(transaction, &err)) {
 		ref_transaction_free(transaction);
@@ -438,7 +438,8 @@ static int do_recursive_merge(struct commit *base, struct commit *next,
 	char **xopt;
 	static struct lock_file index_lock;
 
-	hold_locked_index(&index_lock, LOCK_DIE_ON_ERROR);
+	if (hold_locked_index(&index_lock, LOCK_REPORT_ON_ERROR) < 0)
+		return -1;
 
 	read_cache();
 
@@ -448,6 +449,7 @@ static int do_recursive_merge(struct commit *base, struct commit *next,
 	o.branch2 = next ? next_label : "(empty tree)";
 	if (is_rebase_i(opts))
 		o.buffer_output = 2;
+	o.show_rename_progress = 1;
 
 	head_tree = parse_tree_indirect(head);
 	next_tree = next ? next->tree : empty_tree();
@@ -462,6 +464,7 @@ static int do_recursive_merge(struct commit *base, struct commit *next,
 	if (is_rebase_i(opts) && clean <= 0)
 		fputs(o.obuf.buf, stdout);
 	strbuf_release(&o.obuf);
+	diff_warn_rename_limit("merge.renamelimit", o.needed_rename_limit, 0);
 	if (clean < 0)
 		return clean;
 
@@ -489,7 +492,7 @@ static int is_index_unchanged(void)
 	struct object_id head_oid;
 	struct commit *head_commit;
 
-	if (!resolve_ref_unsafe("HEAD", RESOLVE_REF_READING, head_oid.hash, NULL))
+	if (!resolve_ref_unsafe("HEAD", RESOLVE_REF_READING, &head_oid, NULL))
 		return error(_("could not resolve HEAD commit\n"));
 
 	head_commit = lookup_commit(&head_oid);
@@ -705,7 +708,7 @@ static int is_original_commit_empty(struct commit *commit)
 				oid_to_hex(&parent->object.oid));
 		ptree_oid = &parent->tree->object.oid;
 	} else {
-		ptree_oid = &empty_tree_oid; /* commit is root */
+		ptree_oid = the_hash_algo->empty_tree; /* commit is root */
 	}
 
 	return !oidcmp(ptree_oid, &commit->tree->object.oid);
@@ -792,6 +795,13 @@ static const char *command_to_string(const enum todo_command command)
 	if (command < TODO_COMMENT)
 		return todo_command_info[command].str;
 	die("Unknown command: %d", command);
+}
+
+static char command_to_char(const enum todo_command command)
+{
+	if (command < TODO_COMMENT && todo_command_info[command].c)
+		return todo_command_info[command].c;
+	return comment_line_char;
 }
 
 static int is_noop(const enum todo_command command)
@@ -958,8 +968,9 @@ static int do_pick_commit(enum todo_command command, struct commit *commit,
 	} else {
 		unborn = get_oid("HEAD", &head);
 		if (unborn)
-			oidcpy(&head, &empty_tree_oid);
-		if (index_differs_from(unborn ? EMPTY_TREE_SHA1_HEX : "HEAD", 0, 0))
+			oidcpy(&head, the_hash_algo->empty_tree);
+		if (index_differs_from(unborn ? EMPTY_TREE_SHA1_HEX : "HEAD",
+				       NULL, 0))
 			return error_dirty_index(opts);
 	}
 	discard_cache();
@@ -1115,12 +1126,12 @@ static int do_pick_commit(enum todo_command command, struct commit *commit,
 	 * write it at all.
 	 */
 	if (command == TODO_PICK && !opts->no_commit && (res == 0 || res == 1) &&
-	    update_ref(NULL, "CHERRY_PICK_HEAD", commit->object.oid.hash, NULL,
-		       REF_NODEREF, UPDATE_REFS_MSG_ON_ERR))
+	    update_ref(NULL, "CHERRY_PICK_HEAD", &commit->object.oid, NULL,
+		       REF_NO_DEREF, UPDATE_REFS_MSG_ON_ERR))
 		res = -1;
 	if (command == TODO_REVERT && ((opts->no_commit && res == 0) || res == 1) &&
-	    update_ref(NULL, "REVERT_HEAD", commit->object.oid.hash, NULL,
-		       REF_NODEREF, UPDATE_REFS_MSG_ON_ERR))
+	    update_ref(NULL, "REVERT_HEAD", &commit->object.oid, NULL,
+		       REF_NO_DEREF, UPDATE_REFS_MSG_ON_ERR))
 		res = -1;
 
 	if (res) {
@@ -1184,7 +1195,6 @@ static int read_and_refresh_cache(struct replay_opts *opts)
 	refresh_index(&the_index, REFRESH_QUIET|REFRESH_UNMERGED, NULL, NULL, NULL);
 	if (the_index.cache_changed && index_fd >= 0) {
 		if (write_locked_index(&the_index, &index_lock, COMMIT_LOCK)) {
-			rollback_lock_file(&index_lock);
 			return error(_("git %s: failed to refresh the index"),
 				_(action_name(opts)));
 		}
@@ -1267,6 +1277,7 @@ static int parse_insn_line(struct todo_item *item, const char *bol, char *eol)
 	bol += padding;
 
 	if (item->command == TODO_EXEC) {
+		item->commit = NULL;
 		item->arg = bol;
 		item->arg_len = (int)(eol - bol);
 		return 0;
@@ -1630,7 +1641,7 @@ static int rollback_single_pick(void)
 	if (!file_exists(git_path_cherry_pick_head()) &&
 	    !file_exists(git_path_revert_head()))
 		return error(_("no cherry-pick or revert in progress"));
-	if (read_ref_full("HEAD", 0, head_oid.hash, NULL))
+	if (read_ref_full("HEAD", 0, &head_oid, NULL))
 		return error(_("cannot resolve HEAD"));
 	if (is_null_oid(&head_oid))
 		return error(_("cannot abort from a branch yet to be born"));
@@ -1862,12 +1873,15 @@ static int error_failed_squash(struct commit *commit,
 
 static int do_exec(const char *command_line)
 {
+	struct argv_array child_env = ARGV_ARRAY_INIT;
 	const char *child_argv[] = { NULL, NULL };
 	int dirty, status;
 
 	fprintf(stderr, "Executing: %s\n", command_line);
 	child_argv[0] = command_line;
-	status = run_command_v_opt(child_argv, RUN_USING_SHELL);
+	argv_array_pushf(&child_env, "GIT_DIR=%s", absolute_path(get_git_dir()));
+	status = run_command_v_opt_cd_env(child_argv, RUN_USING_SHELL, NULL,
+					  child_env.argv);
 
 	/* force re-reading of the cache */
 	if (discard_cache() < 0 || read_cache() < 0)
@@ -1896,6 +1910,8 @@ static int do_exec(const char *command_line)
 			  "\n"), command_line);
 		status = 1;
 	}
+
+	argv_array_clear(&child_env);
 
 	return status;
 }
@@ -2124,8 +2140,8 @@ cleanup_head_ref:
 			}
 			msg = reflog_message(opts, "finish", "%s onto %s",
 				head_ref.buf, buf.buf);
-			if (update_ref(msg, head_ref.buf, head.hash, orig.hash,
-					REF_NODEREF, UPDATE_REFS_MSG_ON_ERR)) {
+			if (update_ref(msg, head_ref.buf, &head, &orig,
+				       REF_NO_DEREF, UPDATE_REFS_MSG_ON_ERR)) {
 				res = error(_("could not update %s"),
 					head_ref.buf);
 				goto cleanup_head_ref;
@@ -2279,7 +2295,7 @@ int sequencer_continue(struct replay_opts *opts)
 			if (res)
 				goto release_todo_list;
 		}
-		if (index_differs_from("HEAD", 0, 0)) {
+		if (index_differs_from("HEAD", NULL, 0)) {
 			res = error_dirty_index(opts);
 			goto release_todo_list;
 		}
@@ -2437,14 +2453,16 @@ void append_signoff(struct strbuf *msgbuf, int ignore_footer, unsigned flag)
 	strbuf_release(&sob);
 }
 
-int sequencer_make_script(int keep_empty, FILE *out,
-		int argc, const char **argv)
+int sequencer_make_script(FILE *out, int argc, const char **argv,
+			  unsigned flags)
 {
 	char *format = NULL;
 	struct pretty_print_context pp = {0};
 	struct strbuf buf = STRBUF_INIT;
 	struct rev_info revs;
 	struct commit *commit;
+	int keep_empty = flags & TODO_LIST_KEEP_EMPTY;
+	const char *insn = flags & TODO_LIST_ABBREVIATE_CMDS ? "p" : "pick";
 
 	init_revisions(&revs, NULL);
 	revs.verbose_header = 1;
@@ -2477,7 +2495,8 @@ int sequencer_make_script(int keep_empty, FILE *out,
 		strbuf_reset(&buf);
 		if (!keep_empty && is_original_commit_empty(commit))
 			strbuf_addf(&buf, "%c ", comment_line_char);
-		strbuf_addf(&buf, "pick %s ", oid_to_hex(&commit->object.oid));
+		strbuf_addf(&buf, "%s %s ", insn,
+			    oid_to_hex(&commit->object.oid));
 		pretty_print_commit(&pp, commit, &buf);
 		strbuf_addch(&buf, '\n');
 		fputs(buf.buf, out);
@@ -2486,61 +2505,90 @@ int sequencer_make_script(int keep_empty, FILE *out,
 	return 0;
 }
 
-
-int transform_todo_ids(int shorten_ids)
+/*
+ * Add commands after pick and (series of) squash/fixup commands
+ * in the todo list.
+ */
+int sequencer_add_exec_commands(const char *commands)
 {
 	const char *todo_file = rebase_path_todo();
 	struct todo_list todo_list = TODO_LIST_INIT;
-	int fd, res, i;
-	FILE *out;
+	struct todo_item *item;
+	struct strbuf *buf = &todo_list.buf;
+	size_t offset = 0, commands_len = strlen(commands);
+	int i, first;
 
-	strbuf_reset(&todo_list.buf);
-	fd = open(todo_file, O_RDONLY);
-	if (fd < 0)
-		return error_errno(_("could not open '%s'"), todo_file);
-	if (strbuf_read(&todo_list.buf, fd, 0) < 0) {
-		close(fd);
+	if (strbuf_read_file(&todo_list.buf, todo_file, 0) < 0)
 		return error(_("could not read '%s'."), todo_file);
-	}
-	close(fd);
 
-	res = parse_insn_buffer(todo_list.buf.buf, &todo_list);
-	if (res) {
+	if (parse_insn_buffer(todo_list.buf.buf, &todo_list)) {
 		todo_list_release(&todo_list);
 		return error(_("unusable todo list: '%s'"), todo_file);
 	}
 
-	out = fopen(todo_file, "w");
-	if (!out) {
-		todo_list_release(&todo_list);
-		return error(_("unable to open '%s' for writing"), todo_file);
-	}
-	for (i = 0; i < todo_list.nr; i++) {
-		struct todo_item *item = todo_list.items + i;
-		int bol = item->offset_in_buf;
-		const char *p = todo_list.buf.buf + bol;
-		int eol = i + 1 < todo_list.nr ?
-			todo_list.items[i + 1].offset_in_buf :
-			todo_list.buf.len;
-
-		if (item->command >= TODO_EXEC && item->command != TODO_DROP)
-			fwrite(p, eol - bol, 1, out);
-		else {
-			const char *id = shorten_ids ?
-				short_commit_name(item->commit) :
-				oid_to_hex(&item->commit->object.oid);
-			int len;
-
-			p += strspn(p, " \t"); /* left-trim command */
-			len = strcspn(p, " \t"); /* length of command */
-
-			fprintf(out, "%.*s %s %.*s\n",
-				len, p, id, item->arg_len, item->arg);
+	first = 1;
+	/* insert <commands> before every pick except the first one */
+	for (item = todo_list.items, i = 0; i < todo_list.nr; i++, item++) {
+		if (item->command == TODO_PICK && !first) {
+			strbuf_insert(buf, item->offset_in_buf + offset,
+				      commands, commands_len);
+			offset += commands_len;
 		}
+		first = 0;
 	}
-	fclose(out);
+
+	/* append final <commands> */
+	strbuf_add(buf, commands, commands_len);
+
+	i = write_message(buf->buf, buf->len, todo_file, 0);
 	todo_list_release(&todo_list);
-	return 0;
+	return i;
+}
+
+int transform_todos(unsigned flags)
+{
+	const char *todo_file = rebase_path_todo();
+	struct todo_list todo_list = TODO_LIST_INIT;
+	struct strbuf buf = STRBUF_INIT;
+	struct todo_item *item;
+	int i;
+
+	if (strbuf_read_file(&todo_list.buf, todo_file, 0) < 0)
+		return error(_("could not read '%s'."), todo_file);
+
+	if (parse_insn_buffer(todo_list.buf.buf, &todo_list)) {
+		todo_list_release(&todo_list);
+		return error(_("unusable todo list: '%s'"), todo_file);
+	}
+
+	for (item = todo_list.items, i = 0; i < todo_list.nr; i++, item++) {
+		/* if the item is not a command write it and continue */
+		if (item->command >= TODO_COMMENT) {
+			strbuf_addf(&buf, "%.*s\n", item->arg_len, item->arg);
+			continue;
+		}
+
+		/* add command to the buffer */
+		if (flags & TODO_LIST_ABBREVIATE_CMDS)
+			strbuf_addch(&buf, command_to_char(item->command));
+		else
+			strbuf_addstr(&buf, command_to_string(item->command));
+
+		/* add commit id */
+		if (item->commit) {
+			const char *oid = flags & TODO_LIST_SHORTEN_IDS ?
+					  short_commit_name(item->commit) :
+					  oid_to_hex(&item->commit->object.oid);
+
+			strbuf_addf(&buf, " %s", oid);
+		}
+		/* add all the rest */
+		strbuf_addf(&buf, " %.*s\n", item->arg_len, item->arg);
+	}
+
+	i = write_message(buf.buf, buf.len, todo_file, 0);
+	todo_list_release(&todo_list);
+	return i;
 }
 
 enum check_level {
@@ -2665,6 +2713,19 @@ leave_check:
 	return res;
 }
 
+static int rewrite_file(const char *path, const char *buf, size_t len)
+{
+	int rc = 0;
+	int fd = open(path, O_WRONLY | O_TRUNC);
+	if (fd < 0)
+		return error_errno(_("could not open '%s' for writing"), path);
+	if (write_in_full(fd, buf, len) < 0)
+		rc = error_errno(_("could not write to '%s'"), path);
+	if (close(fd) && !rc)
+		rc = error_errno(_("could not close '%s'"), path);
+	return rc;
+}
+
 /* skip picking commits whose parents are unchanged */
 int skip_unnecessary_picks(void)
 {
@@ -2737,29 +2798,11 @@ int skip_unnecessary_picks(void)
 		}
 		close(fd);
 
-		fd = open(rebase_path_todo(), O_WRONLY, 0666);
-		if (fd < 0) {
-			error_errno(_("could not open '%s' for writing"),
-				    rebase_path_todo());
+		if (rewrite_file(rebase_path_todo(), todo_list.buf.buf + offset,
+				 todo_list.buf.len - offset) < 0) {
 			todo_list_release(&todo_list);
 			return -1;
 		}
-		if (write_in_full(fd, todo_list.buf.buf + offset,
-				todo_list.buf.len - offset) < 0) {
-			error_errno(_("could not write to '%s'"),
-				    rebase_path_todo());
-			close(fd);
-			todo_list_release(&todo_list);
-			return -1;
-		}
-		if (ftruncate(fd, todo_list.buf.len - offset) < 0) {
-			error_errno(_("could not truncate '%s'"),
-				    rebase_path_todo());
-			todo_list_release(&todo_list);
-			close(fd);
-			return -1;
-		}
-		close(fd);
 
 		todo_list.current = i;
 		if (is_fixup(peek_command(&todo_list, 0)))
@@ -2944,15 +2987,7 @@ int rearrange_squash(void)
 			}
 		}
 
-		fd = open(todo_file, O_WRONLY);
-		if (fd < 0)
-			res = error_errno(_("could not open '%s'"), todo_file);
-		else if (write(fd, buf.buf, buf.len) < 0)
-			res = error_errno(_("could not read '%s'."), todo_file);
-		else if (ftruncate(fd, buf.len) < 0)
-			res = error_errno(_("could not finish '%s'"),
-					   todo_file);
-		close(fd);
+		res = rewrite_file(todo_file, buf.buf, buf.len);
 		strbuf_release(&buf);
 	}
 

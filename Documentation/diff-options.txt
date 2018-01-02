@@ -63,7 +63,12 @@ ifndef::git-format-patch[]
 	Synonym for `-p --raw`.
 endif::git-format-patch[]
 
-include::diff-heuristic-options.txt[]
+--indent-heuristic::
+	Enable the heuristic that shift diff hunk boundaries to make patches
+	easier to read. This is the default.
+
+--no-indent-heuristic::
+	Disable the indent heuristic.
 
 --minimal::
 	Spend extra time to make sure the smallest possible
@@ -74,6 +79,16 @@ include::diff-heuristic-options.txt[]
 
 --histogram::
 	Generate a diff using the "histogram diff" algorithm.
+
+--anchored=<text>::
+	Generate a diff using the "anchored diff" algorithm.
++
+This option may be specified more than once.
++
+If a line exists in both the source and destination, exists only once,
+and starts with this text, this algorithm attempts to prevent it from
+appearing as a deletion or addition in the output. It uses the "patience
+diff" algorithm internally.
 
 --diff-algorithm={patience|minimal|histogram|myers}::
 	Choose a diff algorithm. The variants are as follows:
@@ -551,6 +566,9 @@ endif::git-format-patch[]
 -a::
 --text::
 	Treat all files as text.
+
+--ignore-cr-at-eol::
+	Ignore carrige-return at the end of line when doing a comparison.
 
 --ignore-space-at-eol::
 	Ignore changes in whitespace at EOL.
