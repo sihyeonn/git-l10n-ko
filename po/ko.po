@@ -3452,7 +3452,7 @@ msgstr "없는 커밋을 수정할 수 없습니다"
 #: sequencer.c:2252
 #, c-format
 msgid "invalid file: '%s'"
-msgstr "잘못된 키: '%s'"
+msgstr "잘못된 파일: '%s'"
 
 #: sequencer.c:2254
 #, c-format
