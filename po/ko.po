@@ -1,10 +1,10 @@
 # Git Korean translation
-# Copyright (C) 2015-2017 Changwoo Ryu and contributors
+# Copyright (C) 2015-2018 git Korean translation contributors
 # This file is distributed under the same license as the Git package.
 #
 # Contributors:
-#  Hyunjun Kim <yoloseem AT users.noreply.github.com>, 2015.
-#  Changwoo Ryu <cwryu@debian.org>, 2015-2017.
+#  Hyunjun Kim <yoloseem@users.noreply.github.com>, 2015.
+#  Changwoo Ryu <cwryu@debian.org>, 2015-2018.
 #
 # - 작업자는 위 Contributors 목록에 추가해 주세요.
 # - 번역하면서 80컬럼을 넘어가지 않도록 해 주세요.
