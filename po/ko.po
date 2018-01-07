@@ -1683,7 +1683,7 @@ msgstr "'%s'에서 '%s'(으)로 git 디렉터리를 옮겨올 수 없습니다"
 #: editor.c:61
 #, c-format
 msgid "hint: Waiting for your editor to close the file...%c"
-msgstr ""
+msgstr "힌트: 편집기가 파일을 닫기를 기다리는 중입니다...%c"
 
 #: entry.c:177
 msgid "Filtering content"
@@ -2047,7 +2047,7 @@ msgstr "시각 형식이 잘못되었습니다: %s"
 
 #: list-objects-filter-options.c:30
 msgid "multiple object filter types cannot be combined"
-msgstr ""
+msgstr "여러 개의 오브젝트 필터 종류는 결합될 수 없습니다"
 
 #: list-objects-filter-options.c:41 list-objects-filter-options.c:68
 #, c-format
@@ -2312,10 +2312,9 @@ msgid "Adding %s"
 msgstr "추가: %s"
 
 #: merge-recursive.c:1958
-#, fuzzy, c-format
-#| msgid "Dirty index: cannot apply patches (dirty: %s)"
+#, c-format
 msgid "Dirty index: cannot merge (dirty: %s)"
-msgstr "변경된 인덱스: 패치를 적용할 수 없습니다 (dirty: %s)"
+msgstr "변경된 인덱스: 병합할 수 없습니다 (dirty: %s)"
 
 #: merge-recursive.c:1962
 msgid "Already up to date!"
@@ -3249,16 +3248,14 @@ msgid "git %s: failed to refresh the index"
 msgstr "git %s: 인덱스 새로 고침에 실패했습니다"
 
 #: sequencer.c:1270
-#, fuzzy, c-format
-#| msgid "%%(body) does not take arguments"
+#, c-format
 msgid "%s does not accept arguments: '%s'"
-msgstr "%%(body)에 인자를 받지 않습니다"
+msgstr "%s는 인자를 허용하지 않습니다: '%s'"
 
 #: sequencer.c:1279
-#, fuzzy, c-format
-#| msgid "missing object %s for %s"
+#, c-format
 msgid "missing arguments for %s"
-msgstr "없는 오브젝트 %s, %s에 대해"
+msgstr "없는 인자, %s에 대해"
 
 #: sequencer.c:1322
 #, c-format
@@ -5373,7 +5370,7 @@ msgstr "'git bisect next'를 수행합니다"
 
 #: builtin/bisect--helper.c:122
 msgid "write the terms to .git/BISECT_TERMS"
-msgstr ""
+msgstr "용어를 .git/BISECT_TERMS에 씁니다"
 
 #: builtin/bisect--helper.c:124
 msgid "cleanup the bisection state"
@@ -5381,7 +5378,7 @@ msgstr ""
 
 #: builtin/bisect--helper.c:126
 msgid "check for expected revs"
-msgstr ""
+msgstr "예상된 리비전을 확인합니다"
 
 #: builtin/bisect--helper.c:128
 msgid "update BISECT_HEAD instead of checking out the current commit"
@@ -5673,10 +5670,9 @@ msgid "Branch copy failed"
 msgstr "브랜치 복사 실패"
 
 #: builtin/branch.c:517
-#, fuzzy, c-format
-#| msgid "Renamed a misnamed branch '%s' away"
+#, c-format
 msgid "Created a copy of a misnamed branch '%s'"
-msgstr "이름이 잘못된 '%s' 브랜치의 이름을 다르게 바꿉니다"
+msgstr "이름이 잘못된 '%s' 브랜치의 복사본을 만들었습니다"
 
 #: builtin/branch.c:520
 #, c-format
@@ -7891,10 +7887,9 @@ msgid "Not a valid object name %s"
 msgstr "올바른 오브젝트 이름이 아닙니다 (%s)"
 
 #: builtin/describe.c:505
-#, fuzzy, c-format
-#| msgid "%s %s is not a commit!"
+#, c-format
 msgid "%s is neither a commit nor blob"
-msgstr "%s %s, 커밋이 아닙니다"
+msgstr "%s는 커밋도 블롭도 아닙니다"
 
 #: builtin/describe.c:519
 msgid "find the tag that comes after the commit"
@@ -11174,10 +11169,8 @@ msgid "Compressing objects"
 msgstr "오브젝트 압축하는 중"
 
 #: builtin/pack-objects.c:2599
-#, fuzzy
-#| msgid "invalid value for %s"
 msgid "invalid value for --missing"
-msgstr "%s의 값이 올바르지 않습니다"
+msgstr "--missing의 값이 올바르지 않습니다"
 
 #: builtin/pack-objects.c:2902
 #, c-format
@@ -11327,10 +11320,8 @@ msgid "write a bitmap index together with the pack index"
 msgstr "묶음 인덱스와 같이 비트맵 인덱스를 씁니다"
 
 #: builtin/pack-objects.c:3010
-#, fuzzy
-#| msgid "allow missing objects"
 msgid "handling for missing objects"
-msgstr "없는 오브젝트를 허용합니다"
+msgstr "없는 오브젝트를 처리합니다"
 
 #: builtin/pack-objects.c:3144
 msgid "Counting objects"
@@ -12856,7 +12847,7 @@ msgstr "새 인덱스 파일을 쓸 수 없습니다."
 
 #: builtin/rev-list.c:399
 msgid "object filtering requires --objects"
-msgstr ""
+msgstr "오브젝트 필터링은 --objects 옵션이 필요합니다"
 
 #: builtin/rev-list.c:402
 #, fuzzy, c-format
@@ -13390,8 +13381,7 @@ msgid "could not resolve HEAD ref inside the submodule '%s'"
 msgstr "재귀적으로 '%s' 하위 모듈에 들어갈 수 없습니다"
 
 #: builtin/submodule--helper.c:653
-#, fuzzy, c-format
-#| msgid "could not recurse into submodule '%s'"
+#, c-format
 msgid "failed to recurse into submodule '%s'"
 msgstr "재귀적으로 '%s' 하위 모듈에 들어갈 수 없습니다"
 
@@ -13408,10 +13398,8 @@ msgid ""
 msgstr ""
 
 #: builtin/submodule--helper.c:679
-#, fuzzy
-#| msgid "recurse into submodules"
 msgid "recurse into nested submodules"
-msgstr "하위 모듈에 재귀적으로 적용"
+msgstr "내장된 하위 모듈에 재귀적으로 적용"
 
 #: builtin/submodule--helper.c:684
 msgid "git submodule status [--quiet] [--cached] [--recursive] [<path>...]"
@@ -14248,10 +14236,8 @@ msgid "-b, -B, and --detach are mutually exclusive"
 msgstr "-b, -B, --detach 옵션 중 하나만 쓸 수 있습니다"
 
 #: builtin/worktree.c:453
-#, fuzzy
-#| msgid "--local can only be used inside a git repository"
 msgid "--[no-]track can only be used if a new branch is created"
-msgstr "--local 옵션은 깃 저장소 안에서만 쓸 수 있습니다"
+msgstr "--[no-]track 옵션은 새로운 브런치가 생성되었을 경우에만 쓸 수 있습니다"
 
 #: builtin/worktree.c:553
 msgid "reason for locking"
@@ -14377,13 +14363,11 @@ msgstr "%s(으)로 리다이렉트"
 
 #: list-objects-filter-options.h:54
 msgid "args"
-msgstr ""
+msgstr "인자"
 
 #: list-objects-filter-options.h:55
-#, fuzzy
-#| msgid "object type"
 msgid "object filtering"
-msgstr "오브젝트 종류"
+msgstr "오브젝트 필터링"
 
 #: common-cmds.h:9
 msgid "start a working area (see also: git help tutorial)"
@@ -15597,10 +15581,8 @@ msgid "Could not init rewritten commits"
 msgstr "다시 작성된 커밋을 초기화할 수 없습니다"
 
 #: git-rebase--interactive.sh:897
-#, fuzzy
-#| msgid "could not write to %s"
 msgid "Could not generate todo list"
-msgstr "%s에 쓸 수 없습니다"
+msgstr "할 일 목록을 생성할 수 없습니다"
 
 #: git-rebase--interactive.sh:973
 #, sh-format
