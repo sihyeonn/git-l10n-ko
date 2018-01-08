@@ -6,6 +6,7 @@
 #  Hyunjun Kim <yoloseem@users.noreply.github.com>, 2015.
 #  Changwoo Ryu <cwryu@debian.org>, 2015-2018.
 #  Sihyeon Jang <uneedsihyeon@gmail.com>, 2018.
+#  Gwan-gyeong Mun <elongbug@gmail.com>, 2018.
 #
 # - 작업자는 위 Contributors 목록에 추가해 주세요.
 # - 번역하면서 80컬럼을 넘어가지 않도록 해 주세요.
@@ -33,10 +34,11 @@
 #  | committer    | 커미터                                       |
 #  | conflict     | 충돌                                         |
 #  | fast-forward | 정방향 진행                                  |
-#  | head         | 헤드                                         |
-#  | hook         | 훅                                           |
-#  | history      | (커밋) 내역                                  |
+#  | fsmonitor    | 파일 시스템 모니터                           |
 #  | Git          | 깃                                           |
+#  | head         | 헤드                                         |
+#  | hook         | 후크                                         |
+#  | history      | (커밋) 내역                                  |
 #  | log          | 기록                                         |
 #  | merge        | 병합                                         |
 #  | note         | 노트                                         |
@@ -143,7 +145,7 @@ msgstr ""
 "주의: '%s' 체크아웃하기.\n"
 "\n"
 "지금 'HEAD가 분리된' 상태입니다. 이 상태에서는 여기저기 돌아보고,\n"
-"실험적으로 바꾼고 커밋하더라도, 체크아웃할 수 잇는 다른 브랜치에\n"
+"실험적으로 바꾸고 커밋하더라도, 체크아웃할 수 있는 다른 브랜치에\n"
 "영향을 미치지 않고 변경 사항을 잃어버릴 수 있습니다.\n"
 "\n"
 "커밋을 유지하는 브랜치를 새로 만드려면, (지금이든 나중이든) 체크아웃\n"
@@ -1001,7 +1003,7 @@ msgid ""
 "Maybe you started with bad path parameters?\n"
 msgstr ""
 "시험 가능한 커밋이 없습니다.\n"
-"잘못도니 경로 파라미터로 시작하지 않았습니까?\n"
+"잘못된 경로 파라미터로 시작하지 않았습니까?\n"
 
 #: bisect.c:1006
 #, c-format
@@ -2946,6 +2948,8 @@ msgid ""
 "The '%s' hook was ignored because it's not set as executable.\n"
 "You can disable this warning with `git config advice.ignoredHook false`."
 msgstr ""
+"'%s' 후크가 실행 가능하도록 설정되지 않아서, 무시됩니다.\n"
+"이 경고는 `git config advice.ignoredHook false` 명령으로 끌 수 있습니다."
 
 #: send-pack.c:141
 #, c-format
@@ -3065,16 +3069,12 @@ msgid "%s: Unable to write new index file"
 msgstr "%s: 새 인덱스 파일을 쓸 수 없습니다"
 
 #: sequencer.c:496
-#, fuzzy
-#| msgid "could not resolve HEAD commit\n"
 msgid "could not resolve HEAD commit"
-msgstr "HEAD 커밋을 처리할 수 없습니다\n"
+msgstr "HEAD 커밋을 찾을 수 없습니다"
 
 #: sequencer.c:516
-#, fuzzy
-#| msgid "unable to update cache tree\n"
 msgid "unable to update cache tree"
-msgstr "캐시 트리를 업데이트할 수 없습니다\n"
+msgstr "캐시 트리를 업데이트할 수 없습니다"
 
 #: sequencer.c:600
 #, c-format
@@ -3107,16 +3107,14 @@ msgstr ""
 "  git rebase --continue\n"
 
 #: sequencer.c:702
-#, fuzzy, c-format
-#| msgid "could not parse commit %s\n"
+#, c-format
 msgid "could not parse commit %s"
-msgstr "%s 커밋을 파싱할 수 없습니다\n"
+msgstr "%s 커밋을 파싱할 수 없습니다"
 
 #: sequencer.c:707
-#, fuzzy, c-format
-#| msgid "could not parse parent commit %s\n"
+#, c-format
 msgid "could not parse parent commit %s"
-msgstr "%s 이전 커밋을 파싱할 수 없습니다\n"
+msgstr "%s 이전 커밋을 파싱할 수 없습니다"
 
 #: sequencer.c:836
 #, c-format
@@ -4810,7 +4808,7 @@ msgstr "추적되는 파일을 업데이트합니다"
 
 #: builtin/add.c:299
 msgid "renormalize EOL of tracked files (implies -u)"
-msgstr ""
+msgstr "추적된 파일의 새줄문자(EOL)를 재 적용합니다 (-u 옵션 포함)"
 
 #: builtin/add.c:300
 msgid "record only the fact that the path will be added later"
@@ -4930,7 +4928,7 @@ msgstr "작성자 스크립트를 파싱할 수 없습니다"
 #: builtin/am.c:498
 #, c-format
 msgid "'%s' was deleted by the applypatch-msg hook"
-msgstr "applypatch-msg 훅 때문에 '%s'이(가) 삭제되었습니다."
+msgstr "applypatch-msg 후크 때문에 '%s'이(가) 삭제되었습니다."
 
 #: builtin/am.c:539
 #, c-format
@@ -5335,7 +5333,7 @@ msgstr "git bisect--helper --next-all [--no-checkout]"
 
 #: builtin/bisect--helper.c:13
 msgid "git bisect--helper --write-terms <bad_term> <good_term>"
-msgstr ""
+msgstr "git bisect--helper --write-terms <비정상_용어> <정상_용어>"
 
 #: builtin/bisect--helper.c:14
 msgid "git bisect--helper --bisect-clean-state"
@@ -5374,7 +5372,7 @@ msgstr "용어를 .git/BISECT_TERMS에 씁니다"
 
 #: builtin/bisect--helper.c:124
 msgid "cleanup the bisection state"
-msgstr ""
+msgstr "이등분 상태를 정리합니다"
 
 #: builtin/bisect--helper.c:126
 msgid "check for expected revs"
@@ -7276,10 +7274,9 @@ msgstr ""
 "--author '%s' 옵션이 '이름 <전자메일>' 형식이 아니고 기존 작성자에도 없습니다"
 
 #: builtin/commit.c:1090
-#, fuzzy, c-format
-#| msgid "Invalid untracked files mode '%s'"
+#, c-format
 msgid "Invalid ignored mode '%s'"
-msgstr "추적되지 않는 파일 모드가 ('%s') 잘못되었습니다"
+msgstr "무시한 모드가 ('%s') 잘못되었습니다"
 
 #: builtin/commit.c:1104 builtin/commit.c:1349
 #, c-format
@@ -7406,7 +7403,7 @@ msgstr "추적되지 않는 파일의 목록을 여러 열로 표시합니다"
 
 #: builtin/commit.c:1406
 msgid "Unsupported combination of ignored and untracked-files arguments"
-msgstr ""
+msgstr "무시한 모드와 추적되지 않는 파일의 인수가 지원되지 않는 조합입니다"
 
 #: builtin/commit.c:1469
 msgid "couldn't look up newly created commit"
@@ -7417,10 +7414,8 @@ msgid "could not parse newly created commit"
 msgstr "새로 만든 커밋을 파싱할 수 없습니다"
 
 #: builtin/commit.c:1516
-#, fuzzy
-#| msgid "could not resolve HEAD commit\n"
 msgid "unable to resolve HEAD after creating commit"
-msgstr "HEAD 커밋을 처리할 수 없습니다\n"
+msgstr "커밋을 만든 후 HEAD를 찾을 수 없습니다"
 
 #: builtin/commit.c:1518
 msgid "detached HEAD"
@@ -7726,7 +7721,7 @@ msgstr "값이 경로(파일 또는 디렉터리 이름)입니다"
 
 #: builtin/config.c:84
 msgid "value is an expiry date"
-msgstr ""
+msgstr "값이 만료 시각입니다"
 
 #: builtin/config.c:85
 msgid "Other"
@@ -7837,7 +7832,7 @@ msgstr "어떤 태그도 '%s'와(과) 정확히 일치하지 않습니다"
 #: builtin/describe.c:316
 #, c-format
 msgid "No exact match on refs or tags, searching to describe\n"
-msgstr ""
+msgstr "어떤 레퍼런스나 태그도 정확히 일치하지 않고, 설명을 검색합니다\n"
 
 #: builtin/describe.c:363
 #, c-format
@@ -9559,16 +9554,12 @@ msgid "Use mail map file"
 msgstr "메일 맵 파일을 사용합니다"
 
 #: builtin/log.c:155
-#, fuzzy
-#| msgid "only use refs matching <pattern>"
 msgid "only decorate refs that match <pattern>"
-msgstr "<패턴>과 일치하는 레퍼런스만 사용합니다"
+msgstr "<패턴>과 일치하는 레퍼런스만 꾸밉니다"
 
 #: builtin/log.c:157
-#, fuzzy
-#| msgid "do not consider tags matching <pattern>"
 msgid "do not decorate refs that match <pattern>"
-msgstr "<패턴>과 일치하는 태그를 고려하지 않습니다"
+msgstr "<패턴>과 일치하는 레퍼런스를 꾸미지 않습니다"
 
 #: builtin/log.c:158
 msgid "decorate options"
@@ -9901,10 +9892,8 @@ msgid "use lowercase letters for 'assume unchanged' files"
 msgstr "'변경되지 않았다고 가정' 파일에 소문자를 사용합니다"
 
 #: builtin/ls-files.c:521
-#, fuzzy
-#| msgid "use lowercase letters for 'assume unchanged' files"
 msgid "use lowercase letters for 'fsmonitor clean' files"
-msgstr "'변경되지 않았다고 가정' 파일에 소문자를 사용합니다"
+msgstr "'파일 시스템 모니터에 변경되지 않은' 파일에 소문자를 사용합니다"
 
 #: builtin/ls-files.c:523
 msgid "show cached files in the output (default)"
@@ -11932,16 +11921,12 @@ msgid "make rebase script"
 msgstr "리베이스 스크립트를 만듭니다"
 
 #: builtin/rebase--helper.c:32
-#, fuzzy
-#| msgid "shorten SHA-1s in the todo list"
 msgid "shorten commit ids in the todo list"
-msgstr "할 일 목록의 SHA-1을 줄입니다"
+msgstr "할 일 목록의 커밋 아이디를 줄입니다."
 
 #: builtin/rebase--helper.c:34
-#, fuzzy
-#| msgid "expand SHA-1s in the todo list"
 msgid "expand commit ids in the todo list"
-msgstr "할 일 목록의 SHA-1을 늘입니다"
+msgstr "할 일 목록의 커밋 아이디를 늘입니다."
 
 #: builtin/rebase--helper.c:36
 msgid "check the todo list"
@@ -11955,11 +11940,10 @@ msgstr "불필요한 빼오기를 건너뜁니다"
 msgid "rearrange fixup/squash lines"
 msgstr "fixup/squash 줄 재구성"
 
+# English Text에서는 insert를 사용하지만, 소스코드에는 add로 표현되어 있습니다.
 #: builtin/rebase--helper.c:42
-#, fuzzy
-#| msgid "expand SHA-1s in the todo list"
 msgid "insert exec commands in todo list"
-msgstr "할 일 목록의 SHA-1을 늘입니다"
+msgstr "할 일 목록에 실행 명령을 추가합니다"
 
 #: builtin/receive-pack.c:30
 msgid "git receive-pack <git-dir>"
@@ -12850,10 +12834,9 @@ msgid "object filtering requires --objects"
 msgstr "오브젝트 필터링은 --objects 옵션이 필요합니다"
 
 #: builtin/rev-list.c:402
-#, fuzzy, c-format
-#| msgid "invalid color value: %.*s"
+#, c-format
 msgid "invalid sparse value '%s'"
-msgstr "잘못된 색 값: %.*s"
+msgstr "잘못된 드문 값 '%s'"
 
 #: builtin/rev-list.c:442
 msgid "rev-list does not support display of notes"
@@ -12861,7 +12844,7 @@ msgstr "rev-list는 노트 표시를 지원하지 않습니다"
 
 #: builtin/rev-list.c:445
 msgid "cannot combine --use-bitmap-index with object filtering"
-msgstr ""
+msgstr "--use-bitmap-index 옵션에 오브젝트 필터링을 결합 할 수 없습니다"
 
 #: builtin/rev-parse.c:402
 msgid "git rev-parse --parseopt [<options>] -- [<args>...]"
@@ -13375,10 +13358,9 @@ msgid "no submodule mapping found in .gitmodules for path '%s'"
 msgstr "경로 '%s'에 대해 .gitmodules에 있는 하위모듈 매핑이 없습니다"
 
 #: builtin/submodule--helper.c:626
-#, fuzzy, c-format
-#| msgid "could not recurse into submodule '%s'"
+#, c-format
 msgid "could not resolve HEAD ref inside the submodule '%s'"
-msgstr "재귀적으로 '%s' 하위 모듈에 들어갈 수 없습니다"
+msgstr "HEAD 레퍼런스를 '%s' 하위 모듈 안에서 찾을 수 없습니다"
 
 #: builtin/submodule--helper.c:653
 #, c-format
@@ -13386,16 +13368,14 @@ msgid "failed to recurse into submodule '%s'"
 msgstr "재귀적으로 '%s' 하위 모듈에 들어갈 수 없습니다"
 
 #: builtin/submodule--helper.c:677
-#, fuzzy
-#| msgid "prepend this to submodule path output"
 msgid "Suppress submodule status output"
-msgstr "하위 모듈 경로 출력의 앞에 이 디렉터리를 붙입니다"
+msgstr "하위 모듈 상태를 출력하지 않습니다"
 
 #: builtin/submodule--helper.c:678
 msgid ""
 "Use commit stored in the index instead of the one stored in the submodule "
 "HEAD"
-msgstr ""
+msgstr "하위 모듈 HEAD에 저장된 커밋 대신 인덱스에 저장된 커밋을 사용합니다"
 
 #: builtin/submodule--helper.c:679
 msgid "recurse into nested submodules"
@@ -13970,21 +13950,20 @@ msgstr "파일 시스템 시험 없이 추적하지 않는 캐시를 사용합�
 
 #: builtin/update-index.c:1022
 msgid "write out the index even if is not flagged as changed"
-msgstr ""
+msgstr "변경된 것으로 표시되지 않은 경우에도 인덱스에 씁니다"
 
 #: builtin/update-index.c:1024
 msgid "enable or disable file system monitor"
 msgstr "파일 시스템 모니터를 켜거나 끕니다"
 
 #: builtin/update-index.c:1026
-#, fuzzy
-#| msgid "mark files as \"not changing\""
 msgid "mark files as fsmonitor valid"
-msgstr "파일을 \"바꾸지 않음\"으로 표시합니다"
+msgstr "파일 시스템 모니터링 기능이 변경사항을 확인하는 비트를 파일에 표시합니"
+"다"
 
 #: builtin/update-index.c:1029
 msgid "clear fsmonitor valid bit"
-msgstr ""
+msgstr "파일 시스템 모니터링 기능이 변경사항을 확인하는 비트를 지웁니다"
 
 #: builtin/update-index.c:1127
 msgid ""
@@ -14028,33 +14007,25 @@ msgid "Untracked cache enabled for '%s'"
 msgstr "'%s'에 대해 추적되지 않는 캐시를 사용하지 않습니다"
 
 #: builtin/update-index.c:1171
-#, fuzzy
-#| msgid ""
-#| "core.splitIndex is set to false; remove or change it, if you really want "
-#| "to enable split index"
 msgid "core.fsmonitor is unset; set it if you really want to enable fsmonitor"
 msgstr ""
-"core.splitIndex 값이 거짓입니다. 정말로 스플릿 인덱스를 사용하려면 이 값을 제"
-"거하거나 바꾸십시오."
+"core.fsmonitor가 설정되지 않았습니다. 정말로 파일 시스템 모니터를 사용하려면 "
+"설정하십시오"
 
 #: builtin/update-index.c:1175
 msgid "fsmonitor enabled"
-msgstr ""
+msgstr "파일 시스템 모니터가 켜졌습니다"
 
 #: builtin/update-index.c:1178
-#, fuzzy
-#| msgid ""
-#| "core.splitIndex is set to true; remove or change it, if you really want "
-#| "to disable split index"
 msgid ""
 "core.fsmonitor is set; remove it if you really want to disable fsmonitor"
 msgstr ""
-"core.splitIndex 값이 참입니다. 정말로 스플릿 인덱스를 사용하지 않으려면 이 값"
-"을 제거하거나 바꾸십시오."
+"core.fsmonitor가 설정되어 있습니다. 정말로 파일 시스템 모니터를 사용하지 않으"
+"려면 설정을 제거하십시오"
 
 #: builtin/update-index.c:1182
 msgid "fsmonitor disabled"
-msgstr ""
+msgstr "파일 시스템 모니터가 꺼졌습니다"
 
 #: builtin/update-ref.c:10
 msgid "git update-ref [<options>] -d <refname> [<old-val>]"
@@ -14226,10 +14197,8 @@ msgid "set up tracking mode (see git-branch(1))"
 msgstr "추적 모드를 설정합니다 (git-branch(1) 참고)"
 
 #: builtin/worktree.c:380
-#, fuzzy
-#| msgid "upstream branch '%s' not stored as a remote-tracking branch"
 msgid "try to match the new branch name with a remote-tracking branch"
-msgstr "업스트림 '%s' 브랜치가 리모트 추적 브랜치로 저장되지 않았습니다"
+msgstr "새 브랜치 이름과 리모트 추적 브랜치를 일치 시킵니다"
 
 #: builtin/worktree.c:388
 msgid "-b, -B, and --detach are mutually exclusive"
@@ -14628,7 +14597,7 @@ msgstr "?? 무슨 소리인지 모르겠습니다?"
 
 #: git-bisect.sh:453
 msgid "bisect run failed: no command provided."
-msgstr ""
+msgstr "이등분 실행이 실패했습니다: 주어진 명령어가 없습니다."
 
 #: git-bisect.sh:458
 #, sh-format
@@ -14908,7 +14877,7 @@ msgstr "$ref_stash을(를) $w_commit(으)로 업데이트할 수 없습니다"
 #: git-stash.sh:281
 #, sh-format
 msgid "error: unknown option for 'stash push': $option"
-msgstr ""
+msgstr "오류: 'stash push'에 대해 알 수 없는 옵션: $option"
 
 #: git-stash.sh:295
 msgid "Can't use --patch and --include-untracked or --all at the same time"
