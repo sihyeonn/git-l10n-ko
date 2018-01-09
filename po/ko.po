@@ -13216,7 +13216,7 @@ msgstr "그런 레퍼런스가 없습니다: %s"
 #, c-format
 msgid "cannot handle more than %d rev."
 msgid_plural "cannot handle more than %d revs."
-msgstr[0] "레퍼런스를 %d개보다 많이 처리할 수 없습니다."
+msgstr[0] "리비전을 %d개보다 많이 처리할 수 없습니다."
 
 #: builtin/show-branch.c:812
 #, c-format
