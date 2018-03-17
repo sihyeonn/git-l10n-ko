@@ -931,6 +931,7 @@ sub cmd_dcommit {
 		# information from different SVN repos, and paths
 		# which are not underneath this repository root.
 		my $rooturl = $gs->repos_root;
+	        Git::SVN::remove_username($rooturl);
 		foreach my $d (@$linear_refs) {
 			my %parentshash;
 			read_commit_parents(\%parentshash, $d);
@@ -1198,6 +1199,11 @@ sub cmd_branch {
 	print "Copying ${src} at r${rev} to ${dst}...\n";
 	$ctx->copy($src, $rev, $dst)
 		unless $_dry_run;
+
+	# Release resources held by ctx before creating another SVN::Ra
+	# so destruction is orderly.  This seems necessary with SVN 1.9.5
+	# to avoid segfaults.
+	$ctx = undef;
 
 	$gs->fetch_all;
 }
