@@ -64,7 +64,7 @@ msgstr ""
 "Project-Id-Version: git\n"
 "Report-Msgid-Bugs-To: Git Mailing List <git@vger.kernel.org>\n"
 "POT-Creation-Date: 2018-03-16 07:29+0800\n"
-"PO-Revision-Date: 2018-03-19 13:11+0900\n"
+"PO-Revision-Date: 2018-03-28 23:28+0900\n"
 "Last-Translator: Changwoo Ryu <cwryu@debian.org>\n"
 "Language-Team: Git Korean translation <http://github.com/changwoo/git-l10n-"
 "ko>\n"
@@ -3721,7 +3721,7 @@ msgstr "'%s' 커밋을 파싱할 수 없습니다"
 
 #: sequencer.c:3401
 msgid "the script was already rearranged."
-msgstr "스크립트를 이미 재구성했습니다"
+msgstr "스크립트를 이미 재구성했습니다."
 
 #: setup.c:122
 #, c-format
@@ -3814,7 +3814,7 @@ msgstr "깃 저장소가 아닙니다: %s"
 #: setup.c:642
 #, c-format
 msgid "'$%s' too big"
-msgstr "'$%s' 이(가) 너무 큽니다"
+msgstr "'$%s'이(가) 너무 큽니다"
 
 #: setup.c:656
 #, c-format
@@ -4446,7 +4446,7 @@ msgstr "'%s'을(를) 읽는데 실패했습니다"
 #: worktree.c:291
 #, c-format
 msgid "'%s' at main working tree is not the repository directory"
-msgstr "메인 작업 폴더의 '%s'은 저장소 디렉토리가 아닙니다"
+msgstr "메인 작업 폴더의 '%s'은(는) 저장소 디렉터리가 아닙니다"
 
 #: worktree.c:302
 #, c-format
@@ -5485,11 +5485,11 @@ msgstr "원래 브랜치를 복구하고 패치 적용 작업을 중지합니다
 
 #: builtin/am.c:2287
 msgid "abort the patching operation but keep HEAD where it is."
-msgstr "패치 작업을 중단하지만 HEAD는 그대로 둡니다"
+msgstr "패치 작업을 중단하지만 HEAD는 그대로 둡니다."
 
 #: builtin/am.c:2290
 msgid "show the patch being applied."
-msgstr "적용되는 패치를 보여줍니다"
+msgstr "적용되는 패치를 보여줍니다."
 
 # NOTE: 옵션의 의미는 이게 맞다. 원문에서는 사용자가
 # --committer-date-is-author-date라는 옵션을 보고 의미를 알 수 있다고 가정하고 있다.
@@ -13643,9 +13643,7 @@ msgstr "git submodule--helper sync [--quiet] [--recursive] [<경로>]"
 msgid ""
 "Submodule work tree '%s' contains a .git directory (use 'rm -rf' if you "
 "really want to remove it including all of its history)"
-msgstr ""
-"하위 모듈 작업 폴더 '%s'에 .git 디렉토리가 있습니다 (정말로 모든 커밋 내역을 "
-"포함하여 제거하려면 'rm -rf'를 사용하십시오)"
+msgstr "하위 모듈 작업 폴더 '%s'에 .git 디렉터리가 있습니다 (정말로 모든 커밋 내역을 포함하여 제거하려면 'rm -rf'를 사용하십시오)"
 
 #: builtin/submodule--helper.c:958
 #, c-format
@@ -13664,7 +13662,7 @@ msgstr "'%s' 디렉터리를 지웁니다\n"
 #: builtin/submodule--helper.c:968
 #, c-format
 msgid "Could not remove submodule work tree '%s'\n"
-msgstr "하위 모듈 작업 폴더  '%s' 을(를) 제거할 수 없습니다\n"
+msgstr "하위 모듈 작업 폴더  '%s'을(를) 제거할 수 없습니다\n"
 
 #: builtin/submodule--helper.c:977
 #, c-format
@@ -14086,7 +14084,7 @@ msgstr "%s 디렉터리 만들기 실패했습니다"
 #: builtin/update-index.c:88
 #, c-format
 msgid "failed to stat %s"
-msgstr "%s 에 대해 stat()이 실패했습니다"
+msgstr "%s에 대해 stat()이 실패했습니다"
 
 #: builtin/update-index.c:98
 #, c-format
@@ -14595,17 +14593,17 @@ msgstr "'%s'을(를) '%s'(으)로 옮기는데 실패했습니다"
 #: builtin/worktree.c:748
 #, c-format
 msgid "failed to run 'git status' on '%s'"
-msgstr "'%s'에(서) 'git status'를 실행하는데 실패했습니다"
+msgstr "'%s'에서 'git status'를 실행하는데 실패했습니다"
 
 #: builtin/worktree.c:752
 #, c-format
 msgid "'%s' is dirty, use --force to delete it"
-msgstr "'%s' 이 변경 되었습니다,  삭제하려면 --force를 사용하십시오"
+msgstr "'%s'이(가) 변경 되었습니다,  삭제하려면 --force를 사용하십시오"
 
 #: builtin/worktree.c:757
 #, c-format
 msgid "failed to run 'git status' on '%s', code %d"
-msgstr "'%s'에(서) 'git status'를 실행하는데 실패했습니다,  코드 %d"
+msgstr "'%s'에서 'git status'를 실행하는데 실패했습니다,  코드 %d"
 
 #: builtin/worktree.c:768 builtin/worktree.c:782
 #, c-format
@@ -14711,7 +14709,7 @@ msgstr ""
 #: git.c:95
 #, c-format
 msgid "no directory given for --git-dir\n"
-msgstr "--git-dir에 대한 주어진 디렉토리가 없습니다\n"
+msgstr "--git-dir에 대한 주어진 디렉터리가 없습니다\n"
 
 #: git.c:109
 #, c-format
@@ -14721,7 +14719,7 @@ msgstr "--namespace에 대한 주어진 네임 스페이스가 없습니다\n"
 #: git.c:123
 #, c-format
 msgid "no directory given for --work-tree\n"
-msgstr "--work-tree에 대한 주어진 디렉토리가 없습니다\n"
+msgstr "--work-tree에 대한 주어진 디렉터리가 없습니다\n"
 
 #: git.c:137
 #, c-format
@@ -14736,7 +14734,7 @@ msgstr "-c는 옵션에는 설정 문자열이 와야 합니다\n"
 #: git.c:197
 #, c-format
 msgid "no directory given for -C\n"
-msgstr "-C 옵션에 주어진 디렉토리가 없습니다\n"
+msgstr "-C 옵션에 주어진 디렉터리가 없습니다\n"
 
 #: git.c:212
 #, c-format
@@ -14746,7 +14744,7 @@ msgstr "알 수 없는 옵션: %s\n"
 #: git.c:687
 #, c-format
 msgid "expansion of alias '%s' failed; '%s' is not a git command\n"
-msgstr "별칭 '%s'의 확장에 실패했습니다; '%s'은 (는) 깃 명령이 아닙니다\n"
+msgstr "별칭 '%s'의 확장에 실패했습니다; '%s'은(는) 깃 명령이 아닙니다\n"
 
 #: git.c:699
 #, c-format
