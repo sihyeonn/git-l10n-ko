@@ -1,5 +1,6 @@
 #include "builtin.h"
 #include "cache.h"
+#include "repository.h"
 #include "config.h"
 #include "commit.h"
 #include "tree.h"
@@ -16,6 +17,7 @@
 #include "streaming.h"
 #include "decorate.h"
 #include "packfile.h"
+#include "object-store.h"
 
 #define REACHABLE 0x0001
 #define SEEN      0x0002
@@ -65,7 +67,8 @@ static const char *printable_type(struct object *obj)
 	const char *ret;
 
 	if (obj->type == OBJ_NONE) {
-		enum object_type type = sha1_object_info(obj->oid.hash, NULL);
+		enum object_type type = oid_object_info(the_repository,
+							&obj->oid, NULL);
 		if (type > 0)
 			object_as_type(obj, type, 0);
 	}
@@ -225,7 +228,7 @@ static void check_reachable_object(struct object *obj)
 	if (!(obj->flags & HAS_OBJ)) {
 		if (is_promisor_object(&obj->oid))
 			return;
-		if (has_sha1_pack(obj->oid.hash))
+		if (has_object_pack(&obj->oid))
 			return; /* it is in pack - forget about it */
 		printf("missing %s %s\n", printable_type(obj),
 			describe_object(obj));
@@ -337,7 +340,7 @@ static void check_connectivity(void)
 	}
 }
 
-static int fsck_obj(struct object *obj)
+static int fsck_obj(struct object *obj, void *buffer, unsigned long size)
 {
 	int err;
 
@@ -351,7 +354,7 @@ static int fsck_obj(struct object *obj)
 
 	if (fsck_walk(obj, NULL, &fsck_obj_options))
 		objerror(obj, "broken links");
-	err = fsck_object(obj, NULL, 0, &fsck_obj_options);
+	err = fsck_object(obj, buffer, size, &fsck_obj_options);
 	if (err)
 		goto out;
 
@@ -396,7 +399,7 @@ static int fsck_obj_buffer(const struct object_id *oid, enum object_type type,
 	}
 	obj->flags &= ~(REACHABLE | SEEN);
 	obj->flags |= HAS_OBJ;
-	return fsck_obj(obj);
+	return fsck_obj(obj, buffer, size);
 }
 
 static int default_refs;
@@ -504,44 +507,42 @@ static void get_default_heads(void)
 	}
 }
 
-static struct object *parse_loose_object(const struct object_id *oid,
-					 const char *path)
-{
-	struct object *obj;
-	void *contents;
-	enum object_type type;
-	unsigned long size;
-	int eaten;
-
-	if (read_loose_object(path, oid->hash, &type, &size, &contents) < 0)
-		return NULL;
-
-	if (!contents && type != OBJ_BLOB)
-		die("BUG: read_loose_object streamed a non-blob");
-
-	obj = parse_object_buffer(oid, type, size, contents, &eaten);
-
-	if (!eaten)
-		free(contents);
-	return obj;
-}
-
 static int fsck_loose(const struct object_id *oid, const char *path, void *data)
 {
-	struct object *obj = parse_loose_object(oid, path);
+	struct object *obj;
+	enum object_type type;
+	unsigned long size;
+	void *contents;
+	int eaten;
 
-	if (!obj) {
+	if (read_loose_object(path, oid, &type, &size, &contents) < 0) {
 		errors_found |= ERROR_OBJECT;
 		error("%s: object corrupt or missing: %s",
 		      oid_to_hex(oid), path);
 		return 0; /* keep checking other objects */
 	}
 
+	if (!contents && type != OBJ_BLOB)
+		BUG("read_loose_object streamed a non-blob");
+
+	obj = parse_object_buffer(oid, type, size, contents, &eaten);
+	if (!obj) {
+		errors_found |= ERROR_OBJECT;
+		error("%s: object could not be parsed: %s",
+		      oid_to_hex(oid), path);
+		if (!eaten)
+			free(contents);
+		return 0; /* keep checking other objects */
+	}
+
 	obj->flags &= ~(REACHABLE | SEEN);
 	obj->flags |= HAS_OBJ;
-	if (fsck_obj(obj))
+	if (fsck_obj(obj, contents, size))
 		errors_found |= ERROR_OBJECT;
-	return 0;
+
+	if (!eaten)
+		free(contents);
+	return 0; /* keep checking other objects, even if we saw an error */
 }
 
 static int fsck_cruft(const char *basename, const char *path, void *data)
@@ -719,9 +720,12 @@ int cmd_fsck(int argc, const char **argv, const char *prefix)
 		for_each_loose_object(mark_loose_for_connectivity, NULL, 0);
 		for_each_packed_object(mark_packed_for_connectivity, NULL, 0);
 	} else {
+		struct alternate_object_database *alt_odb_list;
+
 		fsck_object_dir(get_object_directory());
 
-		prepare_alt_odb();
+		prepare_alt_odb(the_repository);
+		alt_odb_list = the_repository->objects->alt_odb_list;
 		for (alt = alt_odb_list; alt; alt = alt->next)
 			fsck_object_dir(alt->path);
 
@@ -730,10 +734,9 @@ int cmd_fsck(int argc, const char **argv, const char *prefix)
 			uint32_t total = 0, count = 0;
 			struct progress *progress = NULL;
 
-			prepare_packed_git();
-
 			if (show_progress) {
-				for (p = packed_git; p; p = p->next) {
+				for (p = get_packed_git(the_repository); p;
+				     p = p->next) {
 					if (open_pack_index(p))
 						continue;
 					total += p->num_objects;
@@ -741,7 +744,8 @@ int cmd_fsck(int argc, const char **argv, const char *prefix)
 
 				progress = start_progress(_("Checking objects"), total);
 			}
-			for (p = packed_git; p; p = p->next) {
+			for (p = get_packed_git(the_repository); p;
+			     p = p->next) {
 				/* verify gives error messages itself */
 				if (verify_pack(p, fsck_obj_buffer,
 						progress, count))
@@ -750,6 +754,9 @@ int cmd_fsck(int argc, const char **argv, const char *prefix)
 			}
 			stop_progress(&progress);
 		}
+
+		if (fsck_finish(&fsck_obj_options))
+			errors_found |= ERROR_OBJECT;
 	}
 
 	for (i = 0; i < argc; i++) {

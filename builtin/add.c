@@ -9,7 +9,7 @@
 #include "lockfile.h"
 #include "dir.h"
 #include "pathspec.h"
-#include "exec_cmd.h"
+#include "exec-cmd.h"
 #include "cache-tree.h"
 #include "run-command.h"
 #include "parse-options.h"
@@ -265,8 +265,6 @@ static int edit_patch(int argc, const char **argv, const char *prefix)
 	return 0;
 }
 
-static struct lock_file lock_file;
-
 static const char ignore_error[] =
 N_("The following paths are ignored by one of your .gitignore files:\n");
 
@@ -393,6 +391,7 @@ int cmd_add(int argc, const char **argv, const char *prefix)
 	int add_new_files;
 	int require_pathspec;
 	char *seen = NULL;
+	struct lock_file lock_file = LOCK_INIT;
 
 	git_config(add_config, NULL);
 
@@ -534,10 +533,9 @@ int cmd_add(int argc, const char **argv, const char *prefix)
 	unplug_bulk_checkin();
 
 finish:
-	if (active_cache_changed) {
-		if (write_locked_index(&the_index, &lock_file, COMMIT_LOCK))
-			die(_("Unable to write new index file"));
-	}
+	if (write_locked_index(&the_index, &lock_file,
+			       COMMIT_LOCK | SKIP_IF_UNCHANGED))
+		die(_("Unable to write new index file"));
 
 	UNLEAK(pathspec);
 	UNLEAK(dir);

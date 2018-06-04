@@ -15,7 +15,7 @@
 #include "config.h"
 #include "builtin.h"
 #include "run-command.h"
-#include "exec_cmd.h"
+#include "exec-cmd.h"
 #include "parse-options.h"
 #include "argv-array.h"
 #include "strbuf.h"
@@ -306,7 +306,7 @@ static char *get_symlink(const struct object_id *oid, const char *path)
 	} else {
 		enum object_type type;
 		unsigned long size;
-		data = read_sha1_file(oid->hash, &type, &size);
+		data = read_object_file(oid, &type, &size);
 		if (!data)
 			die(_("could not read object %s for symlink %s"),
 				oid_to_hex(oid), path);
@@ -610,7 +610,7 @@ static int run_dir_diff(const char *extcmd, int symlinks, const char *prefix,
 			continue;
 
 		if (!indices_loaded) {
-			static struct lock_file lock;
+			struct lock_file lock = LOCK_INIT;
 			strbuf_reset(&buf);
 			strbuf_addf(&buf, "%s/wtindex", tmpdir);
 			if (hold_lock_file_for_update(&lock, buf.buf, 0) < 0 ||

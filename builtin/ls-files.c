@@ -166,7 +166,7 @@ static void show_killed_files(const struct index_state *istate,
 				 */
 				pos = index_name_pos(istate, ent->name, ent->len);
 				if (0 <= pos)
-					die("BUG: killed-file %.*s not found",
+					BUG("killed-file %.*s not found",
 						ent->len, ent->name);
 				pos = -pos - 1;
 				while (pos < istate->cache_nr &&
@@ -240,7 +240,7 @@ static void show_ce(struct repository *repo, struct dir_struct *dir,
 			printf("%s%06o %s %d\t",
 			       tag,
 			       ce->ce_mode,
-			       find_unique_abbrev(ce->oid.hash, abbrev),
+			       find_unique_abbrev(&ce->oid, abbrev),
 			       ce_stage(ce));
 		}
 		write_eolinfo(repo->index, ce, fullname);
@@ -271,7 +271,7 @@ static void show_ru_info(const struct index_state *istate)
 			if (!ui->mode[i])
 				continue;
 			printf("%s%06o %s %d\t", tag_resolve_undo, ui->mode[i],
-			       find_unique_abbrev(ui->sha1[i], abbrev),
+			       find_unique_abbrev(&ui->oid[i], abbrev),
 			       i + 1);
 			write_name(path);
 		}

@@ -273,7 +273,7 @@ static int delete_branches(int argc, const char **argv, int force, int kinds,
 			       bname.buf,
 			       (flags & REF_ISBROKEN) ? "broken"
 			       : (flags & REF_ISSYMREF) ? target
-			       : find_unique_abbrev(oid.hash, DEFAULT_ABBREV));
+			       : find_unique_abbrev(&oid, DEFAULT_ABBREV));
 		}
 		delete_branch_config(bname.buf);
 
@@ -391,7 +391,6 @@ static void print_ref_list(struct ref_filter *filter, struct ref_sorting *sortin
 	struct ref_array array;
 	int maxwidth = 0;
 	const char *remote_prefix = "";
-	struct strbuf out = STRBUF_INIT;
 	char *to_free = NULL;
 
 	/*
@@ -419,7 +418,10 @@ static void print_ref_list(struct ref_filter *filter, struct ref_sorting *sortin
 	ref_array_sort(sorting, &array);
 
 	for (i = 0; i < array.nr; i++) {
-		format_ref_array_item(array.items[i], format, &out);
+		struct strbuf out = STRBUF_INIT;
+		struct strbuf err = STRBUF_INIT;
+		if (format_ref_array_item(array.items[i], format, &out, &err))
+			die("%s", err.buf);
 		if (column_active(colopts)) {
 			assert(!filter->verbose && "--column and --verbose are incompatible");
 			 /* format to a string_list to let print_columns() do its job */
@@ -428,6 +430,7 @@ static void print_ref_list(struct ref_filter *filter, struct ref_sorting *sortin
 			fwrite(out.buf, 1, out.len, stdout);
 			putchar('\n');
 		}
+		strbuf_release(&err);
 		strbuf_release(&out);
 	}
 
@@ -497,7 +500,7 @@ static void copy_or_rename_branch(const char *oldname, const char *newname, int 
 
 	if (!skip_prefix(oldref.buf, "refs/heads/", &interpreted_oldname) ||
 	    !skip_prefix(newref.buf, "refs/heads/", &interpreted_newname)) {
-		die("BUG: expected prefix missing for refs");
+		BUG("expected prefix missing for refs");
 	}
 
 	if (copy)

@@ -14,6 +14,7 @@
 #include "run-command.h"
 #include "diff.h"
 #include "refs.h"
+#include "refspec.h"
 #include "commit.h"
 #include "diffcore.h"
 #include "revision.h"
@@ -280,7 +281,7 @@ out:
 	return rc;
 }
 
-static void read_empty(unsigned const char *sha1, int verbose)
+static void read_empty(const struct object_id *oid, int verbose)
 {
 	int i = 0;
 	const char *args[7];
@@ -290,15 +291,15 @@ static void read_empty(unsigned const char *sha1, int verbose)
 		args[i++] = "-v";
 	args[i++] = "-m";
 	args[i++] = "-u";
-	args[i++] = EMPTY_TREE_SHA1_HEX;
-	args[i++] = sha1_to_hex(sha1);
+	args[i++] = empty_tree_oid_hex();
+	args[i++] = oid_to_hex(oid);
 	args[i] = NULL;
 
 	if (run_command_v_opt(args, RUN_GIT_CMD))
 		die(_("read-tree failed"));
 }
 
-static void reset_hard(unsigned const char *sha1, int verbose)
+static void reset_hard(const struct object_id *oid, int verbose)
 {
 	int i = 0;
 	const char *args[6];
@@ -308,7 +309,7 @@ static void reset_hard(unsigned const char *sha1, int verbose)
 		args[i++] = "-v";
 	args[i++] = "--reset";
 	args[i++] = "-u";
-	args[i++] = sha1_to_hex(sha1);
+	args[i++] = oid_to_hex(oid);
 	args[i] = NULL;
 
 	if (run_command_v_opt(args, RUN_GIT_CMD))
@@ -324,7 +325,7 @@ static void restore_state(const struct object_id *head,
 	if (is_null_oid(stash))
 		return;
 
-	reset_hard(head->hash, 1);
+	reset_hard(head, 1);
 
 	args[2] = oid_to_hex(stash);
 
@@ -412,7 +413,7 @@ static void finish(struct commit *head_commit,
 			 * We ignore errors in 'gc --auto', since the
 			 * user should see them.
 			 */
-			close_all_packs();
+			close_all_packs(the_repository->objects);
 			run_command_v_opt(argv_gc_auto, RUN_GIT_CMD);
 		}
 	}
@@ -639,7 +640,7 @@ static int read_tree_trivial(struct object_id *common, struct object_id *head,
 
 static void write_tree_trivial(struct object_id *oid)
 {
-	if (write_cache_as_tree(oid->hash, 0, NULL))
+	if (write_cache_as_tree(oid, 0, NULL))
 		die(_("git write-tree failed to write a tree"));
 }
 
@@ -647,15 +648,14 @@ static int try_merge_strategy(const char *strategy, struct commit_list *common,
 			      struct commit_list *remoteheads,
 			      struct commit *head)
 {
-	static struct lock_file lock;
+	struct lock_file lock = LOCK_INIT;
 	const char *head_arg = "HEAD";
 
 	hold_locked_index(&lock, LOCK_DIE_ON_ERROR);
 	refresh_cache(REFRESH_QUIET);
-	if (active_cache_changed &&
-	    write_locked_index(&the_index, &lock, COMMIT_LOCK))
+	if (write_locked_index(&the_index, &lock,
+			       COMMIT_LOCK | SKIP_IF_UNCHANGED))
 		return error(_("Unable to write index."));
-	rollback_lock_file(&lock);
 
 	if (!strcmp(strategy, "recursive") || !strcmp(strategy, "subtree")) {
 		int clean, x;
@@ -692,10 +692,9 @@ static int try_merge_strategy(const char *strategy, struct commit_list *common,
 				remoteheads->item, reversed, &result);
 		if (clean < 0)
 			exit(128);
-		if (active_cache_changed &&
-		    write_locked_index(&the_index, &lock, COMMIT_LOCK))
+		if (write_locked_index(&the_index, &lock,
+				       COMMIT_LOCK | SKIP_IF_UNCHANGED))
 			die (_("unable to write %s"), get_index_file());
-		rollback_lock_file(&lock);
 		return clean ? 0 : 1;
 	} else {
 		return try_merge_command(strategy, xopts_nr, xopts,
@@ -807,14 +806,13 @@ static int merge_trivial(struct commit *head, struct commit_list *remoteheads)
 {
 	struct object_id result_tree, result_commit;
 	struct commit_list *parents, **pptr = &parents;
-	static struct lock_file lock;
+	struct lock_file lock = LOCK_INIT;
 
 	hold_locked_index(&lock, LOCK_DIE_ON_ERROR);
 	refresh_cache(REFRESH_QUIET);
-	if (active_cache_changed &&
-	    write_locked_index(&the_index, &lock, COMMIT_LOCK))
+	if (write_locked_index(&the_index, &lock,
+			       COMMIT_LOCK | SKIP_IF_UNCHANGED))
 		return error(_("Unable to write index."));
-	rollback_lock_file(&lock);
 
 	write_tree_trivial(&result_tree);
 	printf(_("Wonderful.\n"));
@@ -1300,7 +1298,7 @@ int cmd_merge(int argc, const char **argv, const char *prefix)
 		if (remoteheads->next)
 			die(_("Can merge only exactly one commit into empty head"));
 		remote_head_oid = &remoteheads->item->object.oid;
-		read_empty(remote_head_oid->hash, 0);
+		read_empty(remote_head_oid, 0);
 		update_ref("initial pull", "HEAD", remote_head_oid, NULL, 0,
 			   UPDATE_REFS_DIE_ON_ERR);
 		goto done;
@@ -1327,7 +1325,7 @@ int cmd_merge(int argc, const char **argv, const char *prefix)
 
 			check_commit_signature(commit, &signature_check);
 
-			find_unique_abbrev_r(hex, commit->object.oid.hash, DEFAULT_ABBREV);
+			find_unique_abbrev_r(hex, &commit->object.oid, DEFAULT_ABBREV);
 			switch (signature_check.result) {
 			case 'G':
 				break;
@@ -1420,9 +1418,9 @@ int cmd_merge(int argc, const char **argv, const char *prefix)
 
 		if (verbosity >= 0) {
 			printf(_("Updating %s..%s\n"),
-			       find_unique_abbrev(head_commit->object.oid.hash,
+			       find_unique_abbrev(&head_commit->object.oid,
 						  DEFAULT_ABBREV),
-			       find_unique_abbrev(remoteheads->item->object.oid.hash,
+			       find_unique_abbrev(&remoteheads->item->object.oid,
 						  DEFAULT_ABBREV));
 		}
 		strbuf_addstr(&msg, "Fast-forward");
