@@ -313,4 +313,20 @@ test_expect_success 'A root commit can be a cousin, treat it that way' '
 	EOF
 '
 
+test_expect_success 'labels that are object IDs are rewritten' '
+	git checkout -b third B &&
+	test_commit I &&
+	third=$(git rev-parse HEAD) &&
+	git checkout -b labels master &&
+	git merge --no-commit third &&
+	test_tick &&
+	git commit -m "Merge commit '\''$third'\'' into labels" &&
+	echo noop >script-from-scratch &&
+	test_config sequence.editor \""$PWD"/replace-editor.sh\" &&
+	test_tick &&
+	git rebase -i -r A &&
+	grep "^label $third-" .git/ORIGINAL-TODO &&
+	! grep "^label $third$" .git/ORIGINAL-TODO
+'
+
 test_done

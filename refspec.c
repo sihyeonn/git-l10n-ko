@@ -49,6 +49,8 @@ static int parse_refspec(struct refspec_item *item, const char *refspec, int fet
 		size_t rlen = strlen(++rhs);
 		is_glob = (1 <= rlen && strchr(rhs, '*'));
 		item->dst = xstrndup(rhs, rlen);
+	} else {
+		item->dst = NULL;
 	}
 
 	llen = (rhs ? (rhs - lhs - 1) : strlen(lhs));
@@ -202,6 +204,8 @@ void refspec_ref_prefixes(const struct refspec *rs,
 		const struct refspec_item *item = &rs->items[i];
 		const char *prefix = NULL;
 
+		if (item->exact_sha1)
+			continue;
 		if (rs->fetch == REFSPEC_FETCH)
 			prefix = item->src;
 		else if (item->dst)
