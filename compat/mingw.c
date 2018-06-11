@@ -761,6 +761,17 @@ revert_attrs:
 	return rc;
 }
 
+#undef strftime
+size_t mingw_strftime(char *s, size_t max,
+		      const char *format, const struct tm *tm)
+{
+	size_t ret = strftime(s, max, format, tm);
+
+	if (!ret && errno == EINVAL)
+		die("invalid strftime format: '%s'", format);
+	return ret;
+}
+
 unsigned int sleep (unsigned int seconds)
 {
 	Sleep(seconds*1000);
@@ -2210,7 +2221,7 @@ void mingw_startup(void)
 		die_startup();
 
 	/* determine size of argv and environ conversion buffer */
-	maxlen = wcslen(_wpgmptr);
+	maxlen = wcslen(wargv[0]);
 	for (i = 1; i < argc; i++)
 		maxlen = max(maxlen, wcslen(wargv[i]));
 	for (i = 0; wenv[i]; i++)
@@ -2230,8 +2241,7 @@ void mingw_startup(void)
 	buffer = malloc_startup(maxlen);
 
 	/* convert command line arguments and environment to UTF-8 */
-	__argv[0] = wcstoutfdup_startup(buffer, _wpgmptr, maxlen);
-	for (i = 1; i < argc; i++)
+	for (i = 0; i < argc; i++)
 		__argv[i] = wcstoutfdup_startup(buffer, wargv[i], maxlen);
 	for (i = 0; wenv[i]; i++)
 		environ[i] = wcstoutfdup_startup(buffer, wenv[i], maxlen);

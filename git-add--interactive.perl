@@ -205,8 +205,15 @@ my $status_head = sprintf($status_fmt, __('staged'), __('unstaged'), __('path'))
 	}
 }
 
-sub get_empty_tree {
-	return '4b825dc642cb6eb9a060e54bf8d69288fbee4904';
+{
+	my $empty_tree;
+	sub get_empty_tree {
+		return $empty_tree if defined $empty_tree;
+
+		$empty_tree = run_cmd_pipe(qw(git hash-object -t tree /dev/null));
+		chomp $empty_tree;
+		return $empty_tree;
+	}
 }
 
 sub get_diff_reference {
@@ -1564,7 +1571,7 @@ sub patch_update_file {
 					error_msg __("No other hunks to search\n");
 					next;
 				}
-				if ($1 eq "") {
+				if ($regex eq "") {
 					print colored $prompt_color, __("search for regex? ");
 					$regex = <STDIN>;
 					if (defined $regex) {

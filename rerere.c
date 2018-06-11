@@ -703,10 +703,9 @@ out:
 	return ret;
 }
 
-static struct lock_file index_lock;
-
 static void update_paths(struct string_list *update)
 {
+	struct lock_file index_lock = LOCK_INIT;
 	int i;
 
 	hold_locked_index(&index_lock, LOCK_DIE_ON_ERROR);
@@ -719,11 +718,9 @@ static void update_paths(struct string_list *update)
 			item->string);
 	}
 
-	if (active_cache_changed) {
-		if (write_locked_index(&the_index, &index_lock, COMMIT_LOCK))
-			die("Unable to write new index file");
-	} else
-		rollback_lock_file(&index_lock);
+	if (write_locked_index(&the_index, &index_lock,
+			       COMMIT_LOCK | SKIP_IF_UNCHANGED))
+		die("Unable to write new index file");
 }
 
 static void remove_variant(struct rerere_id *id)
@@ -981,8 +978,8 @@ static int handle_cache(const char *path, unsigned char *sha1, const char *outpu
 			break;
 		i = ce_stage(ce) - 1;
 		if (!mmfile[i].ptr) {
-			mmfile[i].ptr = read_sha1_file(ce->oid.hash, &type,
-						       &size);
+			mmfile[i].ptr = read_object_file(&ce->oid, &type,
+							 &size);
 			mmfile[i].size = size;
 		}
 	}
