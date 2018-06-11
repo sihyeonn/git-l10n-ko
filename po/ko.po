@@ -62,7 +62,7 @@ msgstr ""
 "Project-Id-Version: git\n"
 "Report-Msgid-Bugs-To: Git Mailing List <git@vger.kernel.org>\n"
 "POT-Creation-Date: 2018-03-16 07:29+0800\n"
-"PO-Revision-Date: 2018-03-19 13:11+0900\n"
+"PO-Revision-Date: 2018-01-08 10:09+0900\n"
 "Last-Translator: Changwoo Ryu <cwryu@debian.org>\n"
 "Language-Team: Git Korean translation <http://github.com/changwoo/git-l10n-"
 "ko>\n"
@@ -71,7 +71,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Poedit 2.0.6\n"
+"X-Generator: Poedit 2.0.5\n"
 
 #: advice.c:62
 #, c-format
@@ -1632,8 +1632,9 @@ msgstr ""
 "\"--name-only, --name-status, --check, -s 옵션 중 하나만 쓸 수 있습니다"
 
 #: diff.c:4149
+#, fuzzy
 msgid "-G, -S and --find-object are mutually exclusive"
-msgstr "-G, -S, --find-object 옵션 중 하나만 쓸 수 있습니다"
+msgstr "-b, -B, --detach 옵션 중 하나만 쓸 수 있습니다"
 
 #: diff.c:4237
 msgid "--follow requires exactly one pathspec"
@@ -1668,9 +1669,9 @@ msgid ""
 msgstr "%s 변수를 최소한 %d(으)로 설정하고 명령을 다시 시도해 보십시오."
 
 #: dir.c:1866
-#, c-format
+#, fuzzy, c-format
 msgid "could not open directory '%s'"
-msgstr "'%s' 디렉터리를 열 수 없습니다"
+msgstr "'%s' 디렉터리를 만들 수 없습니다"
 
 #: dir.c:2108
 msgid "failed to get kernel name and information"
@@ -1705,8 +1706,9 @@ msgid "could not stat file '%s'"
 msgstr "'%s' 파일에 stat을 할 수 없습니다"
 
 #: fetch-object.c:17
+#, fuzzy
 msgid "Remote with no URL"
-msgstr "URL 없는 리모트"
+msgstr "git archive: URL 없는 리모트"
 
 #: fetch-pack.c:253
 msgid "git fetch-pack: expected shallow list"
@@ -1853,8 +1855,9 @@ msgid "Server supports ofs-delta"
 msgstr "서버에서 ofs-delta를 지원합니다"
 
 #: fetch-pack.c:985
+#, fuzzy
 msgid "Server supports filter"
-msgstr "서버에서 필터를 지원합니다"
+msgstr "서버에서 ofs-delta를 지원합니다"
 
 #: fetch-pack.c:993
 #, c-format
@@ -2913,7 +2916,7 @@ msgstr "브랜치가 '%s'보다 %d개 커밋만큼 앞에 있습니다.\n"
 #: remote.c:2146
 #, c-format
 msgid "  (use \"%s\" for details)\n"
-msgstr " (자세한 정보를 위해 \"%s\"를 사용하십시오)\n"
+msgstr ""
 
 #: remote.c:2150
 #, c-format
@@ -3222,13 +3225,14 @@ msgid " (root-commit)"
 msgstr " (최상위-커밋)"
 
 #: sequencer.c:1050
+#, fuzzy
 msgid "could not parse HEAD"
-msgstr "HEAD를 파싱할 수 없습니다"
+msgstr "HEAD를 읽을 수 없습니다"
 
 #: sequencer.c:1052
-#, c-format
+#, fuzzy, c-format
 msgid "HEAD %s is not a commit!"
-msgstr "HEAD %s은(는) 커밋이 아닙니다!"
+msgstr "%s %s, 커밋이 아닙니다"
 
 #: sequencer.c:1056 builtin/commit.c:1491
 msgid "could not parse HEAD commit"
@@ -3727,9 +3731,9 @@ msgid "the script was already rearranged."
 msgstr "스크립트를 이미 재구성했습니다"
 
 #: setup.c:122
-#, c-format
+#, fuzzy, c-format
 msgid "'%s' is outside repository"
-msgstr "'%s'은(는) 저장소 밖입니다"
+msgstr "%s: '%s'은(는) 저장소 밖입니다"
 
 #: setup.c:171
 #, c-format
@@ -3786,9 +3790,9 @@ msgid "unknown repository extensions found:"
 msgstr "알 수 없는 저장소 확장이 있습니다:"
 
 #: setup.c:533
-#, c-format
+#, fuzzy, c-format
 msgid "error opening '%s'"
-msgstr "'%s'을(를) 여는데 오류"
+msgstr "'%s'을(를) 여는데 실패"
 
 #: setup.c:535
 #, fuzzy, c-format
@@ -3796,9 +3800,9 @@ msgid "too large to be a .git file: '%s'"
 msgstr "'%s' 입력 파일을 읽을 수 없습니다"
 
 #: setup.c:537
-#, c-format
+#, fuzzy, c-format
 msgid "error reading %s"
-msgstr "%s을(를) 읽는데 오류"
+msgstr "트리 빌드에 오류"
 
 #: setup.c:539
 #, fuzzy, c-format
@@ -3811,9 +3815,9 @@ msgid "no path in gitfile: %s"
 msgstr "%s 패치 파일을 열 수 없습니다"
 
 #: setup.c:543
-#, c-format
+#, fuzzy, c-format
 msgid "not a git repository: %s"
-msgstr "깃 저장소가 아닙니다: %s"
+msgstr "깃 저장소가 아닙니다"
 
 #: setup.c:642
 #, c-format
@@ -3821,14 +3825,14 @@ msgid "'$%s' too big"
 msgstr ""
 
 #: setup.c:656
-#, c-format
+#, fuzzy, c-format
 msgid "not a git repository: '%s'"
-msgstr "깃 저장소가 아닙니다: '%s'"
+msgstr "깃 저장소가 아닙니다"
 
 #: setup.c:685 setup.c:687 setup.c:718
-#, c-format
+#, fuzzy, c-format
 msgid "cannot chdir to '%s'"
-msgstr "'%s'에 대해 chdir를 할 수 없습니다"
+msgstr "%s에 대해 chdir를 할 수 없습니다"
 
 #: setup.c:690 setup.c:746 setup.c:756 setup.c:795 setup.c:803 setup.c:818
 #, fuzzy
@@ -3850,9 +3854,9 @@ msgid "Unable to read current working directory"
 msgstr "현재 작업 디렉터리를 읽을 수 없습니다"
 
 #: setup.c:1069 setup.c:1075
-#, c-format
+#, fuzzy, c-format
 msgid "cannot change to '%s'"
-msgstr "'%s'에 대해 변경 할 수 없습니다"
+msgstr "'%s' 위치로 이동할 수 없습니다"
 
 #: setup.c:1088
 #, fuzzy, c-format
@@ -3879,12 +3883,14 @@ msgid "open /dev/null or dup failed"
 msgstr "/dev/null 열기 실패"
 
 #: setup.c:1230
+#, fuzzy
 msgid "fork failed"
-msgstr "fork 실패"
+msgstr "fseek 실패"
 
 #: setup.c:1235
+#, fuzzy
 msgid "setsid failed"
-msgstr "setsid 실패"
+msgstr "스태시 실패"
 
 #: sha1_file.c:592
 #, c-format
@@ -4459,9 +4465,9 @@ msgid "'%s' file does not contain absolute path to the working tree location"
 msgstr ""
 
 #: worktree.c:314
-#, c-format
+#, fuzzy, c-format
 msgid "'%s' does not exist"
-msgstr "'%s'이(가) 없습니다"
+msgstr "'%s' 경로가 없습니다"
 
 #: worktree.c:320
 #, fuzzy, c-format
@@ -7202,9 +7208,10 @@ msgstr ""
 "십시오."
 
 #: builtin/clone.c:1099
+#, fuzzy
 msgid "--filter is ignored in local clones; use file:// instead."
 msgstr ""
-"--filter 옵션은 로컬 복제에서 무시됩니다. 대신에 'file://'을 사용하십시오."
+"--depth 옵션은 로컬 복제에서 무시됩니다. 대신에 'file://'을 사용하십시오."
 
 #: builtin/clone.c:1102
 msgid "source repository is shallow, ignoring --local"
@@ -7523,8 +7530,9 @@ msgid "Only one of -c/-C/-F/--fixup can be used."
 msgstr "-c/-C/-F/--fixup 옵션 중에 하나만 사용할 수 있습니다."
 
 #: builtin/commit.c:1114
+#, fuzzy
 msgid "Option -m cannot be combined with -c/-C/-F."
-msgstr "-m 옵션은 -c/-C/-F 옵션과 같이 쓸 수 없습니다."
+msgstr "-m 옵션은 -c/-C/-F/--fixup 옵션과 같이 쓸 수 없습니다."
 
 #: builtin/commit.c:1122
 msgid "--reset-author can be used only with -C, -c or --amend."
@@ -8586,7 +8594,7 @@ msgstr "--deepen 옵션에 음수 깊이는 지원하지 않습니다"
 
 #: builtin/fetch.c:1441
 msgid "--deepen and --depth are mutually exclusive"
-msgstr "--deepen, --depth 옵션 중 하나만 쓸 수 있습니다"
+msgstr "-deepen, --depth 옵션 중 하나만 쓸 수 있습니다"
 
 #: builtin/fetch.c:1446
 msgid "--depth and --unshallow cannot be used together"
@@ -13046,8 +13054,9 @@ msgid "Could not write new index file."
 msgstr "새 인덱스 파일을 쓸 수 없습니다."
 
 #: builtin/rev-list.c:397
+#, fuzzy
 msgid "cannot combine --exclude-promisor-objects and --missing"
-msgstr "--exclude-promisor-objects 옵션과 --missing 옵션을 결합 할 수 없습니다"
+msgstr "--use-bitmap-index 옵션에 오브젝트 필터링을 결합 할 수 없습니다"
 
 #: builtin/rev-list.c:455
 msgid "object filtering requires --objects"
@@ -13610,9 +13619,9 @@ msgid "git submodule--helper name <path>"
 msgstr "git submodule--helper name <경로>"
 
 #: builtin/submodule--helper.c:806
-#, c-format
+#, fuzzy, c-format
 msgid "Synchronizing submodule url for '%s'\n"
-msgstr "하위 모듈 URL을 '%s'에 대해 동기화\n"
+msgstr "하위 모듈 URL을 '$displaypath'에 대해 동기화"
 
 #: builtin/submodule--helper.c:812
 #, fuzzy, c-format
@@ -13640,8 +13649,9 @@ msgid "Recurse into nested submodules"
 msgstr "내장된 하위 모듈에 재귀적으로 적용"
 
 #: builtin/submodule--helper.c:892
+#, fuzzy
 msgid "git submodule--helper sync [--quiet] [--recursive] [<path>]"
-msgstr "git submodule--helper sync [--quiet] [--recursive] [<경로>]"
+msgstr "git submodule status [--quiet] [--cached] [--recursive] [<경로>...]"
 
 #: builtin/submodule--helper.c:946
 #, fuzzy, c-format
@@ -13662,9 +13672,9 @@ msgstr ""
 "f'를 사용하십시오"
 
 #: builtin/submodule--helper.c:966
-#, c-format
+#, fuzzy, c-format
 msgid "Cleared directory '%s'\n"
-msgstr "'%s' 디렉터리를 지웁니다\n"
+msgstr "'$displaypath' 디렉터리를 지웁니다"
 
 #: builtin/submodule--helper.c:968
 #, fuzzy, c-format
@@ -13672,9 +13682,9 @@ msgid "Could not remove submodule work tree '%s'\n"
 msgstr "하위 모듈 디렉터리를 ('$displaypath') 제거할 수 없습니다"
 
 #: builtin/submodule--helper.c:977
-#, c-format
+#, fuzzy, c-format
 msgid "could not create empty submodule directory %s"
-msgstr "빈 하위 모듈 디렉터리를 %s을(를) 만들 수 없습니다"
+msgstr "빈 하위 모듈 디렉터리를 ('$displaypath') 만들 수 없습니다"
 
 #: builtin/submodule--helper.c:993
 #, fuzzy, c-format
@@ -13691,10 +13701,10 @@ msgid "Unregister all submodules"
 msgstr "하위 모듈에 재귀적으로 적용"
 
 #: builtin/submodule--helper.c:1028
+#, fuzzy
 msgid ""
 "git submodule deinit [--quiet] [-f | --force] [--all | [--] [<path>...]]"
-msgstr ""
-"git submodule deinit [--quiet] [-f | --force] [--all | [--] [<경로>...]]"
+msgstr "git submodule status [--quiet] [--cached] [--recursive] [<경로>...]"
 
 #: builtin/submodule--helper.c:1042
 msgid "Use '--all' if you really want to deinitialize all submodules"
@@ -14113,7 +14123,7 @@ msgstr "%s 디렉터리를 삭제하는데 실패했습니다"
 #: builtin/update-index.c:138
 #, c-format
 msgid "Testing mtime in '%s' "
-msgstr "'%s' 안의 수정 시각을 확인하는 중입니다 "
+msgstr "'%s' 안의 수정 시각을 확인하는 중입니다"
 
 #: builtin/update-index.c:152
 msgid "directory stat info does not change after adding a new file"
@@ -14569,9 +14579,9 @@ msgid "working trees containing submodules cannot be moved or removed"
 msgstr ""
 
 #: builtin/worktree.c:672 builtin/worktree.c:811
-#, c-format
+#, fuzzy, c-format
 msgid "'%s' is a main working tree"
-msgstr "'%s'은(는) 메인 작업 폴더입니다"
+msgstr "'%s'은(는) 작업 폴더가 아닙니다"
 
 #: builtin/worktree.c:677
 #, fuzzy, c-format
@@ -14579,18 +14589,19 @@ msgid "could not figure out destination name from '%s'"
 msgstr "'%s'에서 '%s'(으)로 git 디렉터리를 옮겨올 수 없습니다"
 
 #: builtin/worktree.c:683
-#, c-format
+#, fuzzy, c-format
 msgid "target '%s' already exists"
-msgstr "타게 '%s'이(가) 이미 있습니다"
+msgstr "태그 '%s'이(가) 이미 있습니다"
 
 #: builtin/worktree.c:690
-#, c-format
+#, fuzzy, c-format
 msgid "cannot move a locked working tree, lock reason: %s"
-msgstr "잠긴 작업 폴더를 옮길 수 없습니다. 잠긴 이유: %s"
+msgstr "작업폴더 변경 사항을 제거할 수 없습니다"
 
 #: builtin/worktree.c:692
+#, fuzzy
 msgid "cannot move a locked working tree"
-msgstr "잠긴 작업 폴더를 옮길 수 없습니다"
+msgstr "작업 폴더 상태를 기록할 수 없습니다"
 
 #: builtin/worktree.c:695
 #, c-format
@@ -14618,9 +14629,9 @@ msgid "failed to run 'git status' on '%s', code %d"
 msgstr "하위 모듈 '%s'에서 'git status'를 실행할 수 없습니다"
 
 #: builtin/worktree.c:768 builtin/worktree.c:782
-#, c-format
+#, fuzzy, c-format
 msgid "failed to delete '%s'"
-msgstr "'%s'을(를) 삭제하는데 실패했습니다"
+msgstr "실행 실패: '%s'"
 
 #: builtin/worktree.c:794
 #, fuzzy
@@ -14628,13 +14639,14 @@ msgid "force removing even if the worktree is dirty"
 msgstr "대상이 이미 있어도 강제로 옮기기/이름 바꾸기를 합니다"
 
 #: builtin/worktree.c:815
-#, c-format
+#, fuzzy, c-format
 msgid "cannot remove a locked working tree, lock reason: %s"
-msgstr "잠긴 작업 폴더를 제거할 수 없습니다. 잠긴 이유: %s"
+msgstr "작업폴더 변경 사항을 제거할 수 없습니다"
 
 #: builtin/worktree.c:817
+#, fuzzy
 msgid "cannot remove a locked working tree"
-msgstr "잠긴 작업 폴더를 제거할 수 없습니다"
+msgstr "작업 폴더 상태를 기록할 수 없습니다"
 
 #: builtin/worktree.c:820
 #, c-format
@@ -16349,34 +16361,34 @@ msgid "Patch update"
 msgstr "패치 업데이트"
 
 #: git-add--interactive.perl:1383
-#, perl-format
+#, fuzzy, perl-format
 msgid "Stage mode change [y,n,q,a,d%s,?]? "
-msgstr "모드 변경을 스테이징합니까 [y,n,q,a,d%s,?]? "
+msgstr "모드 변경을 스테이징합니까 [y,n,q,a,d,/%s,?]? "
 
 #: git-add--interactive.perl:1384
-#, perl-format
+#, fuzzy, perl-format
 msgid "Stage deletion [y,n,q,a,d%s,?]? "
-msgstr "삭제를 스테이징합니까 [y,n,q,a,d%s,?]? "
+msgstr "삭제를 스테이징합니까 [y,n,q,a,d,/%s,?]? "
 
 #: git-add--interactive.perl:1385
-#, perl-format
+#, fuzzy, perl-format
 msgid "Stage this hunk [y,n,q,a,d%s,?]? "
-msgstr "이 부분 스테이징합니까 [y,n,q,a,d%s,?]? "
+msgstr "이 부분 스테이징합니까 [y,n,q,a,d,/%s,?]? "
 
 #: git-add--interactive.perl:1388
-#, perl-format
+#, fuzzy, perl-format
 msgid "Stash mode change [y,n,q,a,d%s,?]? "
-msgstr "모드 변경 스태시합니까 [y,n,q,a,d%s,?]? "
+msgstr "모드 변경 스태시합니까 [y,n,q,a,d,/%s,?]? "
 
 #: git-add--interactive.perl:1389
-#, perl-format
+#, fuzzy, perl-format
 msgid "Stash deletion [y,n,q,a,d%s,?]? "
-msgstr "삭제 스태시합니까 [y,n,q,a,d%s,?]? "
+msgstr "삭제 스태시합니까 [y,n,q,a,d,/%s,?]? "
 
 #: git-add--interactive.perl:1390
-#, perl-format
+#, fuzzy, perl-format
 msgid "Stash this hunk [y,n,q,a,d%s,?]? "
-msgstr "이 부분 스태시합니까 [y,n,q,a,d%s,?]? "
+msgstr "이 부분 스태시합니까 [y,n,q,a,d,/%s,?]? "
 
 #: git-add--interactive.perl:1393
 #, fuzzy, perl-format
@@ -16394,64 +16406,64 @@ msgid "Unstage this hunk [y,n,q,a,d%s,?]? "
 msgstr "이 부분 스태시 해제합니까 [y,n,q,a,d,/%s,?]? "
 
 #: git-add--interactive.perl:1398
-#, perl-format
+#, fuzzy, perl-format
 msgid "Apply mode change to index [y,n,q,a,d%s,?]? "
-msgstr "모드 변경을 인덱스에 적용합니까 [y,n,q,a,d%s,?]? "
+msgstr "모드 변경을 인덱스에 적용합니까 [y,n,q,a,d,/%s,?]? "
 
 #: git-add--interactive.perl:1399
-#, perl-format
+#, fuzzy, perl-format
 msgid "Apply deletion to index [y,n,q,a,d%s,?]? "
-msgstr "삭제를 인덱스에 적용합니까 [y,n,q,a,d%s,?]? "
+msgstr "삭제를 인덱스에 적용합니까 [y,n,q,a,d,/%s,?]? "
 
 #: git-add--interactive.perl:1400
-#, perl-format
+#, fuzzy, perl-format
 msgid "Apply this hunk to index [y,n,q,a,d%s,?]? "
-msgstr "이 부분을 인덱스에 적용합니까 [y,n,q,a,d%s,?]? "
+msgstr "이 부분을 인덱스에 적용합니까 [y,n,q,a,d,/%s,?]? "
 
 #: git-add--interactive.perl:1403
-#, perl-format
+#, fuzzy, perl-format
 msgid "Discard mode change from worktree [y,n,q,a,d%s,?]? "
-msgstr "모드 변경을 작업 폴더에서 버립니까 [y,n,q,a,d%s,?]? "
+msgstr "모드 변경을 작업 폴더에서 버립니까 [y,n,q,a,d,/%s,?]? "
 
 #: git-add--interactive.perl:1404
-#, perl-format
+#, fuzzy, perl-format
 msgid "Discard deletion from worktree [y,n,q,a,d%s,?]? "
-msgstr "삭제를 작업 폴더에서 버립니까 [y,n,q,a,d%s,?]? "
+msgstr "삭제를 작업 폴더에서 버립니까 [y,n,q,a,d,/%s,?]? "
 
 #: git-add--interactive.perl:1405
-#, perl-format
+#, fuzzy, perl-format
 msgid "Discard this hunk from worktree [y,n,q,a,d%s,?]? "
-msgstr "이 부분을 작업 폴더에서 버립니까 [y,n,q,a,d%s,?]? "
+msgstr "이 부분을 작업 폴더에서 버립니까 [y,n,q,a,d,/%s,?]? "
 
 #: git-add--interactive.perl:1408
-#, perl-format
+#, fuzzy, perl-format
 msgid "Discard mode change from index and worktree [y,n,q,a,d%s,?]? "
-msgstr "모드 변경을 인덱스와 작업 폴더에서 버립니까 [y,n,q,a,d%s,?]? "
+msgstr "모드 변경을 인덱스와 작업 폴더에서 버립니까 [y,n,q,a,d,/%s,?]? "
 
 #: git-add--interactive.perl:1409
-#, perl-format
+#, fuzzy, perl-format
 msgid "Discard deletion from index and worktree [y,n,q,a,d%s,?]? "
-msgstr "삭제를 인덱스와 작업 폴더에서 버립니까 [y,n,q,a,d%s,?]? "
+msgstr "삭제를 인덱스와 작업 폴더에서 버립니까 [y,n,q,a,d,/%s,?]? "
 
 #: git-add--interactive.perl:1410
-#, perl-format
+#, fuzzy, perl-format
 msgid "Discard this hunk from index and worktree [y,n,q,a,d%s,?]? "
-msgstr "이 부분을 인덱스와 작업 폴더에서 버립니까 [y,n,q,a,d%s,?]? "
+msgstr "이 부분을 인덱스와 작업 폴더에서 버립니까 [y,n,q,a,d,/%s,?]? "
 
 #: git-add--interactive.perl:1413
-#, perl-format
+#, fuzzy, perl-format
 msgid "Apply mode change to index and worktree [y,n,q,a,d%s,?]? "
-msgstr "모드 변경을 인덱스와 작업 폴더에 적용합니까 [y,n,q,a,d%s,?]? "
+msgstr "모드 변경을 인덱스와 작업 폴더에 적용합니까 [y,n,q,a,d,/%s,?]? "
 
 #: git-add--interactive.perl:1414
-#, perl-format
+#, fuzzy, perl-format
 msgid "Apply deletion to index and worktree [y,n,q,a,d%s,?]? "
-msgstr "삭제를 인덱스와 작업 폴더에 적용합니까 [y,n,q,a,d%s,?]? "
+msgstr "삭제를 인덱스와 작업 폴더에 적용합니까 [y,n,q,a,d,/%s,?]? "
 
 #: git-add--interactive.perl:1415
-#, perl-format
+#, fuzzy, perl-format
 msgid "Apply this hunk to index and worktree [y,n,q,a,d%s,?]? "
-msgstr "이 부분을 인덱스와 작업 폴더에 적용합니까 [y,n,q,a,d%s,?]? "
+msgstr "이 부분을 인덱스와 작업 폴더에 적용합니까 [y,n,q,a,d,/%s,?]? "
 
 #: git-add--interactive.perl:1515
 msgid "No other hunks to goto\n"
@@ -16503,7 +16515,7 @@ msgstr "다음 부분이 없습니다\n"
 
 #: git-add--interactive.perl:1637
 msgid "Sorry, cannot split this hunk\n"
-msgstr "미안합니다. 이 부분을 분리 할 수 없습니다\n"
+msgstr ""
 
 #: git-add--interactive.perl:1643
 #, perl-format
@@ -16513,7 +16525,7 @@ msgstr[0] "%d개 부분으로 나눕니다.\n"
 
 #: git-add--interactive.perl:1653
 msgid "Sorry, cannot edit this hunk\n"
-msgstr "미안합니다. 이 부분을 수정할 수 없습니다\n"
+msgstr ""
 
 #: git-add--interactive.perl:1699
 msgid "Review diff"
