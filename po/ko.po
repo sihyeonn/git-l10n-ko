@@ -36,6 +36,7 @@
 #  | fast-forward | 정방향 진행                                  |
 #  | fsmonitor    | 파일 시스템 모니터                           |
 #  | Git          | 깃                                           |
+#  | graft        | 그래프트                                     |
 #  | head         | 헤드                                         |
 #  | hook         | 후크                                         |
 #  | history      | (커밋) 내역                                  |
@@ -64,7 +65,7 @@ msgstr ""
 "Project-Id-Version: git\n"
 "Report-Msgid-Bugs-To: Git Mailing List <git@vger.kernel.org>\n"
 "POT-Creation-Date: 2018-06-08 09:03+0800\n"
-"PO-Revision-Date: 2018-03-28 23:28+0900\n"
+"PO-Revision-Date: 2018-06-11 23:39+0900\n"
 "Last-Translator: Changwoo Ryu <cwryu@debian.org>\n"
 "Language-Team: Git Korean translation <http://github.com/changwoo/git-l10n-"
 "ko>\n"
@@ -76,9 +77,9 @@ msgstr ""
 "X-Generator: Poedit 2.0.6\n"
 
 #: advice.c:92
-#, fuzzy, c-format
+#, c-format
 msgid "%shint: %.*s%s\n"
-msgstr "힌트: %.*s\n"
+msgstr "%s힌트: %.*s%s\n"
 
 #: advice.c:137
 msgid "Cherry-picking is not possible because you have unmerged files."
@@ -1301,6 +1302,16 @@ msgid ""
 "Turn this message off by running\n"
 "\"git config advice.graftFileDeprecated false\""
 msgstr ""
+"<GIT_DIR>/info/grafts에 대한 지원은 다음 깃\n"
+"버전에서 제거될 예정입니다.\n"
+"\n"
+"그래프트를 레퍼런스로 전환하려면\n"
+"\"git replace --convert-graft-file\" 명령을\n"
+"사용하십시오.\n"
+"\n"
+"이 메시지를 보지 않으려면\n"
+"\"git config advice.graftFileDeprecated false\"\n"
+"명령을 사용하십시오"
 
 #: commit.c:1537
 msgid ""
@@ -1315,12 +1326,11 @@ msgstr ""
 #: commit-graph.c:669
 #, c-format
 msgid "the commit graph format cannot write %d commits"
-msgstr ""
+msgstr "커밋 그래프 포맷에서 커밋 %d개를 쓸 수 없습니다"
 
 #: commit-graph.c:696
-#, fuzzy
 msgid "too many commits to write graph"
-msgstr "첫 브랜치에 없는 커밋만 표시합니다"
+msgstr "그래프를 쓰기에는 커밋 수가 너무 많습니다"
 
 #: commit-graph.c:707 builtin/init-db.c:516 builtin/init-db.c:521
 #, c-format
@@ -1449,7 +1459,7 @@ msgstr "잘못된 %s: '%s'"
 #: config.c:2243
 #, c-format
 msgid "unknown core.untrackedCache value '%s'; using 'keep' default value"
-msgstr "알 수 없는 core.untrackedCache 값 '%s'; 기본값으로 'keep' 사용"
+msgstr "알 수 없는 core.untrackedCache 값 '%s'. 기본값으로 'keep' 사용"
 
 #: config.c:2269
 #, c-format
@@ -1549,40 +1559,40 @@ msgstr ""
 #: convert.c:279
 #, c-format
 msgid "BOM is prohibited in '%s' if encoded as %s"
-msgstr ""
+msgstr "'%s'에서 인코딩이 %s이면 BOM이 금지됩니다"
 
 #: convert.c:286
 #, c-format
 msgid ""
 "The file '%s' contains a byte order mark (BOM). Please use UTF-%s as working-"
 "tree-encoding."
-msgstr ""
+msgstr "'%s' 파일에 BOM(byte order mark)이 들어 있습니다. working-tree-encoding으로 UTF-%s 값을 사용하십시오."
 
 #: convert.c:304
 #, c-format
 msgid "BOM is required in '%s' if encoded as %s"
-msgstr ""
+msgstr "'%s'에서 인코딩이 %s이면 BOM이 필요합니다"
 
 #: convert.c:306
 #, c-format
 msgid ""
 "The file '%s' is missing a byte order mark (BOM). Please use UTF-%sBE or UTF-"
 "%sLE (depending on the byte order) as working-tree-encoding."
-msgstr ""
+msgstr "'%s' 파일에 BOM(byte order mark)이 없습니다. (바이트 순서에 따라) UTF-%sBE 또는 UTF-%sLE 값을 working-tree-encoding으로 사용하십시오."
 
 #: convert.c:424
-#, fuzzy, c-format
+#, c-format
 msgid "failed to encode '%s' from %s to %s"
-msgstr "'%s'에서 '%s'(으)로 노트를 복사하는데 실패했습니다"
+msgstr "'%s'의 인코딩을 %s에서 %s(으)로 변환하는데 실패했습니다"
 
 #: convert.c:467
 #, c-format
 msgid "encoding '%s' from %s to %s and back is not the same"
-msgstr ""
+msgstr "'%s'의 인코딩을 %s에서 %s(으)로 변환하고 다시 역으로 변환했을 때 원래 내용과 다릅니다."
 
 #: convert.c:1225
 msgid "true/false are no valid working-tree-encodings"
-msgstr ""
+msgstr "true/false는 올바른 working-tree-encodings 값이 아닙니다"
 
 #: date.c:116
 msgid "in the future"
@@ -1949,9 +1959,8 @@ msgid "git fetch-pack: fetch failed."
 msgstr "git fetch-pack: 가져오기 실패."
 
 #: fetch-pack.c:1199
-#, fuzzy
 msgid "Server does not support shallow requests"
-msgstr "서버에서 shallow 클라이언트를 지원하지 않습니다"
+msgstr "서버에서 shallow 요청을 지원하지 않습니다"
 
 #: fetch-pack.c:1584
 msgid "no matching remote head"
@@ -2023,36 +2032,35 @@ msgstr "협동 작업 (참고: git help workflows)"
 
 #: help.c:31
 msgid "Main Porcelain Commands"
-msgstr ""
+msgstr "주요 사용자용 명령"
 
 #: help.c:32
 msgid "Ancillary Commands / Manipulators"
-msgstr ""
+msgstr "보조 명령 / 조작 기능"
 
 #: help.c:33
 msgid "Ancillary Commands / Interrogators"
-msgstr ""
+msgstr "보조 명령 / 정보 획득 기능"
 
 #: help.c:34
-#, fuzzy
 msgid "Interacting with Others"
-msgstr "패치 생성"
+msgstr "다른 사람과 소통"
 
 #: help.c:35
 msgid "Low-level Commands / Manipulators"
-msgstr ""
+msgstr "저수준 명령/ 조작 기능"
 
 #: help.c:36
 msgid "Low-level Commands / Interrogators"
-msgstr ""
+msgstr "보조 명령 / 정보 획득 기능"
 
 #: help.c:37
 msgid "Low-level Commands / Synching Repositories"
-msgstr ""
+msgstr "보조 명령 / 저장소 동기화 기능"
 
 #: help.c:38
 msgid "Low-level Commands / Internal Helpers"
-msgstr ""
+msgstr "보조 명령 / 내부 사용 기능"
 
 #: help.c:293
 #, c-format
@@ -2068,14 +2076,13 @@ msgid "These are common Git commands used in various situations:"
 msgstr "다음은 여러가지 상황에서 자주 사용하는 깃 명령입니다:"
 
 #: help.c:358 git.c:90
-#, fuzzy, c-format
+#, c-format
 msgid "unsupported command listing type '%s'"
-msgstr "지원하지 않는 인덱스 버전 %s"
+msgstr "지원하지 명령 열거 방식 '%s'"
 
 #: help.c:405
-#, fuzzy
 msgid "The common Git guides are:"
-msgstr "자주 사용하는 깃 안내서는 다음과 같습니다:\n"
+msgstr "자주 사용하는 깃 안내서는 다음과 같습니다:"
 
 #: help.c:467
 #, c-format
@@ -2246,14 +2253,14 @@ msgid "(bad commit)\n"
 msgstr "(잘못된 커밋)\n"
 
 #: merge-recursive.c:320
-#, fuzzy, c-format
+#, c-format
 msgid "add_cacheinfo failed for path '%s'; merge aborting."
-msgstr "'%s' 경로에 대해 addinfo_cache가 실패했습니다"
+msgstr "'%s' 경로에 대해 addinfo_cache 실패. 병합 중지."
 
 #: merge-recursive.c:328
-#, fuzzy, c-format
+#, c-format
 msgid "add_cacheinfo failed to refresh for path '%s'; merge aborting."
-msgstr "'%s' 경로에 대해 addinfo_cache가 실패했습니다"
+msgstr "'%s' 경로에 대해 addinfo_cache 새로 고침 실패. 병합 중지."
 
 #: merge-recursive.c:410
 msgid "error building trees"
@@ -2304,43 +2311,43 @@ msgid "do not know what to do with %06o %s '%s'"
 msgstr "다음을 어떻게 할지 알 수 없습니다: %06o %s '%s'"
 
 #: merge-recursive.c:1186
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to merge submodule %s (not checked out)"
-msgstr "'$sm_path' 하위 모듈을 등록하는데 실패했습니다"
+msgstr "%s 하위 모듈 병합 실패 (가져오지 않음)"
 
 #: merge-recursive.c:1193
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to merge submodule %s (commits not present)"
-msgstr "'$sm_path' 하위 모듈을 등록하는데 실패했습니다"
+msgstr "%s 하위 모듈 병합 실패 (커밋이 없습니다)"
 
 #: merge-recursive.c:1200
 #, c-format
 msgid "Failed to merge submodule %s (commits don't follow merge-base)"
-msgstr ""
+msgstr "%s 하위 모듈 병합 실패 (커밋이 병합 베이스를 따르지 않습니다)"
 
 #: merge-recursive.c:1208 merge-recursive.c:1220
 #, c-format
 msgid "Fast-forwarding submodule %s to the following commit:"
-msgstr ""
+msgstr "%s 하위 모듈을 다음 커밋으로 정방향 진행:"
 
 #: merge-recursive.c:1211 merge-recursive.c:1223
-#, fuzzy, c-format
+#, c-format
 msgid "Fast-forwarding submodule %s to %s"
-msgstr "정방향 진행, $sha1 위치로"
+msgstr "%s 하위 모듈을 %s 위치로 정방향 진행"
 
 #: merge-recursive.c:1245
 #, c-format
 msgid "Failed to merge submodule %s (merge following commits not found)"
-msgstr ""
+msgstr "%s 하위 모듈 병합 실패 (병합할 때 따라갈 커밋이 없습니다)"
 
 #: merge-recursive.c:1249
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to merge submodule %s (not fast-forward)"
-msgstr "'$sm_path' 하위 모듈을 등록하는데 실패했습니다"
+msgstr "%s 하위 모듈 병합 실패 (정방향이 아닙니다)"
 
 #: merge-recursive.c:1250
 msgid "Found a possible merge resolution for the submodule:\n"
-msgstr ""
+msgstr "하위 모듈에 대해 가능한 병합 방법을 찾았습니다:\n"
 
 #: merge-recursive.c:1253
 #, c-format
@@ -2352,11 +2359,17 @@ msgid ""
 "\n"
 "which will accept this suggestion.\n"
 msgstr ""
+"이 제안이 맞으면 인덱스에 추가하면 됩니다. 예를 들어\n"
+"다음 명령을 사용하면:\n"
+"\n"
+"  git update-index --cacheinfo 160000 %s \"%s\"\n"
+"\n"
+"제안을 받아들이게 됩니다.\n"
 
 #: merge-recursive.c:1262
 #, c-format
 msgid "Failed to merge submodule %s (multiple merges found)"
-msgstr ""
+msgstr "%s 하위 모듈 병합 실패 (병합이 여러개 있습니다)"
 
 #: merge-recursive.c:1321
 msgid "Failed to execute internal merge"
@@ -2373,44 +2386,37 @@ msgid "Auto-merging %s"
 msgstr "자동 병합: %s"
 
 #: merge-recursive.c:1423
-#, fuzzy, c-format
+#, c-format
 msgid "Error: Refusing to lose untracked file at %s; writing to %s instead."
-msgstr "'%s' 위치의 추적되지 않는 파일을 잃기를 거부합니다"
+msgstr "오류: %s 위치의 추적되지 않는 파일을 잃기를 거부합니다. 대신 %s에 씁니다."
 
 #: merge-recursive.c:1475
 #, c-format
 msgid ""
 "CONFLICT (%s/delete): %s deleted in %s and %s in %s. Version %s of %s left "
 "in tree."
-msgstr ""
-"충돌! (%s/삭제): %s (위치 %s) 및 %s (%s에서) 삭제. %s 버전의 %s 트리에 남음."
+msgstr "충돌 (%s/삭제): %s (위치 %s) 및 %s (%s에서) 삭제. %s 버전의 %s 트리에 남음."
 
 #: merge-recursive.c:1480
 #, c-format
 msgid ""
 "CONFLICT (%s/delete): %s deleted in %s and %s to %s in %s. Version %s of %s "
 "left in tree."
-msgstr ""
-"충돌! (%s/삭제): %s (위치 %s) 삭제, %s에서 %s(으)로 (위치 %s). %s 버전의 %s "
-"트리에 남음."
+msgstr "충돌 (%s/삭제): %s (위치 %s) 삭제, %s에서 %s(으)로 (위치 %s). %s 버전의 %s 트리에 남음."
 
 #: merge-recursive.c:1487
 #, c-format
 msgid ""
 "CONFLICT (%s/delete): %s deleted in %s and %s in %s. Version %s of %s left "
 "in tree at %s."
-msgstr ""
-"충돌! (%s/삭제): %s (위치 %s) 및 %s (위치 %s) 삭제. %s 버전의 %s 트리에 "
-"%s(으)로 남음."
+msgstr "충돌 (%s/삭제): %s (위치 %s) 및 %s (위치 %s) 삭제. %s 버전의 %s 트리에 %s(으)로 남음."
 
 #: merge-recursive.c:1492
 #, c-format
 msgid ""
 "CONFLICT (%s/delete): %s deleted in %s and %s to %s in %s. Version %s of %s "
 "left in tree at %s."
-msgstr ""
-"충돌! (%s/삭제): %s (위치 %s) 삭제, %s에서 %s(으)로 (위치 %s). %s 버전의 %s "
-"트리에 남음 (위치 %s)."
+msgstr "충돌 (%s/삭제): %s (위치 %s) 삭제, %s에서 %s(으)로 (위치 %s). %s 버전의 %s 트리에 남음 (위치 %s)."
 
 #: merge-recursive.c:1526
 msgid "rename"
@@ -2422,9 +2428,9 @@ msgstr "이름바꿈"
 
 #: merge-recursive.c:1580 merge-recursive.c:1736 merge-recursive.c:2368
 #: merge-recursive.c:3086
-#, fuzzy, c-format
+#, c-format
 msgid "Refusing to lose dirty file at %s"
-msgstr "'%s' 위치의 추적되지 않는 파일을 잃기를 거부합니다"
+msgstr "%s 위치의 변경된 파일을 잃기를 거부합니다"
 
 #: merge-recursive.c:1594
 #, c-format
@@ -2432,18 +2438,16 @@ msgid "%s is a directory in %s adding as %s instead"
 msgstr "%s은(는) %s에 있는 디렉터리로 %s(으)로 이름을 바꿉니다"
 
 #: merge-recursive.c:1599
-#, fuzzy, c-format
+#, c-format
 msgid "Refusing to lose untracked file at %s; adding as %s instead"
-msgstr "'%s' 위치의 추적되지 않는 파일을 잃기를 거부합니다"
+msgstr "%s 위치의 추적되지 않는 파일을 잃기를 거부합니다. 대신 %s 추가"
 
 #: merge-recursive.c:1625
 #, c-format
 msgid ""
 "CONFLICT (rename/rename): Rename \"%s\"->\"%s\" in branch \"%s\" rename \"%s"
 "\"->\"%s\" in \"%s\"%s"
-msgstr ""
-"충돌! (이름바꾸기/이름바꾸기): \"%3$s\" 브랜치에서 이름바꾸기 \"%1$s\"->"
-"\"%2$s\" \"%6$s\" 브랜치에서 이름 바꾸기 \"%4$s\"->\"%5$s\"%7$s"
+msgstr "충돌 (이름바꾸기/이름바꾸기): \"%3$s\" 브랜치에서 이름바꾸기 \"%1$s\"->\"%2$s\" \"%6$s\" 브랜치에서 이름 바꾸기 \"%4$s\"->\"%5$s\"%7$s"
 
 #: merge-recursive.c:1630
 msgid " (left unresolved)"
@@ -2452,9 +2456,7 @@ msgstr " (해결되지 않음)"
 #: merge-recursive.c:1694
 #, c-format
 msgid "CONFLICT (rename/rename): Rename %s->%s in %s. Rename %s->%s in %s"
-msgstr ""
-"충돌! (rename/rename): 이름 바꾸기 %s->%s (위치 %s). 이름 바꾸기 %s->%s (위"
-"치 %s)"
+msgstr "충돌 (rename/rename): 이름 바꾸기 %s->%s (위치 %s). 이름 바꾸기 %s->%s (위치 %s)"
 
 #: merge-recursive.c:1733
 #, c-format
@@ -2462,9 +2464,9 @@ msgid "Renaming %s to %s and %s to %s instead"
 msgstr "대신 이름을 %s에서 %s(으)로 바꾸고 %s에서 %s(으)로 바꿉니다"
 
 #: merge-recursive.c:1745
-#, fuzzy, c-format
+#, c-format
 msgid "Refusing to lose untracked file at %s, even though it's in the way."
-msgstr "'%s' 위치의 추적되지 않는 파일을 잃기를 거부합니다"
+msgstr "%s 위치의 추적되지 않는 파일을 잃기를 (잃어버릴 예정이지만) 거부합니다."
 
 #: merge-recursive.c:1951
 #, c-format
@@ -2472,42 +2474,40 @@ msgid ""
 "CONFLICT (directory rename split): Unclear where to place %s because "
 "directory %s was renamed to multiple other directories, with no destination "
 "getting a majority of the files."
-msgstr ""
+msgstr "충돌 (디렉터리 이름 바꾸기 분리): %s 파일을 어디에 놓을지 불분명합니다. %s 디렉터리가 여러 개의 다른 디렉터리로 이름이 바뀌었고 파일 다수가 들어 있는 대상이 없기 때문입니다."
 
 #: merge-recursive.c:1983
 #, c-format
 msgid ""
 "CONFLICT (implicit dir rename): Existing file/dir at %s in the way of "
 "implicit directory rename(s) putting the following path(s) there: %s."
-msgstr ""
+msgstr "충돌 (묵시적인 디렉터리 이름 바꾸기): %s 위치의 기존 파일/디렉터리가 묵시적으로 디렉터리 이름이 바뀌어 다음 경로가 들어갈 예정입니다: %s."
 
 #: merge-recursive.c:1993
 #, c-format
 msgid ""
 "CONFLICT (implicit dir rename): Cannot map more than one path to %s; "
 "implicit directory renames tried to put these paths there: %s"
-msgstr ""
+msgstr "충돌 (묵시적인 디렉터리 이름 바꾸기): 여러 개의 경로를 %s에 대응할 수 없습니다. 묵시적인 디렉터리 이름 바꾸기 기능은 이들 경로를 해당 위치에 놓도록 시도합니다: %s"
 
 #: merge-recursive.c:2085
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "CONFLICT (rename/rename): Rename directory %s->%s in %s. Rename directory %s-"
 ">%s in %s"
-msgstr ""
-"충돌! (rename/rename): 이름 바꾸기 %s->%s (위치 %s). 이름 바꾸기 %s->%s (위"
-"치 %s)"
+msgstr "충돌 (rename/rename): 이름 바꾸기 %s->%s (위치 %s). 이름 바꾸기 %s->%s (위치 %s)"
 
 #: merge-recursive.c:2330
 #, c-format
 msgid ""
 "WARNING: Avoiding applying %s -> %s rename to %s, because %s itself was "
 "renamed."
-msgstr ""
+msgstr "경고: %s -> %s 이름 바꾸기 (대상 %s) 적용 거부. %s 자체가 이미 이름이 바뀌었습니다."
 
 #: merge-recursive.c:2736
 #, c-format
 msgid "CONFLICT (rename/add): Rename %s->%s in %s. %s added in %s"
-msgstr "충돌! (rename/add): 이름 바꾸기 %s->%s (위치 %s). %s 추가 (위치 %s)"
+msgstr "충돌 (rename/add): 이름 바꾸기 %s->%s (위치 %s). %s 추가 (위치 %s)"
 
 #: merge-recursive.c:2751
 #, c-format
@@ -2557,7 +2557,7 @@ msgstr "하위 모듈"
 #: merge-recursive.c:3056
 #, c-format
 msgid "CONFLICT (%s): Merge conflict in %s"
-msgstr "충돌! (%s): %s에 병합 충돌"
+msgstr "충돌 (%s): %s에 병합 충돌"
 
 #: merge-recursive.c:3178
 #, c-format
@@ -2575,9 +2575,7 @@ msgstr "디렉터리/파일"
 #: merge-recursive.c:3217
 #, c-format
 msgid "CONFLICT (%s): There is a directory with name %s in %s. Adding %s as %s"
-msgstr ""
-"충돌! (%s): 이름이 %s인 디렉터리가 %s에 있습니다. %s을(를) %s(으)로 추가합니"
-"다"
+msgstr "충돌 (%s): 이름이 %s인 디렉터리가 %s에 있습니다. %s을(를) %s(으)로 추가합니다"
 
 #: merge-recursive.c:3226
 #, c-format
@@ -2706,9 +2704,9 @@ msgid "-NUM"
 msgstr "-NUM"
 
 #: parse-options-cb.c:44
-#, fuzzy, c-format
+#, c-format
 msgid "malformed expiration date '%s'"
-msgstr "형식이 잘못된 옵션 시트: '%s'"
+msgstr "형식이 잘못된 만료 시각: '%s'"
 
 #: parse-options-cb.c:112
 #, c-format
@@ -3030,9 +3028,9 @@ msgid "(no branch, rebasing %s)"
 msgstr "(브랜치 없음, %s 리베이스)"
 
 #: ref-filter.c:1390
-#, fuzzy, c-format
+#, c-format
 msgid "(no branch, rebasing detached HEAD %s)"
-msgstr "(브랜치 없음, %s 리베이스)"
+msgstr "(브랜치 없음, 분리된 HEAD %s 리베이스)"
 
 #: ref-filter.c:1393
 #, c-format
@@ -3286,9 +3284,9 @@ msgid "invalid commit message cleanup mode '%s'"
 msgstr "잘못된 커밋 메시지 정리 모드 '%s'"
 
 #: sequencer.c:275
-#, fuzzy, c-format
+#, c-format
 msgid "could not delete '%s'"
-msgstr "%s을(를) 삭제할 수 없습니다"
+msgstr "'%s'을(를) 삭제할 수 없습니다"
 
 #: sequencer.c:301
 msgid "revert"
@@ -3415,9 +3413,8 @@ msgstr ""
 "  git rebase --continue\n"
 
 #: sequencer.c:818
-#, fuzzy
 msgid "writing root commit"
-msgstr "커밋할 사항 없음\n"
+msgstr "최상위 커밋을 씁니다"
 
 #: sequencer.c:1043
 msgid "'prepare-commit-msg' hook failed"
@@ -3587,9 +3584,8 @@ msgid "your index file is unmerged."
 msgstr "인덱스 파일이 병합되지 않았습니다."
 
 #: sequencer.c:1638
-#, fuzzy
 msgid "cannot fixup root commit"
-msgstr "%s 커밋을 찾을 수 없음 (%s)"
+msgstr "최상위 커밋을 바로잡을 수 없습니다"
 
 #: sequencer.c:1657
 #, c-format
@@ -3706,7 +3702,7 @@ msgstr "%s의 값이 잘못됨: %s"
 
 #: sequencer.c:2269
 msgid "unusable squash-onto"
-msgstr ""
+msgstr "불안한 squash-onto"
 
 #: sequencer.c:2285
 #, c-format
@@ -3820,53 +3816,49 @@ msgstr ""
 "\n"
 
 #: sequencer.c:2771
-#, fuzzy
 msgid "writing fake root commit"
-msgstr "커밋할 사항 없음\n"
+msgstr "가짜 최상위 커밋을 씁니다"
 
 #: sequencer.c:2776
 msgid "writing squash-onto"
-msgstr ""
+msgstr "squash-onto를 씁니다"
 
 #: sequencer.c:2811
-#, fuzzy, c-format
+#, c-format
 msgid "failed to find tree of %s"
-msgstr "%s의 트리를 찾는데 실패했습니다."
+msgstr "%s의 트리를 찾는데 실패했습니다"
 
 #: sequencer.c:2829
-#, fuzzy
 msgid "could not write index"
-msgstr "인덱스를 읽을 수 없습니다"
+msgstr "인덱스를 쓸 수 없습니다"
 
 #: sequencer.c:2861
-#, fuzzy
 msgid "cannot merge without a current revision"
-msgstr "이전 커밋 없이 '%s' 수행할 수 없습니다"
+msgstr "현재 리비전 없이 병합할 수 없습니다"
 
 #: sequencer.c:2884
-#, fuzzy, c-format
+#, c-format
 msgid "could not resolve '%s'"
-msgstr "'%s'을(를) 제거할 수 없습니다"
+msgstr "'%s' 해결할 수 없습니다"
 
 #: sequencer.c:2906
-#, fuzzy, c-format
+#, c-format
 msgid "could not get commit message of '%s'"
-msgstr "%s의 커밋 메시지를 읽을 수 없습니다"
+msgstr "'%s'의 커밋 메시지를 읽을 수 없습니다"
 
 #: sequencer.c:2916 sequencer.c:2941
-#, fuzzy, c-format
+#, c-format
 msgid "could not write '%s'"
 msgstr "'%s'에 쓸 수 없습니다"
 
 #: sequencer.c:3005
-#, fuzzy, c-format
+#, c-format
 msgid "could not even attempt to merge '%.*s'"
-msgstr "'%s'을(를) 열거나 읽을 수 없습니다"
+msgstr "'%.*s' 병합을 시도도 할 수 없습니다"
 
 #: sequencer.c:3021
-#, fuzzy
 msgid "merge: Unable to write new index file"
-msgstr "%s: 새 인덱스 파일을 쓸 수 없습니다"
+msgstr "병합: 새 인덱스 파일을 쓸 수 없습니다"
 
 #: sequencer.c:3088
 #, c-format
@@ -3901,6 +3893,14 @@ msgid ""
 "    git rebase --edit-todo\n"
 "    git rebase --continue\n"
 msgstr ""
+"할 일 목록 명령을 실행할 수 없습니다\n"
+"\n"
+"    %.*s\n"
+"스케줄을 조정합니다. 계속 하기 전에 명령어를 편집하려면, 먼저 다음\n"
+"할 일 목록을 편집하십시오:\n"
+"\n"
+"    git rebase --edit-todo\n"
+"    git rebase --continue\n"
 
 #: sequencer.c:3202
 #, c-format
@@ -3954,9 +3954,9 @@ msgstr ""
 "커밋하고 'git rebase --continue' 명령을 다시 실행하십시오."
 
 #: sequencer.c:3455 sequencer.c:3493
-#, fuzzy, c-format
+#, c-format
 msgid "could not write file: '%s'"
-msgstr "'%s' 파일을 만들 수 없습니다"
+msgstr "파일을 쓸 수 없습니다: '%s'"
 
 #: sequencer.c:3508
 msgid "could not remove CHERRY_PICK_HEAD"
@@ -4229,7 +4229,7 @@ msgstr "레퍼런스 '%s' 저장소가 얕은 저장소입니다"
 #: sha1-file.c:671
 #, c-format
 msgid "reference repository '%s' is grafted"
-msgstr "레퍼런스 '%s' 저장소가 붙어 있는 저장소입니다"
+msgstr "레퍼런스 '%s' 저장소가 그래프트로 붙은 저장소입니다"
 
 #: sha1-name.c:442
 #, c-format
@@ -4370,9 +4370,9 @@ msgid "ls-tree returned unexpected return code %d"
 msgstr "ls-tree가 예상치 못한 코드 %d번을 리턴했습니다"
 
 #: submodule-config.c:230
-#, fuzzy, c-format
+#, c-format
 msgid "ignoring suspicious submodule name: %s"
-msgstr "망가진 이름 %s에 레퍼런스를 무시합니다"
+msgstr "의심스러운 하위 모듈 이름을 무시합니다: %s"
 
 #: submodule-config.c:294
 msgid "negative values not allowed for submodule.fetchjobs"
@@ -4448,9 +4448,8 @@ msgid "transport: invalid depth option '%s'"
 msgstr "transport: 잘못된 깊이 옵션: %s"
 
 #: transport.c:584
-#, fuzzy
 msgid "could not parse transport.color.* config"
-msgstr "작성자 스크립트를 파싱할 수 없습니다"
+msgstr "transport.color.* 설정을 파싱할 수 없습니다"
 
 #: transport.c:996
 #, c-format
@@ -5981,23 +5980,22 @@ msgid "<rev-opts> are documented in git-rev-list(1)"
 msgstr "<리비전-옵션>은 git-rev-list(1)에 설명되어 있습니다"
 
 #: builtin/blame.c:404
-#, fuzzy, c-format
+#, c-format
 msgid "expecting a color: %s"
-msgstr "포맷 색을 유지합니다"
+msgstr "색을 예상합니다: %s"
 
 #: builtin/blame.c:411
 msgid "must end with a color"
-msgstr ""
+msgstr "색으로 끝나야 합니다"
 
 #: builtin/blame.c:697
-#, fuzzy, c-format
+#, c-format
 msgid "invalid color '%s' in color.blame.repeatedLines"
-msgstr "log.graphColors에 잘못된 색을 ('%.*s') 무시합니다"
+msgstr "color.blame.repeatedLines에 잘못된 색을 ('%s') 무시합니다"
 
 #: builtin/blame.c:715
-#, fuzzy
 msgid "invalid value for blame.coloring"
-msgstr "--missing의 값이 올바르지 않습니다"
+msgstr "blame.coloring의 값이 올바르지 않습니다"
 
 #: builtin/blame.c:786
 msgid "Show blame entries as we find them, incrementally"
@@ -6065,11 +6063,11 @@ msgstr "공백 문자 차이점을 무시합니다"
 
 #: builtin/blame.c:802
 msgid "color redundant metadata from previous line differently"
-msgstr ""
+msgstr "불필요한 메타데이터를 앞의 줄과 다르게 색을 칠합니다"
 
 #: builtin/blame.c:803
 msgid "color lines by age"
-msgstr ""
+msgstr "줄이 얼마나 오래 됐느냐에 따라 다르게 색을 칠합니다"
 
 #: builtin/blame.c:810
 msgid "Use an experimental heuristic to improve diffs"
@@ -7972,13 +7970,12 @@ msgid "list untracked files in columns"
 msgstr "추적되지 않는 파일의 목록을 여러 열로 표시합니다"
 
 #: builtin/commit.c:1330
-#, fuzzy
 msgid "do not detect renames"
-msgstr "리모트에 질의하지 않습니다"
+msgstr "이름 바꾸기를 검사하지 않습니다"
 
 #: builtin/commit.c:1332
 msgid "detect renames, optionally set similarity index"
-msgstr ""
+msgstr "이름 바꾸기 검사하고, 부가적으로 유사성 인덱스를 설정합니다"
 
 #: builtin/commit.c:1352
 msgid "Unsupported combination of ignored and untracked-files arguments"
@@ -8164,17 +8161,17 @@ msgstr ""
 
 #: builtin/commit-graph.c:9
 msgid "git commit-graph [--object-dir <objdir>]"
-msgstr ""
+msgstr "git commit-graph [--object-dir <오브젝트디렉터리>]"
 
 #: builtin/commit-graph.c:10 builtin/commit-graph.c:16
 msgid "git commit-graph read [--object-dir <objdir>]"
-msgstr ""
+msgstr "git commit-graph read [--object-dir <오브젝트디렉터리>]"
 
 #: builtin/commit-graph.c:11 builtin/commit-graph.c:21
 msgid ""
 "git commit-graph write [--object-dir <objdir>] [--append] [--stdin-packs|--"
 "stdin-commits]"
-msgstr ""
+msgstr "git commit-graph write [--object-dir <오브젝트디렉터리>] [--append] [--stdin-packs|--stdin-commits]"
 
 #: builtin/commit-graph.c:39 builtin/commit-graph.c:92
 #: builtin/commit-graph.c:147 builtin/fetch.c:161 builtin/log.c:1466
@@ -8184,32 +8181,32 @@ msgstr "디렉터리"
 #: builtin/commit-graph.c:40 builtin/commit-graph.c:93
 #: builtin/commit-graph.c:148
 msgid "The object directory to store the graph"
-msgstr ""
+msgstr "그래프를 저장할 오브젝트 디렉터리"
 
 #: builtin/commit-graph.c:95
 msgid "scan pack-indexes listed by stdin for commits"
-msgstr ""
+msgstr "커밋을 찾을 때 표준입력에서 열거한 묶음 인덱스를 검사합니다"
 
 #: builtin/commit-graph.c:97
 msgid "start walk at commits listed by stdin"
-msgstr ""
+msgstr "표준 입력에 열거한 커밋에서부터 그리기를 시작합니다"
 
 #: builtin/commit-graph.c:99
 msgid "include all commits already in the commit-graph file"
-msgstr ""
+msgstr "commit-graph 파일에 이미 있는 모든 커밋을 포함합니다"
 
 #: builtin/commit-graph.c:108
 msgid "cannot use both --stdin-commits and --stdin-packs"
-msgstr ""
+msgstr "--stdin-commits 및 --stdin-packs 옵션은 같이 쓸 수 없습니다"
 
 #: builtin/config.c:10
 msgid "git config [<options>]"
 msgstr "git config [<옵션>]"
 
 #: builtin/config.c:101
-#, fuzzy, c-format
+#, c-format
 msgid "unrecognized --type argument, %s"
-msgstr "알 수 없는 인자: %s"
+msgstr "알 수 없는 --type 인자: %s"
 
 #: builtin/config.c:123
 msgid "Config file location"
@@ -8304,9 +8301,8 @@ msgid "Type"
 msgstr "값 종류"
 
 #: builtin/config.c:145
-#, fuzzy
 msgid "value is given this type"
-msgstr "값이 만료 시각입니다"
+msgstr "값이 해당 종류로 주어집니다"
 
 #: builtin/config.c:146
 msgid "value is \"true\" or \"false\""
@@ -8349,18 +8345,17 @@ msgid "show origin of config (file, standard input, blob, command line)"
 msgstr "설정의 출처를 표시합니다 (파일, 표준 입력, 블롭, 명령행)"
 
 #: builtin/config.c:156
-#, fuzzy
 msgid "value"
-msgstr "키=값"
+msgstr "값"
 
 #: builtin/config.c:156
 msgid "with --get, use default value when missing entry"
-msgstr ""
+msgstr "--wget 옵션에서, 해당 항목이 없으면 기본값을 사용합니다"
 
 #: builtin/config.c:332
-#, fuzzy, c-format
+#, c-format
 msgid "failed to format default config value: %s"
-msgstr "%s 파일을 만드는데 실패했습니다"
+msgstr "기본 설정 값을 포매팅하는데 실패했습니다: %s"
 
 #: builtin/config.c:431
 msgid "unable to parse default color value"
@@ -8386,9 +8381,8 @@ msgid "--local can only be used inside a git repository"
 msgstr "--local 옵션은 깃 저장소 안에서만 쓸 수 있습니다"
 
 #: builtin/config.c:606
-#, fuzzy
 msgid "--blob can only be used inside a git repository"
-msgstr "--local 옵션은 깃 저장소 안에서만 쓸 수 있습니다"
+msgstr "--blob 옵션은 깃 저장소 안에서만 쓸 수 있습니다"
 
 #: builtin/config.c:735
 #, c-format
@@ -9248,17 +9242,17 @@ msgstr "이미 가비지컬렉터가 실행 중이더라도 강제로 가비지�
 
 #: builtin/gc.c:511
 msgid "repack all other packs except the largest pack"
-msgstr ""
+msgstr "가장 큰 묶음을 제외한 다른 묶음을 다시 묶습니다"
 
 #: builtin/gc.c:528
-#, fuzzy, c-format
+#, c-format
 msgid "failed to parse gc.logexpiry value %s"
 msgstr "gc.logexpiry 값을 (%s) 파싱하는데 실패했습니다"
 
 #: builtin/gc.c:539
-#, fuzzy, c-format
+#, c-format
 msgid "failed to parse prune expiry value %s"
-msgstr "gc.logexpiry 값을 (%s) 파싱하는데 실패했습니다"
+msgstr "만료값 %s 파싱하는데 실패했습니다"
 
 #: builtin/gc.c:559
 #, c-format
@@ -9612,9 +9606,8 @@ msgid "show info page"
 msgstr "인포 페이지를 표시합니다"
 
 #: builtin/help.c:53
-#, fuzzy
 msgid "print command description"
-msgstr "커밋 내용을 표시합니다"
+msgstr "명령어 설명을 표시합니다"
 
 #: builtin/help.c:58
 msgid "git help [--all] [--guides] [--man | --web | --info] [<command>]"
@@ -9814,9 +9807,8 @@ msgid "invalid blob object %s"
 msgstr "잘못된 블롭 오브젝트 %s"
 
 #: builtin/index-pack.c:842 builtin/index-pack.c:860
-#, fuzzy
 msgid "fsck error in packed object"
-msgstr "묶음 오브젝트를 무시합니다"
+msgstr "묶음 오브젝트에서 fsck 오류"
 
 #: builtin/index-pack.c:857
 #, c-format
@@ -9973,9 +9965,8 @@ msgid "--verify with no packfile name given"
 msgstr "--verify 옵션에 묶음파일 이름을 지정하지 않았습니다"
 
 #: builtin/index-pack.c:1832 builtin/unpack-objects.c:578
-#, fuzzy
 msgid "fsck error in pack objects"
-msgstr "오브젝트에 오류: %s"
+msgstr "묶음 오브젝트에서 fsck 오류"
 
 #: builtin/init-db.c:55
 #, c-format
@@ -10013,7 +10004,7 @@ msgid "ignoring template %s"
 msgstr "%s 서식을 무시합니다"
 
 #: builtin/init-db.c:120
-#, fuzzy, c-format
+#, c-format
 msgid "templates not found in %s"
 msgstr "%s에 서식이 없습니다"
 
@@ -11782,14 +11773,14 @@ msgid "Counting objects"
 msgstr "오브젝트 개수 세는 중"
 
 #: builtin/pack-objects.c:1895
-#, fuzzy, c-format
+#, c-format
 msgid "unable to get size of %s"
-msgstr "%s을(를) %s(으)로 옮길 수 없습니다"
+msgstr "%s의 크기를 알아낼 수 없습니다"
 
 #: builtin/pack-objects.c:1910
-#, fuzzy, c-format
+#, c-format
 msgid "unable to parse object header of %s"
-msgstr "오브젝트를 파싱할 수 없습니다: %s"
+msgstr "%s의 오브젝트 헤더를 파싱할 수 없습니다"
 
 #: builtin/pack-objects.c:2564
 msgid "Compressing objects"
@@ -11930,18 +11921,16 @@ msgid "ignore packs that have companion .keep file"
 msgstr "해당하는 .keep 파일이 있는 묶음을 무시합니다"
 
 #: builtin/pack-objects.c:3167
-#, fuzzy
 msgid "ignore this pack"
-msgstr "얇은 묶음을 사용합니다"
+msgstr "이 묶음을 무시합니다"
 
 #: builtin/pack-objects.c:3169
 msgid "pack compression level"
 msgstr "묶음 압축 단계"
 
-# FIXME: graft?
 #: builtin/pack-objects.c:3171
 msgid "do not hide commits by grafts"
-msgstr "붙어 있는 커밋을 숨기지 않습니다"
+msgstr "그래프트로 발생한 커밋을 숨기지 않습니다"
 
 #: builtin/pack-objects.c:3173
 msgid "use a bitmap index if available to speed up counting objects"
@@ -11962,17 +11951,16 @@ msgstr "프라미서 묶음 파일에 오브젝트를 묶지 않습니다"
 #: builtin/pack-objects.c:3205
 #, c-format
 msgid "delta chain depth %d is too deep, forcing %d"
-msgstr ""
+msgstr "델타 체인 깊이 값이 (%d) 너무 큽니다. %d 값으로 조정합니다"
 
 #: builtin/pack-objects.c:3210
 #, c-format
 msgid "pack.deltaCacheLimit is too high, forcing %d"
-msgstr ""
+msgstr "pack.deltaCacheLimit 값이 너무 큽니다. %d 값으로 조정합니다"
 
 #: builtin/pack-objects.c:3338
-#, fuzzy
 msgid "Enumerating objects"
-msgstr "오브젝트 쓰는 중"
+msgstr "오브젝트 나열하는 중"
 
 #: builtin/pack-refs.c:7
 msgid "git pack-refs [<options>]"
@@ -12567,13 +12555,12 @@ msgid "allow commits with empty messages"
 msgstr "빈 메시지로 커밋을 허용합니다"
 
 #: builtin/rebase--helper.c:27
-#, fuzzy
 msgid "rebase merge commits"
-msgstr "커밋 '%s'에 잘못된 병합태그"
+msgstr "병합 커밋을 리베이스합니다"
 
 #: builtin/rebase--helper.c:29
 msgid "keep original branch points of cousins"
-msgstr ""
+msgstr "관련된 본래 브랜치 위치를 유지합니다"
 
 #: builtin/rebase--helper.c:30
 msgid "continue rebase"
@@ -12614,7 +12601,7 @@ msgstr "할 일 목록에 실행 명령을 추가합니다"
 
 #: builtin/rebase--helper.c:68
 msgid "--[no-]rebase-cousins has no effect without --rebase-merges"
-msgstr ""
+msgstr "--[no-]rebase-cousins 옵션은 --rebase-merges 옵션 없이는 아무 효과가 없습니다"
 
 #: builtin/receive-pack.c:31
 msgid "git receive-pack <git-dir>"
@@ -12920,9 +12907,9 @@ msgid "rebases interactively onto remote %s"
 msgstr "리모트 %s 위로 대화식으로 리베이스합니다"
 
 #: builtin/remote.c:973
-#, fuzzy, c-format
+#, c-format
 msgid "rebases interactively (with merges) onto remote %s"
-msgstr "리모트 %s 위로 대화식으로 리베이스합니다"
+msgstr "리모트 %s 위로 대화식으로 (병합 포함) 리베이스합니다"
 
 #: builtin/remote.c:976
 #, c-format
@@ -13272,9 +13259,8 @@ msgid "repack objects in packs marked with .keep"
 msgstr ".keep으로 표시된 묶음의 오브젝트를 다시 묶습니다"
 
 #: builtin/repack.c:214
-#, fuzzy
 msgid "do not repack this pack"
-msgstr "프라미서 묶음 파일에 오브젝트를 묶지 않습니다"
+msgstr "이 묶음을 다시 묶지 않습니다"
 
 #: builtin/repack.c:224
 msgid "cannot delete packs in a precious-objects repo"
@@ -13302,9 +13288,8 @@ msgid "git replace [-f] --graft <commit> [<parent>...]"
 msgstr "git replace [-f] --graft <커밋> [<상위>...]"
 
 #: builtin/replace.c:25
-#, fuzzy
 msgid "git replace [-f] --convert-graft-file"
-msgstr "git replace [-f] --edit <오브젝트>"
+msgstr "git replace [-f] --convert-graft-file"
 
 #: builtin/replace.c:26
 msgid "git replace -d <object>..."
@@ -13353,11 +13338,13 @@ msgid "could not write replacement commit for: '%s'"
 msgstr "다음에 대한 대체 커밋을 쓸 수 없습니다: '%s'"
 
 #: builtin/replace.c:514
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "could not convert the following graft(s):\n"
 "%s"
-msgstr "다음 항목을 제거할 예정입니다:"
+msgstr ""
+"다음 그래프트를 변환할 수 없습니다:\n"
+"%s"
 
 #: builtin/replace.c:535
 msgid "list replace refs"
@@ -13376,9 +13363,8 @@ msgid "change a commit's parents"
 msgstr "커밋의 상위 항목을 바꿉니다"
 
 #: builtin/replace.c:539
-#, fuzzy
 msgid "convert existing graft file"
-msgstr "기존 파일을 강제로 덮어 씁니다"
+msgstr "기존 그래프트 파일을 변환합니다"
 
 #: builtin/replace.c:540
 msgid "replace the ref if it exists"
@@ -13766,28 +13752,24 @@ msgid "print status from remote helper"
 msgstr "리모트 도움 프로그램의 상태를 표시합니다"
 
 #: builtin/serve.c:7
-#, fuzzy
 msgid "git serve [<options>]"
-msgstr "git repack [<옵션>]"
+msgstr "git serve [<옵션>]"
 
 #: builtin/serve.c:17 builtin/upload-pack.c:23
 msgid "quit after a single request/response exchange"
 msgstr "하나의 요청/응답 교환 뒤에 끝납니다"
 
 #: builtin/serve.c:19
-#, fuzzy
 msgid "exit immediately after advertising capabilities"
-msgstr "최초 레퍼런스 알림 뒤에 즉시 끝납니다"
+msgstr "기능 정보 교환 뒤에 즉시 끝납니다"
 
 #: builtin/shortlog.c:14
-#, fuzzy
 msgid "git shortlog [<options>] [<revision-range>] [[--] <path>...]"
-msgstr "git shortlog [<옵션>] [<리비전-범위>] [[--] [<경로>...]]"
+msgstr "git shortlog [<옵션>] [<리비전-범위>] [[--] <경로>...]"
 
 #: builtin/shortlog.c:15
-#, fuzzy
 msgid "git log --pretty=short | git shortlog [<options>]"
-msgstr "git worktree list [<옵션>]"
+msgstr "git log --pretty=short | git shortlog [<옵션>]"
 
 #: builtin/shortlog.c:264
 msgid "Group by committer rather than author"
@@ -13814,9 +13796,8 @@ msgid "Linewrap output"
 msgstr "줄바꿈 출력"
 
 #: builtin/shortlog.c:298
-#, fuzzy
 msgid "too many arguments given outside repository"
-msgstr "업스트림 설정을 해제하는데 인자가 너무 많습니다"
+msgstr "저장소 밖에서 주어진 인자가 너무 많습니다"
 
 #: builtin/show-branch.c:12
 msgid ""
@@ -15014,24 +14995,24 @@ msgid "could not create directory of '%s'"
 msgstr "'%s'의 디렉터리를 만들 수 없습니다"
 
 #: builtin/worktree.c:373 builtin/worktree.c:379
-#, fuzzy, c-format
+#, c-format
 msgid "Preparing worktree (new branch '%s')"
-msgstr "'%s' 브랜치를 삭제하는데 오류"
+msgstr "작업 트리 준비 중 (새 브랜치 '%s')"
 
 #: builtin/worktree.c:375
 #, c-format
 msgid "Preparing worktree (resetting branch '%s'; was at %s)"
-msgstr ""
+msgstr "작업 트리 준비 중 ('%s' 브랜치 재설정 중. 원래 위치 %s)"
 
 #: builtin/worktree.c:384
 #, c-format
 msgid "Preparing worktree (checking out '%s')"
-msgstr ""
+msgstr "작업 트리 준비 중 ('%s' 가져오는 중)"
 
 #: builtin/worktree.c:390
-#, fuzzy, c-format
+#, c-format
 msgid "Preparing worktree (detached HEAD %s)"
-msgstr "%s 준비 중 (ID %s)"
+msgstr "작업 트리 준비 중 (분리된 HEAD %s)"
 
 #: builtin/worktree.c:431
 msgid "checkout <branch> even if already checked out in other worktree"
@@ -15208,7 +15189,6 @@ msgid "print debugging messages to stderr"
 msgstr "디버깅 메시지를 표준오류로 출력합니다"
 
 #: git.c:27
-#, fuzzy
 msgid ""
 "git [--version] [--help] [-C <path>] [-c <name>=<value>]\n"
 "           [--exec-path[=<path>]] [--html-path] [--man-path] [--info-path]\n"
@@ -15219,7 +15199,7 @@ msgid ""
 msgstr ""
 "git [--version] [--help] [-C <경로>] [-c <이름>=<값>]\n"
 "           [--exec-path[=<경로>]] [--html-path] [--man-path] [--info-path]\n"
-"           [-p | --paginate | --no-pager] [--no-replace-objects] [--bare]\n"
+"           [-p | --paginate | -P | --no-pager] [--no-replace-objects] [--bare]\n"
 "           [--git-dir=<경로>] [--work-tree=<경로>] [--namespace=<이름>]\n"
 "           <명령> [<인자>]"
 
@@ -16328,7 +16308,7 @@ msgstr ""
 
 #: git-rebase.sh:509
 msgid "error: cannot combine '--signoff' with '--preserve-merges'"
-msgstr ""
+msgstr "오류: '--signoff' 옵션과 '--preserve-merges' 옵션을 같이 쓸 수 없습니다"
 
 #: git-rebase.sh:537
 #, sh-format
@@ -16753,7 +16733,6 @@ msgid "Rebasing ($new_count/$total)"
 msgstr "리베이스중 ($new_count/$total)"
 
 #: git-rebase--interactive.sh:158
-#, fuzzy
 msgid ""
 "\n"
 "Commands:\n"
@@ -16782,6 +16761,12 @@ msgstr ""
 " f, fixup = \"squash\"와 같지만, 이 커밋의 로그 메시지를 버림\n"
 " x, exec = 셸을 사용해 명령 실행 (뒤에 명령 지정)\n"
 " d, drop = 커밋 제거\n"
+" l, label <레이블> = 현재 HEAD에 이름을 붙입니다\n"
+" t, reset <레이블> = HEAD를 레이블 위치로 리셋합니다\n"
+" m, merge [-C <커밋> | -c <커밋>] <레이블> [# <한줄>]\n"
+" .       본래 병합 커밋의 메시지를 이용해 병합 커밋을 만듭니다.\n"
+" .       (본래 병합 커밋을 지정하지 않는 경우, <한줄>을 메시지로\n"
+" .       사용합니다.) 커밋 메시지를 편집하려면 -c <커밋>을 사용.\n"
 "\n"
 "이 줄은 순서를 바꿀 수 있습니다. 위에서 아래 순서로 실행합니다.\n"
 
@@ -17070,7 +17055,6 @@ msgid_plural "Rebase $shortrevisions onto $shortonto ($todocount commands)"
 msgstr[0] "리베이스 $shortrevisions, $shortonto 위로 (명령 $todocount개)"
 
 #: git-rebase--interactive.sh:920
-#, fuzzy
 msgid ""
 "\n"
 "\tHowever, if you remove everything, the rebase will be aborted.\n"
@@ -17080,6 +17064,7 @@ msgstr ""
 "\n"
 "하지만 모두 제거할 경우, 리베이스를 중지합니다.\n"
 "\n"
+"\t"
 
 #: git-rebase--interactive.sh:927
 msgid "Note that empty commits are commented out"
@@ -17906,9 +17891,8 @@ msgstr ""
 #. translation. The program will only accept English input
 #. at this point.
 #: git-send-email.perl:1415
-#, fuzzy
 msgid "Send this email? ([y]es|[n]o|[e]dit|[q]uit|[a]ll): "
-msgstr "이 전자메일을 보내시겠습니까? ([y]예|[n]아니오|[q]끝내기|[a]모두): "
+msgstr "이 전자메일을 보내시겠습니까? ([y]예|[n]아니오|[e]편집|[q]끝내기|[a]모두): "
 
 #: git-send-email.perl:1418
 msgid "Send this email reply required"
