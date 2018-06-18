@@ -65,7 +65,7 @@ msgstr ""
 "Project-Id-Version: git\n"
 "Report-Msgid-Bugs-To: Git Mailing List <git@vger.kernel.org>\n"
 "POT-Creation-Date: 2018-06-16 22:06+0800\n"
-"PO-Revision-Date: 2018-06-11 23:39+0900\n"
+"PO-Revision-Date: 2018-06-19 02:00+0900\n"
 "Last-Translator: Changwoo Ryu <cwryu@debian.org>\n"
 "Language-Team: Git Korean translation <http://github.com/changwoo/git-l10n-"
 "ko>\n"
@@ -966,7 +966,7 @@ msgid ""
 "So we cannot be sure the first %s commit is between %s and %s.\n"
 "We continue anyway."
 msgstr ""
-"%s 및 %s 사이의 머지 베이스를 건너뜁니다.\n"
+"%s 및 %s 사이의 병합 베이스를 건너뜁니다.\n"
 "그러므로 처음 %s 커밋이 %s 및 %s 사이에 있는지 확신할 수 없습니다.\n"
 "어쨌든 계속합니다."
 
@@ -2337,9 +2337,9 @@ msgid "Fast-forwarding submodule %s to the following commit:"
 msgstr "%s 하위 모듈을 다음 커밋으로 정방향 진행:"
 
 #: merge-recursive.c:1211 merge-recursive.c:1223
-#, fuzzy, c-format
+#, c-format
 msgid "Fast-forwarding submodule %s"
-msgstr "%s 하위 모듈을 %s 위치로 정방향 진행"
+msgstr "%s 하위 모듈을 정방향 진행"
 
 #: merge-recursive.c:1245
 #, c-format
@@ -15287,7 +15287,7 @@ msgstr "알 수 없는 옵션: %s\n"
 #: git.c:765
 #, c-format
 msgid "expansion of alias '%s' failed; '%s' is not a git command\n"
-msgstr "별칭 '%s'의 확장에 실패했습니다; '%s'은(는) 깃 명령이 아닙니다\n"
+msgstr "별칭 '%s'의 확장에 실패했습니다. '%s'은(는) 깃 명령이 아닙니다\n"
 
 #: git.c:777
 #, c-format
@@ -15358,27 +15358,23 @@ msgstr "파일 내용을 인덱스에 추가합니다"
 
 #: command-list.h:51
 msgid "Apply a series of patches from a mailbox"
-msgstr ""
+msgstr "메일함에서 연속된 패치를 적용합니다"
 
 #: command-list.h:52
-#, fuzzy
 msgid "Annotate file lines with commit information"
-msgstr "줄마다 커밋 정보가 표시되는 사용자용 형식으로 표시합니다"
+msgstr "파일 줄마다 커밋 정보를 표시합니다"
 
 #: command-list.h:53
-#, fuzzy
 msgid "Apply a patch to files and/or to the index"
-msgstr "지정한 항목을 인덱스에 추가합니다"
+msgstr "패치를 파일 및/또는 인덱스에 적용합니다"
 
 #: command-list.h:54
-#, fuzzy
 msgid "Import an Arch repository into Git"
-msgstr "저장소를 복제해 새 디렉터리로 가져 옵니다"
+msgstr "arch 저장소를 깃 저장소로 가져옵니다"
 
 #: command-list.h:55
-#, fuzzy
 msgid "Create an archive of files from a named tree"
-msgstr "아카이브에 포함된 파일을 표준오류로 표시합니다"
+msgstr "지정한 트리에 들어 있는 파일의 아카이브를 만듭니다"
 
 #: command-list.h:56
 msgid "Use binary search to find the commit that introduced a bug"
@@ -15386,7 +15382,7 @@ msgstr "이진 탐색으로 버그를 만들어낸 커밋을 찾습니다"
 
 #: command-list.h:57
 msgid "Show what revision and author last modified each line of a file"
-msgstr ""
+msgstr "파일 줄마다 끝에 마지막으로 수정한 리비전과 작성자를 표시합니다"
 
 #: command-list.h:58
 msgid "List, create, or delete branches"
@@ -15394,64 +15390,59 @@ msgstr "브랜치를 만들거나, 삭제하거나, 목록을 출력합니다"
 
 #: command-list.h:59
 msgid "Move objects and refs by archive"
-msgstr ""
+msgstr "아카이브 형태로 오브젝트와 레퍼런스를 옮깁니다"
 
 #: command-list.h:60
 msgid "Provide content or type and size information for repository objects"
-msgstr ""
+msgstr "저장소 오브젝트에 대해 내용 또는 종류와 크기 정보를 표시합니다"
 
 #: command-list.h:61
-#, fuzzy
 msgid "Display gitattributes information"
-msgstr "인덱스에서만 .gitattributes를 사용합니다"
+msgstr "gitattributes 정보를 표시합니다"
 
 #: command-list.h:62
 msgid "Debug gitignore / exclude files"
-msgstr ""
+msgstr "gitignore / 제외할 파일을 디버깅합니다"
 
 #: command-list.h:63
-#, fuzzy
 msgid "Show canonical names and email addresses of contacts"
-msgstr "작성자의 전자메일 주소를 표시합니다"
+msgstr "연락처의 전체 이름과 메일 주소를 표시합니다"
 
 #: command-list.h:64
 msgid "Switch branches or restore working tree files"
 msgstr "브랜치를 전환하거나 작업 파일을 복구합니다"
 
 #: command-list.h:65
-#, fuzzy
 msgid "Copy files from the index to the working tree"
-msgstr "작업 폴더로 가는 경로"
+msgstr "인덱스의 파일을 작업 폴더로 복사합니다"
 
 #: command-list.h:66
 msgid "Ensures that a reference name is well formed"
-msgstr ""
+msgstr "레퍼런스 이름의 형식이 올바른지 확인합니다"
 
 #: command-list.h:67
 msgid "Find commits yet to be applied to upstream"
-msgstr ""
+msgstr "업스트림에 적용해야 할 커밋을 찾습니다"
 
 #: command-list.h:68
 msgid "Apply the changes introduced by some existing commits"
-msgstr ""
+msgstr "기존 커밋으로 발생한 변경 사항을 적용합니다"
 
 #: command-list.h:69
 msgid "Graphical alternative to git-commit"
-msgstr ""
+msgstr "git-commit의 그래픽 대체 버전"
 
 #: command-list.h:70
-#, fuzzy
 msgid "Remove untracked files from the working tree"
-msgstr "파일을 작업 폴더에서 제거하고 인덱스에서도 제거합니다"
+msgstr "작업 폴더에서 추적되지 않는 파일을 제거합니다"
 
 #: command-list.h:71
 msgid "Clone a repository into a new directory"
-msgstr "저장소를 복제해 새 디렉터리로 가져 옵니다"
+msgstr "저장소를 복제해 새 디렉터리로 가져옵니다"
 
 #: command-list.h:72
-#, fuzzy
 msgid "Display data in columns"
-msgstr "목록을 여러 열로 표시합니다"
+msgstr "데이터를 여러 열로 표시합니다"
 
 #: command-list.h:73
 msgid "Record changes to the repository"
@@ -15459,123 +15450,116 @@ msgstr "바뀐 사항을 저장소에 기록합니다"
 
 #: command-list.h:74
 msgid "Write and verify Git commit graph files"
-msgstr ""
+msgstr "깃 커밋 그래프 파일을 쓰고 확인합니다"
 
 #: command-list.h:75
-#, fuzzy
 msgid "Create a new commit object"
-msgstr "커밋 오브젝트를 쓰는데 실패했습니다"
+msgstr "새 커밋 오브젝트를 만듭니다"
 
 #: command-list.h:76
 msgid "Get and set repository or global options"
-msgstr ""
+msgstr "저장소 옵션 또는 전체 옵션을 보거나 설정합니다"
 
 #: command-list.h:77
 msgid "Count unpacked number of objects and their disk consumption"
-msgstr ""
+msgstr "묶여지지 않은 오브젝트의 개수 및 그 디스크 사용량을 측정합니다"
 
 #: command-list.h:78
 msgid "Retrieve and store user credentials"
-msgstr ""
+msgstr "사용자 비밀 정보를 가져오고 저장합니다"
 
 #: command-list.h:79
 msgid "Helper to temporarily store passwords in memory"
-msgstr ""
+msgstr "메모리에 임시로 암호 저장하는 도움 명령"
 
 #: command-list.h:80
 msgid "Helper to store credentials on disk"
-msgstr ""
+msgstr "비밀 정보를 디스크에 저장하는 도움 명령"
 
 #: command-list.h:81
 msgid "Export a single commit to a CVS checkout"
-msgstr ""
+msgstr "하나의 커밋을 CVS 체크아웃으로 내보냅니다"
 
+# * "people love to hate" 번역은 전달하기 힘들고 빠져도 내용 문제가 없으므로 생략
 #: command-list.h:82
 msgid "Salvage your data out of another SCM people love to hate"
-msgstr ""
+msgstr "다른 소스 코드 관리 시스템에서 데이터 가져오기"
 
 #: command-list.h:83
 msgid "A CVS server emulator for Git"
-msgstr ""
+msgstr "깃용 CVS 서버 에뮬레이터"
 
 #: command-list.h:84
 msgid "A really simple server for Git repositories"
-msgstr ""
+msgstr "깃 저장소에 대한 아주 간단한 서버"
 
 #: command-list.h:85
 msgid "Give an object a human readable name based on an available ref"
-msgstr ""
+msgstr "사용 가능한 레퍼런스를 기준으로 오브젝트에 읽을 수 있는 이름을 부여합니다"
 
 #: command-list.h:86
 msgid "Show changes between commits, commit and working tree, etc"
 msgstr "커밋과 커밋 사이, 커밋과 작업 내용 사이 등의 바뀐 점을 봅니다"
 
 #: command-list.h:87
-#, fuzzy
 msgid "Compares files in the working tree and the index"
-msgstr "파일을 작업 폴더에서 제거하고 인덱스에서도 제거합니다"
+msgstr "작업 폴더와 인덱스의 파일을 비교합니다"
 
 #: command-list.h:88
-#, fuzzy
 msgid "Compare a tree to the working tree or index"
-msgstr "작업 폴더로 가는 경로"
+msgstr "트리를 작업 폴더나 인덱스와 비교합니다"
 
 #: command-list.h:89
 msgid "Compares the content and mode of blobs found via two tree objects"
-msgstr ""
+msgstr "두 개의 트리 오브젝트에 있는 내용과 블롭의 모드를 비교합니다"
 
 #: command-list.h:90
 msgid "Show changes using common diff tools"
-msgstr ""
+msgstr "일반적인 diff 도구를 사용해 변경 사항을 표시합니다"
 
 #: command-list.h:91
 msgid "Git data exporter"
-msgstr ""
+msgstr "깃 데이터 내보내기"
 
 #: command-list.h:92
 msgid "Backend for fast Git data importers"
-msgstr ""
+msgstr "고속 깃 데이터 가져오기 백엔드"
 
 #: command-list.h:93
 msgid "Download objects and refs from another repository"
 msgstr "다른 저장소에서 오브젝트와 레퍼런스를 다운로드합니다"
 
 #: command-list.h:94
-#, fuzzy
 msgid "Receive missing objects from another repository"
-msgstr "다른 저장소에서 오브젝트와 레퍼런스를 다운로드합니다"
+msgstr "다른 저장소에서 없는 오브젝트를 다운로드합니다"
 
 #: command-list.h:95
-#, fuzzy
 msgid "Rewrite branches"
-msgstr "  리모트 브랜치:%s"
+msgstr "리모트 브랜치"
 
 #: command-list.h:96
-#, fuzzy
 msgid "Produce a merge commit message"
-msgstr "커밋 '%s'에 잘못된 병합태그"
+msgstr "병합 커밋 메시지를 만듭니다"
 
 #: command-list.h:97
-#, fuzzy
 msgid "Output information on each ref"
-msgstr "인덱스 파일의 stat 정보를 업데이트합니다"
+msgstr "각 레퍼런스의 정보를 출력합니다"
 
 #: command-list.h:98
 msgid "Prepare patches for e-mail submission"
-msgstr ""
+msgstr "메일 제출 용도로 패치를 준비합니다"
 
 #: command-list.h:99
-#, fuzzy
 msgid "Verifies the connectivity and validity of the objects in the database"
-msgstr "오브젝트를 오브젝트 데이터베이스로 씁니다"
+msgstr "연결을 확인하고 데이터베이스의 오브젝트가 올바른지 확인합니다"
 
 #: command-list.h:100
 msgid "Cleanup unnecessary files and optimize the local repository"
-msgstr ""
+msgstr "불필요한 파일을 지우고 로컬 저장소를 최적화합니다"
 
 #: command-list.h:101
 msgid "Extract commit ID from an archive created using git-archive"
-msgstr ""
+msgstr "git-archive로 만든 아카이브에서 커밋 ID를 추출합니다"
 
 #: command-list.h:102
 msgid "Print lines matching a pattern"
@@ -15583,37 +15567,35 @@ msgstr "패턴과 일치하는 줄을 표시합니다"
 
 #: command-list.h:103
 msgid "A portable graphical interface to Git"
-msgstr ""
+msgstr "깃의 포터블 그래픽 인터페이스"
 
 #: command-list.h:104
 msgid "Compute object ID and optionally creates a blob from a file"
-msgstr ""
+msgstr "오브젝트 ID를 계산하고 선택적으로 파일의 블롭을 만듭니다"
 
 #: command-list.h:105
 msgid "Display help information about Git"
-msgstr ""
+msgstr "깃의 도움말 정보를 표시합니다"
 
 #: command-list.h:106
 msgid "Server side implementation of Git over HTTP"
-msgstr ""
+msgstr "깃 HTTP 프로토콜의 서버측 구현"
 
 #: command-list.h:107
-#, fuzzy
 msgid "Download from a remote Git repository via HTTP"
-msgstr "다른 저장소에서 오브젝트와 레퍼런스를 다운로드합니다"
+msgstr "원격 깃 저장소에서 HTTP를 통해 다운로드합니다"
 
 #: command-list.h:108
-#, fuzzy
 msgid "Push objects over HTTP/DAV to another repository"
-msgstr "다른 저장소에서 오브젝트와 레퍼런스를 다운로드합니다"
+msgstr "오브젝트를 HTTP/DAV를 통해 다른 저장소로 푸시합니다"
 
 #: command-list.h:109
 msgid "Send a collection of patches from stdin to an IMAP folder"
-msgstr ""
+msgstr "표준입력에서 패치 모음을 읽어 IMAP 폴더로 보냅니다"
 
 #: command-list.h:110
 msgid "Build pack index file for an existing packed archive"
-msgstr ""
+msgstr "기존 묶음 아카이브에 대한 묶음 인덱스 파일을 만듭니다"
 
 #: command-list.h:111
 msgid "Create an empty Git repository or reinitialize an existing one"
@@ -15621,83 +15603,76 @@ msgstr "빈 깃 저장소를 만들거나 기존 저장소를 다시 초기화�
 
 #: command-list.h:112
 msgid "Instantly browse your working repository in gitweb"
-msgstr ""
+msgstr "내 작업 저장소를 gitweb에서 즉시 살펴봅니다"
 
+# * "Signed-off-by: name" 같은 정보를 말한다
 #: command-list.h:113
 msgid "add or parse structured information in commit messages"
-msgstr ""
+msgstr "커밋 메시지에 구조화된 정보를 추가하거나 정보를 파싱합니다"
 
 #: command-list.h:114
-#, fuzzy
 msgid "The Git repository browser"
-msgstr "깃 저장소가 아닙니다: %s"
+msgstr "깃 저장소 살펴보기"
 
 #: command-list.h:115
 msgid "Show commit logs"
 msgstr "커밋 기록을 표시합니다"
 
 #: command-list.h:116
-#, fuzzy
 msgid "Show information about files in the index and the working tree"
-msgstr "그리고 인덱스 그리고/또는 작업 폴더에 변경 사항이 있습니다"
+msgstr "인덱스와 작업 폴더의 파일에 대한 정보를 표시합니다"
 
 #: command-list.h:117
-#, fuzzy
 msgid "List references in a remote repository"
-msgstr "레퍼런스 저장소"
+msgstr "원격 저장소의 레퍼런스를 열거합니다"
 
 #: command-list.h:118
-#, fuzzy
 msgid "List the contents of a tree object"
-msgstr "해당 오브젝트의 태그만 표시합니다"
+msgstr "트리 오브젝트의 내용을 열거합니다"
 
 #: command-list.h:119
 msgid "Extracts patch and authorship from a single e-mail message"
-msgstr ""
+msgstr "하나의 메일 메시지에서 패치와 작성자 정보를 뽑아냅니다"
 
 #: command-list.h:120
 msgid "Simple UNIX mbox splitter program"
-msgstr ""
+msgstr "간단한 유닉스 mbox 쪼개기 프로그램"
 
 #: command-list.h:121
 msgid "Join two or more development histories together"
 msgstr "여러 개의 개발 내역을 하나로 합칩니다"
 
 #: command-list.h:122
-#, fuzzy
 msgid "Find as good common ancestors as possible for a merge"
-msgstr "하나의 n-방향 병합에 대한 과거 커밋을 찾습니다"
+msgstr "병합에 사용할 최선의 공통 과거 커밋을 찾습니다"
 
 #: command-list.h:123
-#, fuzzy
 msgid "Run a three-way file merge"
-msgstr "3-방향 병합으로 대신합니다...\n"
+msgstr "3-방향 파일 병합을 실행합니다"
 
 #: command-list.h:124
-#, fuzzy
 msgid "Run a merge for files needing merging"
-msgstr "파일 단위 병합이 필요하지 않으면 3-방향 병합을 합니다"
+msgstr "병합이 필요한 파일에 대해 병합을 실행합니다"
 
 #: command-list.h:125
 msgid "The standard helper program to use with git-merge-index"
-msgstr ""
+msgstr "git-merge-index와 같이 사용하는 기본 도움 프로그램"
 
 #: command-list.h:126
 msgid "Run merge conflict resolution tools to resolve merge conflicts"
-msgstr ""
+msgstr "병합 충돌 상황에서 병합 충돌 해결 도구를 실행합니다"
 
 #: command-list.h:127
 msgid "Show three-way merge without touching index"
-msgstr ""
+msgstr "인덱스를 바꾸지 않고 3-방향 병합을 표시합니다"
 
 #: command-list.h:128
-#, fuzzy
 msgid "Creates a tag object"
-msgstr "현재 오브젝트를 편집합니다"
+msgstr "태그 오브젝트를 만듭니다"
 
 #: command-list.h:129
 msgid "Build a tree-object from ls-tree formatted text"
-msgstr ""
+msgstr "ls-tree 포맷의 텍스트에서 tree-object를 만듭니다"
 
 #: command-list.h:130
 msgid "Move or rename a file, a directory, or a symlink"
@@ -15705,47 +15680,43 @@ msgstr "파일, 디렉터리, 심볼릭 링크를 옮기거나 이름을 바꿉�
 
 #: command-list.h:131
 msgid "Find symbolic names for given revs"
-msgstr ""
+msgstr "주어진 리비전에 대한 심볼 이름을 찾습니다"
 
 #: command-list.h:132
-#, fuzzy
 msgid "Add or inspect object notes"
-msgstr "예상한 %s 오브젝트를 받지 않았습니다"
+msgstr "오브젝트 노트를 추가하거나 살펴봅니다"
 
 #: command-list.h:133
 msgid "Import from and submit to Perforce repositories"
-msgstr ""
+msgstr "Perforce 저장소에서 가져오거나 저장소로 제출합니다"
 
 #: command-list.h:134
-#, fuzzy
 msgid "Create a packed archive of objects"
-msgstr "묶음 오브젝트를 무시합니다"
+msgstr "오브젝트의 묶음 아카이브를 만듭니다"
 
 #: command-list.h:135
-#, fuzzy
 msgid "Find redundant pack files"
-msgstr "묶음 파일에 대해 pread를 할 수 없습니다"
+msgstr "중복된 묶음 파일을 찾습니다"
 
 #: command-list.h:136
 msgid "Pack heads and tags for efficient repository access"
-msgstr ""
+msgstr "효율적인 저장소 접근을 위해 헤드와 태그를 묶습니다"
 
 #: command-list.h:137
 msgid "Routines to help parsing remote repository access parameters"
-msgstr ""
+msgstr "원격 저장소 접근 파라미터를 파싱하는데 사용하는 공통 기능"
 
 #: command-list.h:138
 msgid "Compute unique ID for a patch"
-msgstr ""
+msgstr "패치에 대한 유일한 ID를 계산합니다"
 
 #: command-list.h:139
-#, fuzzy
 msgid "Prune all unreachable objects from the object database"
-msgstr "오브젝트를 오브젝트 데이터베이스로 씁니다"
+msgstr "오브젝트 데이터베이스에서 도달할 수 없는 오브젝트를 모두 잘라냅니다"
 
 #: command-list.h:140
 msgid "Remove extra objects that are already in pack files"
-msgstr ""
+msgstr "묶음 파일에 이미 들어 있는 오브젝트를 추가로 제거합니다"
 
 #: command-list.h:141
 msgid "Fetch from and integrate with another repository or a local branch"
@@ -15756,70 +15727,60 @@ msgid "Update remote refs along with associated objects"
 msgstr "원격 레퍼런스 및 그와 관련된 오브젝트를 업데이트합니다"
 
 #: command-list.h:143
-#, fuzzy
 msgid "Applies a quilt patchset onto the current branch"
-msgstr "현재 브랜치에 대해 기본 업스트림을 지정하지 않았습니다."
+msgstr "현재 브랜치에 quilt 패치 모음을 적용합니다"
 
 #: command-list.h:144
-#, fuzzy
 msgid "Reads tree information into the index"
-msgstr "인덱스 파일의 stat 정보를 업데이트합니다"
+msgstr "트리 정보를 인덱스로 읽습니다"
 
 #: command-list.h:145
 msgid "Reapply commits on top of another base tip"
 msgstr "커밋을 다른 베이스 끝의 최상위에서 적용합니다"
 
 #: command-list.h:146
-#, fuzzy
 msgid "Receive what is pushed into the repository"
-msgstr "바뀐 사항을 저장소에 기록합니다"
+msgstr "저장소에 푸시한 내용을 받습니다"
 
 #: command-list.h:147
-#, fuzzy
 msgid "Manage reflog information"
-msgstr "resolve-undo 정보를 표시합니다"
+msgstr "reflog 정보를 관리합니다"
 
 #: command-list.h:148
-#, fuzzy
 msgid "Manage set of tracked repositories"
-msgstr "바뀐 사항을 저장소에 기록합니다"
+msgstr "추적하는 저장소 모음을 관리합니다"
 
 #: command-list.h:149
-#, fuzzy
 msgid "Pack unpacked objects in a repository"
-msgstr "저장소 밖에서 --cached 옵션 사용"
+msgstr "저장소의 묶여지지 않은 오브젝트를 묶습니다"
 
 #: command-list.h:150
-#, fuzzy
 msgid "Create, list, delete refs to replace objects"
-msgstr "태그를 만들거나, 표시하거나, 삭제하거나, GPG 서명을 검증합니다"
+msgstr "오브젝트를 바꾸는 레퍼런스를 만들거나, 표시하거나, 삭제합니다"
 
 #: command-list.h:151
 msgid "Generates a summary of pending changes"
-msgstr ""
+msgstr "예정된 변경 사항의 요약을 만듭니다"
 
 #: command-list.h:152
 msgid "Reuse recorded resolution of conflicted merges"
-msgstr ""
+msgstr "충돌하는 병합의 기록된 해결 방법을 다시 사용합니다"
 
 #: command-list.h:153
 msgid "Reset current HEAD to the specified state"
 msgstr "현재 HEAD를 지정한 상태로 재설정화합니다"
 
 #: command-list.h:154
-#, fuzzy
 msgid "Revert some existing commits"
-msgstr "없는 커밋을 수정할 수 없습니다"
+msgstr "기존 커밋을 되돌립니다"
 
 #: command-list.h:155
-#, fuzzy
 msgid "Lists commit objects in reverse chronological order"
-msgstr "위상 순서에 따라 커밋을 표시합니다"
+msgstr "시간 반대 순서에 따라 커밋 오브젝트를 열거합니다"
 
 #: command-list.h:156
-#, fuzzy
 msgid "Pick out and massage parameters"
-msgstr "파라미터가 너무 많습니다"
+msgstr "파라미터를 찾아내서 조정합니다"
 
 #: command-list.h:157
 msgid "Remove files from the working tree and from the index"
@@ -15827,56 +15788,51 @@ msgstr "파일을 작업 폴더에서 제거하고 인덱스에서도 제거합�
 
 #: command-list.h:158
 msgid "Send a collection of patches as emails"
-msgstr ""
+msgstr "패치 모음을 메일로 보냅니다"
 
 #: command-list.h:159
-#, fuzzy
 msgid "Push objects over Git protocol to another repository"
-msgstr "다른 저장소에서 오브젝트와 레퍼런스를 다운로드합니다"
+msgstr "오브젝트를 깃 프로토콜을 통해 다른 저장소로 푸시합니다"
 
 #: command-list.h:160
 msgid "Restricted login shell for Git-only SSH access"
-msgstr ""
+msgstr "깃만 사용하는 SSH 접근에 필요한 제한된 로그인 셸"
 
 #: command-list.h:161
 msgid "Summarize 'git log' output"
-msgstr ""
+msgstr "'git log' 출력을 요약합니다"
 
 #: command-list.h:162
 msgid "Show various types of objects"
 msgstr "여러가지 종류의 오브젝트를 표시합니다"
 
 #: command-list.h:163
-#, fuzzy
 msgid "Show branches and their commits"
-msgstr "커밋이 있는 브랜치만 표시합니다"
+msgstr "브랜치 목록과 그 커밋을 표시합니다"
 
 #: command-list.h:164
 msgid "Show packed archive index"
-msgstr ""
+msgstr "묶여진 아카이브 인덱스를 표시합니다"
 
 #: command-list.h:165
-#, fuzzy
 msgid "List references in a local repository"
-msgstr "레퍼런스 '%s' 저장소가 로컬 저장소가 아닙니다."
+msgstr "로컬 저장소의 레퍼런스를 열거합니다"
 
 #: command-list.h:166
 msgid "Git's i18n setup code for shell scripts"
-msgstr ""
+msgstr "셸 스크립트를 위한 깃의 국제화 준비 코드"
 
 #: command-list.h:167
 msgid "Common Git shell script setup code"
-msgstr ""
+msgstr "공통 깃 셸 스크립트 준비 코드"
 
 #: command-list.h:168
-#, fuzzy
 msgid "Stash the changes in a dirty working directory away"
-msgstr "%s: 이미 작업 디렉터리에 있습니다"
+msgstr "작업 폴더의 변경 사항을 임시로 다른 곳에 저장합니다"
 
 #: command-list.h:169
-#, fuzzy
 msgid "Add file contents to the staging area"
-msgstr "파일 내용을 인덱스에 추가합니다"
+msgstr "파일 내용을 스테이징 영역에 추가합니다"
 
 #: command-list.h:170
 msgid "Show the working tree status"
@@ -15884,22 +15840,19 @@ msgstr "작업 폴더 상태를 표시합니다"
 
 #: command-list.h:171
 msgid "Remove unnecessary whitespace"
-msgstr ""
+msgstr "불필요한 공백 문자를 제거합니다"
 
 #: command-list.h:172
-#, fuzzy
 msgid "Initialize, update or inspect submodules"
-msgstr ""
-"하위 모듈 경로 '%s'에 대한 리모트 (저장소)를 업데이트하는데 실패했습니다"
+msgstr "하위 모듈을 초기화하거나, 업데이트하거나, 조사합니다"
 
 #: command-list.h:173
 msgid "Bidirectional operation between a Subversion repository and Git"
-msgstr ""
+msgstr "서브버전 저장소와 깃 사이의 양방향 동작"
 
 #: command-list.h:174
-#, fuzzy
 msgid "Read, modify and delete symbolic refs"
-msgstr "심볼릭 레퍼런스를 삭제합니다"
+msgstr "심볼릭 레퍼런스를 읽고, 수정하고, 삭제합니다"
 
 #: command-list.h:175
 msgid "Create, list, delete or verify a tag object signed with GPG"
@@ -15907,69 +15860,63 @@ msgstr "태그를 만들거나, 표시하거나, 삭제하거나, GPG 서명을 
 
 #: command-list.h:176
 msgid "Creates a temporary file with a blob's contents"
-msgstr ""
+msgstr "블롭의 내용으로 임시 파일을 만듭니다"
 
 #: command-list.h:177
-#, fuzzy
 msgid "Unpack objects from a packed archive"
-msgstr "프라미서 묶음 파일에 오브젝트를 묶지 않습니다"
+msgstr "묶음 아카이브에서 오브젝트를 풀어냅니다"
 
 #: command-list.h:178
-#, fuzzy
 msgid "Register file contents in the working tree to the index"
-msgstr "파일을 작업 폴더에서 제거하고 인덱스에서도 제거합니다"
+msgstr "작업 폴더에서 파일 내용을 인덱스에 등록합니다"
 
 #: command-list.h:179
 msgid "Update the object name stored in a ref safely"
-msgstr ""
+msgstr "레퍼런스에 저장된 오브젝트 이름을 안전하게 업데이트합니다"
 
 #: command-list.h:180
 msgid "Update auxiliary info file to help dumb servers"
-msgstr ""
+msgstr "단순 서버에 도움을 주도록 보조 정보 파일을 업데이트합니다"
 
 #: command-list.h:181
 msgid "Send archive back to git-archive"
-msgstr ""
+msgstr "아카이브를 다시 git-archive로 보냅니다"
 
 #: command-list.h:182
 msgid "Send objects packed back to git-fetch-pack"
-msgstr ""
+msgstr "묶은 오브젝트를 다시 git-fetch-pack으로 보냅니다"
 
 #: command-list.h:183
 msgid "Show a Git logical variable"
-msgstr ""
+msgstr "깃의 논리적 변수를 표시합니다"
 
 #: command-list.h:184
-#, fuzzy
 msgid "Check the GPG signature of commits"
-msgstr "GPG 서명 커밋"
+msgstr "커밋의 GPG 서명을 확인합니다"
 
 #: command-list.h:185
-#, fuzzy
 msgid "Validate packed Git archive files"
-msgstr "'%s' 아카이브 파일을 만들 수 없습니다"
+msgstr "묶음 깃 아카이브 파일을 검증합니다"
 
 #: command-list.h:186
 msgid "Check the GPG signature of tags"
-msgstr ""
+msgstr "태그의 GPG 서명을 확인합니다"
 
 #: command-list.h:187
 msgid "Git web interface (web frontend to Git repositories)"
-msgstr ""
+msgstr "깃 웹 인터페이스 (깃 저장소에 대한 웹 프론트엔드)"
 
 #: command-list.h:188
 msgid "Show logs with difference each commit introduces"
-msgstr ""
+msgstr "각 커밋으로 발생하는 차이점마다 기록을 표시합니다"
 
 #: command-list.h:189
-#, fuzzy
 msgid "Manage multiple working trees"
-msgstr "작업 폴더로 가는 경로"
+msgstr "여러 개의 작업 폴더를 관리합니다"
 
 #: command-list.h:190
-#, fuzzy
 msgid "Create a tree object from the current index"
-msgstr "표준 입력에서 오브젝트를 읽습니다"
+msgstr "현재 인덱스에서 트리 오브젝트를 만듭니다"
 
 #: command-list.h:191
 msgid "Defining attributes per path"
@@ -15977,33 +15924,31 @@ msgstr "경로마다 속성 정의하기"
 
 #: command-list.h:192
 msgid "Git command-line interface and conventions"
-msgstr ""
+msgstr "깃 명령행 인터페이스 및 관습"
 
 #: command-list.h:193
 msgid "A Git core tutorial for developers"
-msgstr ""
+msgstr "개발자를 위한 깃 핵심 따라하기 문서"
 
 #: command-list.h:194
 msgid "Git for CVS users"
-msgstr ""
+msgstr "CVS 사용자를 위한 깃"
 
 #: command-list.h:195
-#, fuzzy
 msgid "Tweaking diff output"
-msgstr "diff를 출력하지 않습니다"
+msgstr "diff 출력 미세 조정"
 
 #: command-list.h:196
 msgid "A useful minimum set of commands for Everyday Git"
-msgstr ""
+msgstr "매일매일 유용하게 사용할 최소한의 깃 명령어 모음"
 
 #: command-list.h:197
-#, fuzzy
 msgid "A Git Glossary"
 msgstr "깃 용어 사전"
 
 #: command-list.h:198
 msgid "Hooks used by Git"
-msgstr ""
+msgstr "깃에서 사용하는 후크"
 
 #: command-list.h:199
 msgid "Specifies intentionally untracked files to ignore"
@@ -16015,25 +15960,23 @@ msgstr "하위 모듈 속성 정의하기"
 
 #: command-list.h:201
 msgid "Git namespaces"
-msgstr ""
+msgstr "깃 네임스페이스"
 
 #: command-list.h:202
 msgid "Git Repository Layout"
-msgstr ""
+msgstr "깃 저장소 구조"
 
 #: command-list.h:203
 msgid "Specifying revisions and ranges for Git"
 msgstr "깃의 리비전 및 범위를 지정하기"
 
 #: command-list.h:204
-#, fuzzy
 msgid "A tutorial introduction to Git: part two"
-msgstr "깃 따라하기 안내서 (버전 1.5.1 이후)"
+msgstr "깃 따라하기 안내서: 2부"
 
 #: command-list.h:205
-#, fuzzy
 msgid "A tutorial introduction to Git"
-msgstr "깃 따라하기 안내서 (버전 1.5.1 이후)"
+msgstr "깃 따라하기 안내서"
 
 #: command-list.h:206
 msgid "An overview of recommended workflows with Git"
@@ -18055,103 +17998,3 @@ msgstr "%s 넘어감, 예비 확장자 '%s' 있음.\n"
 #, perl-format
 msgid "Do you really want to send %s? [y|N]: "
 msgstr "정말로 %s 파일을 보내시겠습니까? [y|N]: "
-
-#~ msgid "Everyday Git With 20 Commands Or So"
-#~ msgstr "매일매일 사용하는 20개 내외의 깃 명령"
-
-#~ msgid "Could not open '%s' for writing"
-#~ msgstr "'%s'을(를) 쓰기용으로 열 수 없습니다"
-
-#~ msgid ""
-#~ "unexpected 1st line of squash message:\n"
-#~ "\n"
-#~ "\t%.*s"
-#~ msgstr ""
-#~ "커밋 합치기 메시지의 첫 줄이 예상치 못함:\n"
-#~ "\n"
-#~ "\t%.*s"
-
-#~ msgid ""
-#~ "invalid 1st line of squash message:\n"
-#~ "\n"
-#~ "\t%.*s"
-#~ msgstr ""
-#~ "커밋 합치기 메시지의 첫 줄이 잘못됨:\n"
-#~ "\n"
-#~ "\t%.*s"
-
-#~ msgid "BUG: returned path string doesn't match cwd?"
-#~ msgstr "버그: 리턴된 경로 문자열이 현재 디렉터리와 맞지 않습니다?"
-
-#~ msgid "Error in object"
-#~ msgstr "오브젝트에 오류"
-
-#~ msgid "git fetch-pack: expected ACK/NAK, got EOF"
-#~ msgstr "git fetch-pack: ACK/NAK가 와야 하지만, EOF를 받았습니다"
-
-#~ msgid "invalid filter-spec expression '%s'"
-#~ msgstr "잘못된 필터 양식 '%s'"
-
-#~ msgid "The copy of the patch that failed is found in: %s"
-#~ msgstr "실패한 패치의 복사본이 다음 위치에 있습니다: %s"
-
-#~ msgid "pathspec and --all are incompatible"
-#~ msgstr "경로명세 및 --all 옵션은 호환되지 않습니다"
-
-#~ msgid "Submodule '$name' ($url) unregistered for path '$displaypath'"
-#~ msgstr ""
-#~ "'$name' 하위 모듈이 ($url) '$displaypath' 경로에 대해 등록되지 않았습니다"
-
-#~ msgid "To/Cc/Bcc fields are not interpreted yet, they have been ignored\n"
-#~ msgstr "To/Cc/Bcc 필드가 해석되지 않아서, 무시합니다\n"
-
-#~ msgid ""
-#~ "empty strings as pathspecs will be made invalid in upcoming releases. "
-#~ "please use . instead if you meant to match all paths"
-#~ msgstr ""
-#~ "경로명세로 빈 문자열을 넣는 일은 다음 릴리스에서 오류로 취급할 예정입니"
-#~ "다. 모든 경로를 지정하려면 점(.)을 사용하십시오."
-
-#~ msgid "unable to open '%s' for writing"
-#~ msgstr "'%s'을(를) 쓰기 용으로 열 수 없습니다"
-
-#~ msgid "could not truncate '%s'"
-#~ msgstr "'%s' 파일을 자를 수 없습니다"
-
-#~ msgid "could not finish '%s'"
-#~ msgstr "'%s'을(를) 마칠 수 없습니다"
-
-#~ msgid "could not close %s"
-#~ msgstr "%s을(를) 닫을 수 없습니다"
-
-#~ msgid "Copied a misnamed branch '%s' away"
-#~ msgstr "이름이 잘못된 '%s' 브랜치를 복사합니다"
-
-#~ msgid "it does not make sense to create 'HEAD' manually"
-#~ msgstr "'HEAD'를 수동으로 만드는 건 앞뒤가 맞지 않습니다"
-
-#~ msgid "Don't know how to clone %s"
-#~ msgstr "%s의 복제 방법을 알지 못합니다"
-
-#~ msgid "show ignored files"
-#~ msgstr "무시되는 파일을 표시합니다"
-
-#~ msgid "%s is not a valid '%s' object"
-#~ msgstr "%s은(는) 올바른 '%s' 오브젝트가 아닙니다"
-
-#~ msgid "Don't know how to fetch from %s"
-#~ msgstr "'%s'에서 가져오는 방법을 알 수 없습니다"
-
-#~ msgid "'$term' is not a valid term"
-#~ msgstr "'$term'이(가) 올바른 용어가 아닙니다"
-
-#~ msgid ""
-#~ "error: unknown option for 'stash save': $option\n"
-#~ "       To provide a message, use git stash save -- '$option'"
-#~ msgstr ""
-#~ "오류: 'stash save'에 대해 알 수 없는 옵션: $option\n"
-#~ "       메시지를 넘기려면, 다음과 같이 쓰십시오: git stash save -- "
-#~ "'$option'"
-
-#~ msgid "Failed to recurse into submodule path '$sm_path'"
-#~ msgstr "재귀적으로 하위 모듈 경로 '$sm_path'에 들어가는데 실패했습니다"
