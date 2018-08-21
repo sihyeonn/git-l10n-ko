@@ -121,7 +121,7 @@ static int send_pack_config(const char *k, const char *v, void *cb)
 			}
 		}
 	}
-	return 0;
+	return git_default_config(k, v, cb);
 }
 
 int cmd_send_pack(int argc, const char **argv, const char *prefix)
@@ -178,7 +178,7 @@ int cmd_send_pack(int argc, const char **argv, const char *prefix)
 		OPT_BOOL(0, "stdin", &from_stdin, N_("read refs from stdin")),
 		OPT_BOOL(0, "helper-status", &helper_status, N_("print status from remote helper")),
 		{ OPTION_CALLBACK,
-		  0, CAS_OPT_NAME, &cas, N_("refname>:<expect"),
+		  0, CAS_OPT_NAME, &cas, N_("<refname>:<expect>"),
 		  N_("require old value of ref to be at this value"),
 		  PARSE_OPT_OPTARG, parseopt_push_cas_option },
 		OPT_END()
