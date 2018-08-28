@@ -899,9 +899,9 @@ msgid "Argument not supported for format '%s': -%d"
 msgstr "'%s' 형식에서는 지원하지 않는 인자: -%d"
 
 #: archive-tar.c:125 archive-zip.c:344
-#, fuzzy, c-format
+#, c-format
 msgid "cannot stream blob %s"
-msgstr "%s을(를) 저장할 수 없습니다"
+msgstr "블롭 %s을(를) 스트림할 수 없습니다"
 
 #: archive-tar.c:260 archive-zip.c:361
 #, c-format
@@ -909,14 +909,14 @@ msgid "unsupported file mode: 0%o (SHA1: %s)"
 msgstr "지원하지 않는 파일 모드: 0%o (SHA1: %s)"
 
 #: archive-tar.c:287 archive-zip.c:352
-#, fuzzy, c-format
+#, c-format
 msgid "cannot read %s"
-msgstr "'%s'을(를) 읽을 수 없습니다"
+msgstr "%s을(를) 읽을 수 없습니다"
 
 #: archive-tar.c:458
-#, fuzzy, c-format
+#, c-format
 msgid "unable to start '%s' filter"
-msgstr "'%s'을(를) 만들 수 없습니다"
+msgstr "'%s' 필터를 시작 할 수 없습니다"
 
 #: archive-tar.c:461
 #, fuzzy
@@ -924,9 +924,9 @@ msgid "unable to redirect descriptor"
 msgstr "인덱스를 새로 고칠 수 없습니다"
 
 #: archive-tar.c:468
-#, fuzzy, c-format
+#, c-format
 msgid "'%s' filter reported error"
-msgstr "'%s'은(는) 저장소 밖입니다"
+msgstr "'%s' 필터에서 오류를 보고했습니다"
 
 #: archive-zip.c:313
 #, c-format
@@ -1390,14 +1390,14 @@ msgid "graph signature %X does not match signature %X"
 msgstr ""
 
 #: commit-graph.c:97
-#, fuzzy, c-format
+#, c-format
 msgid "graph version %X does not match version %X"
-msgstr "'%s' 경로에 상대편 버전이 없습니다"
+msgstr "그래프 버전 %X 은(는) 버전 %X 와 일치하지 않습니다"
 
 #: commit-graph.c:104
-#, fuzzy, c-format
+#, c-format
 msgid "hash version %X does not match version %X"
-msgstr "'%s' 경로에 상대편 버전이 없습니다"
+msgstr "해시 버전 %X 은(는) 버전 %X 와 일치하지 않습니다"
 
 #: commit-graph.c:128
 #, c-format
@@ -1476,9 +1476,9 @@ msgid "relative config include conditionals must come from files"
 msgstr "상대 경로 설정 include 조건은 파일에서 와야 합니다"
 
 #: config.c:348
-#, fuzzy, c-format
+#, c-format
 msgid "key does not contain a section: %s"
-msgstr "'%s'은(는) '%s'을(를) 가리키지 않습니다"
+msgstr "키가 섹션을 포함하지 않습니다: %s"
 
 #: config.c:354
 #, c-format
@@ -1632,9 +1632,9 @@ msgid "unable to load config blob object '%s'"
 msgstr "'%s' 오브젝트에 대해 'show'를 시작할 수 없습니다"
 
 #: config.c:1613
-#, fuzzy, c-format
+#, c-format
 msgid "reference '%s' does not point to a blob"
-msgstr "'%s'이(가) 커밋을 가리키지 않습니다"
+msgstr "레퍼런스 '%s'이(가) 블롭을 가리키지 않습니다"
 
 #: config.c:1630
 #, fuzzy, c-format
@@ -1690,29 +1690,29 @@ msgid "%s has multiple values"
 msgstr "%s은(는) 여러 개 값이 있습니다"
 
 #: config.c:2440
-#, fuzzy, c-format
+#, c-format
 msgid "failed to write new configuration file %s"
-msgstr "%s 설정 파일을 만들 수 없습니다"
+msgstr "새로운 설정 파일 %s 을(를) 쓰는 데 실패하였습니다"
 
 #: config.c:2691 config.c:3015
-#, fuzzy, c-format
+#, c-format
 msgid "could not lock config file %s"
-msgstr "'%s' 로그 파일을 읽을 수 없습니다"
+msgstr "설정 파일 %s 을(를) 잠글 수 없습니다"
 
 #: config.c:2702
-#, fuzzy, c-format
+#, c-format
 msgid "opening %s"
-msgstr "'%s'을(를) 여는데 오류"
+msgstr "%s 을(를) 여는 중"
 
 #: config.c:2737 builtin/config.c:324
-#, fuzzy, c-format
+#, c-format
 msgid "invalid pattern: %s"
-msgstr "잘못된 옵션: %s"
+msgstr "잘못된 패턴: %s"
 
 #: config.c:2762
-#, fuzzy, c-format
+#, c-format
 msgid "invalid config file %s"
-msgstr "잘못된 파일: '%s'"
+msgstr "잘못된 설정 파일: '%s'"
 
 #: config.c:2775 config.c:3028
 #, c-format
@@ -1745,9 +1745,9 @@ msgid "could not unset '%s'"
 msgstr "'%s' 설정을 지울 수 없습니다"
 
 #: config.c:3006
-#, fuzzy, c-format
+#, c-format
 msgid "invalid section name: %s"
-msgstr "잘못된 옵션: %s"
+msgstr "잘못된 섹션 이름: %s"
 
 #: config.c:3173
 #, fuzzy, c-format
@@ -1772,14 +1772,14 @@ msgstr ""
 "확인하십시오."
 
 #: connect.c:81
-#, fuzzy, c-format
+#, c-format
 msgid "server doesn't support '%s'"
-msgstr "서버에서 STARTTLS를 지원하지 않습니다! %s"
+msgstr "서버에서 '%s'을(를) 지원하지 않습니다"
 
 #: connect.c:103
-#, fuzzy, c-format
+#, c-format
 msgid "server doesn't support feature '%s'"
-msgstr "서버에서 --deepen 옵션을 지원하지 않습니다"
+msgstr "서버에서 기능 '%s'을(를) 지원하지 않습니다"
 
 #: connect.c:114
 #, fuzzy
@@ -1810,14 +1810,13 @@ msgid "remote error: %s"
 msgstr "리모트 오류: %s"
 
 #: connect.c:316
-#, fuzzy
 msgid "invalid packet"
-msgstr "잘못된 경로 '%s'"
+msgstr "잘못된 패킷"
 
 #: connect.c:336
-#, fuzzy, c-format
+#, c-format
 msgid "protocol error: unexpected '%s'"
-msgstr "프로토콜 오류: 잘못된 묶음 헤더"
+msgstr "프로토콜 오류: 예상치 못한 '%s'"
 
 #: connect.c:444
 #, fuzzy, c-format
@@ -1829,23 +1828,23 @@ msgid "expected flush after ref listing"
 msgstr ""
 
 #: connect.c:547
-#, fuzzy, c-format
+#, c-format
 msgid "protocol '%s' is not supported"
-msgstr "'%s'은(는) 잠기지 않았습니다"
+msgstr "프로토콜 '%s'은(는) 지원하지 않습니다"
 
 #: connect.c:598
 msgid "unable to set SO_KEEPALIVE on socket"
 msgstr ""
 
 #: connect.c:638 connect.c:701
-#, fuzzy, c-format
+#, c-format
 msgid "Looking up %s ... "
-msgstr "%s 패치를 확인하는 중입니다..."
+msgstr "%s 을(를) 찾아보는 중 ... "
 
 #: connect.c:642
-#, fuzzy, c-format
+#, c-format
 msgid "unable to look up %s (port %s) (%s)"
-msgstr "%s을(를) %s(으)로 옮길 수 없습니다"
+msgstr "%s (포트 %s) 을(를) 찾을 수 없습니다 (%s)"
 
 #. TRANSLATORS: this is the end of "Looking up %s ... "
 #: connect.c:646 connect.c:717
@@ -1858,27 +1857,28 @@ msgstr ""
 "%s (포트 %s) 에 연결중 ... "
 
 #: connect.c:668 connect.c:745
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "unable to connect to %s:\n"
 "%s"
-msgstr "%s을(를) 열 수 없습니다: %s\n"
+msgstr ""
+"%s 에 연결 할 수 없습니다:\n"
+"%s"
 
 #. TRANSLATORS: this is the end of "Connecting to %s (port %s) ... "
 #: connect.c:674 connect.c:751
-#, fuzzy
 msgid "done."
-msgstr "완료.\n"
+msgstr "완료."
 
 #: connect.c:705
-#, fuzzy, c-format
+#, c-format
 msgid "unable to look up %s (%s)"
-msgstr "%s을(를) 열 수 없습니다: %s\n"
+msgstr "%s을(를) 찾을 수 없습니다 (%s)"
 
 #: connect.c:711
-#, fuzzy, c-format
+#, c-format
 msgid "unknown port %s"
-msgstr "알 수 없는 옵션: %s"
+msgstr "알 수 없는 포트 %s"
 
 #: connect.c:848 connect.c:1174
 #, c-format
@@ -1891,9 +1891,9 @@ msgid "strange port '%s' blocked"
 msgstr "잘못된 포트 '%s'이(가) 차단되었습니다"
 
 #: connect.c:860
-#, fuzzy, c-format
+#, c-format
 msgid "cannot start proxy %s"
-msgstr "'%s'을(를) stat()할 수 없습니다"
+msgstr "프록시 %s 을(를) 시작할 수 없습니다"
 
 #: connect.c:927
 msgid "no path specified; see 'git help pull' for valid url syntax"
@@ -2011,9 +2011,9 @@ msgstr ""
 "다릅니다."
 
 #: convert.c:674
-#, fuzzy, c-format
+#, c-format
 msgid "cannot fork to run external filter '%s'"
-msgstr "기존 '%s' 묶음 파일을 열 수 없습니다"
+msgstr "외부 필터 '%s'을(를) 실행하기 위해 fork 할 수 없습니다"
 
 #: convert.c:694
 #, fuzzy, c-format
@@ -2021,9 +2021,9 @@ msgid "cannot feed the input to external filter '%s'"
 msgstr "'%s'의 현재 내용을 읽을 수 없습니다"
 
 #: convert.c:701
-#, fuzzy, c-format
+#, c-format
 msgid "external filter '%s' failed %d"
-msgstr "'%s'의 이름 바꾸기가 실패했습니다"
+msgstr "외부 필터 '%s'이(가) 실패했습니다 %d"
 
 #: convert.c:736 convert.c:739
 #, c-format
@@ -2031,9 +2031,9 @@ msgid "read from external filter '%s' failed"
 msgstr ""
 
 #: convert.c:742 convert.c:796
-#, fuzzy, c-format
+#, c-format
 msgid "external filter '%s' failed"
-msgstr "'%s'의 이름 바꾸기가 실패했습니다"
+msgstr "외부 필터 '%s'이(가) 실패했습니다"
 
 #: convert.c:844
 msgid "unexpected filter type"
@@ -2227,14 +2227,14 @@ msgid ""
 msgstr "%s 변수를 최소한 %d(으)로 설정하고 명령을 다시 시도해 보십시오."
 
 #: dir.c:569
-#, fuzzy, c-format
+#, c-format
 msgid "pathspec '%s' did not match any file(s) known to git"
-msgstr "'%s' 경로명세가 어떤 파일과도 일치하지 않습니다"
+msgstr "경로명세 '%s' 이(가) 깃에 알려진 어떤 파일(들)과도 일치하지 않습니다"
 
 #: dir.c:958
-#, fuzzy, c-format
+#, c-format
 msgid "cannot use %s as an exclude file"
-msgstr "인덱스 파일을 저장할 수 없습니다"
+msgstr "%s을(를) 제외할 파일로 사용할 수 없습니다"
 
 #: dir.c:1873
 #, c-format
@@ -2246,9 +2246,8 @@ msgid "failed to get kernel name and information"
 msgstr "커널 이름과 정보를 가져오는데 실패했습니다"
 
 #: dir.c:2239
-#, fuzzy
 msgid "untracked cache is disabled on this system or location"
-msgstr "이 시스템 또는 위치에서는 추적되지 않는 캐시를 사용하지 않습니다."
+msgstr "이 시스템 또는 위치에서는 추적되지 않는 캐시를 사용할 수 없습니다"
 
 #: dir.c:3037
 #, fuzzy, c-format
@@ -2280,14 +2279,14 @@ msgid "could not stat file '%s'"
 msgstr "'%s' 파일에 stat을 할 수 없습니다"
 
 #: environment.c:150
-#, fuzzy, c-format
+#, c-format
 msgid "bad git namespace path \"%s\""
-msgstr "깃 네임스페이스"
+msgstr "잘못된 깃 네임스페이스 경로 “%s”"
 
 #: environment.c:332
-#, fuzzy, c-format
+#, c-format
 msgid "could not set GIT_DIR to '%s'"
-msgstr "'%s'을(를) '%s'(으)로 설정할 수 없습니다"
+msgstr "'%s'을(를) GIT_DIR로 설정할 수 없습니다"
 
 #: exec-cmd.c:361
 #, c-format
@@ -2470,12 +2469,12 @@ msgid "Server does not support shallow requests"
 msgstr "서버에서 shallow 요청을 지원하지 않습니다"
 
 #: fetch-pack.c:1191
-#, fuzzy, c-format
+#, c-format
 msgid "error reading section header '%s'"
-msgstr "%s을(를) 읽는데 오류"
+msgstr "섹션 헤더 '%s'을(를) 읽는데 오류"
 
 #: fetch-pack.c:1197
-#, fuzzy, c-format
+#, c-format
 msgid "expected '%s', received '%s'"
 msgstr "%s '%s'에 대해 블롭을 예상"
 
@@ -2495,14 +2494,14 @@ msgid "error processing shallow info: %d"
 msgstr ""
 
 #: fetch-pack.c:1294
-#, fuzzy, c-format
+#, c-format
 msgid "expected wanted-ref, got '%s'"
-msgstr "shallow/unshallow가 와야 하지만, %s을(를) 받았습니다"
+msgstr "wanted-ref가 와야 하지만, '%s'을(를) 받았습니다"
 
 #: fetch-pack.c:1304
-#, fuzzy, c-format
+#, c-format
 msgid "unexpected wanted-ref: '%s'"
-msgstr "예상치 못하게 파일이 끝났습니다"
+msgstr "예상치 못한 wanted-ref: '%s'"
 
 #: fetch-pack.c:1308
 #, c-format
@@ -3450,9 +3449,8 @@ msgid "could not parse commit '%s'"
 msgstr "'%s' 커밋을 파싱할 수 없습니다"
 
 #: range-diff.c:196
-#, fuzzy
 msgid "failed to generate diff"
-msgstr "'%s'을(를) 삭제하는데 실패했습니다"
+msgstr "diff를 생성하는데 실패했습니다"
 
 #: range-diff.c:421 range-diff.c:423
 #, fuzzy, c-format
@@ -3513,19 +3511,19 @@ msgid "ignoring broken ref %s"
 msgstr "망가진 레퍼런스 %s 무시"
 
 #: refs.c:685
-#, fuzzy, c-format
+#, c-format
 msgid "could not open '%s' for writing: %s"
-msgstr "'%s'을(를) 쓰기용으로 열 수 없습니다"
+msgstr "'%s'을(를) 쓰기용으로 열 수 없습니다: %s"
 
 #: refs.c:695 refs.c:746
-#, fuzzy, c-format
+#, c-format
 msgid "could not read ref '%s'"
-msgstr "%s 레퍼런스를 읽을 수 없습니다"
+msgstr "'%s' 레퍼런스를 읽을 수 없습니다"
 
 #: refs.c:701
-#, fuzzy, c-format
+#, c-format
 msgid "ref '%s' already exists"
-msgstr "'%s'이(가) 이미 있습니다"
+msgstr "레퍼런스 '%s'이(가) 이미 있습니다"
 
 #: refs.c:706
 #, c-format
@@ -3660,14 +3658,14 @@ msgid "unrecognized %%(%s) argument: %s"
 msgstr "인식할 수 없는 %%(%s) 인자: %s"
 
 #: ref-filter.c:222
-#, fuzzy, c-format
+#, c-format
 msgid "%%(objecttype) does not take arguments"
-msgstr "%%(subject)에 인자를 받지 않습니다"
+msgstr "%%(objecttype)에 인자를 받지 않습니다"
 
 #: ref-filter.c:234
-#, fuzzy, c-format
+#, c-format
 msgid "%%(objectsize) does not take arguments"
-msgstr "%%(subject)에 인자를 받지 않습니다"
+msgstr "%%(objectsize)에 인자를 받지 않습니다"
 
 #: ref-filter.c:246
 #, c-format
@@ -4078,7 +4076,7 @@ msgid "rebase -i"
 msgstr "rebase -i"
 
 #: sequencer.c:310
-#, fuzzy, c-format
+#, c-format
 msgid "unknown action: %d"
 msgstr "알 수 없는 동작: %d"
 
@@ -5258,14 +5256,14 @@ msgid "%s: unsupported file type"
 msgstr "%s: 지원하지 않는 파일 종류"
 
 #: sha1-file.c:2019
-#, fuzzy, c-format
+#, c-format
 msgid "%s is not a valid object"
-msgstr "'%s'은(는) 올바른 용어가 아닙니다."
+msgstr "%s은(는) 올바른 오브젝트가 아닙니다"
 
 #: sha1-file.c:2021
-#, fuzzy, c-format
+#, c-format
 msgid "%s is not a valid '%s' object"
-msgstr "'%s'은(는) 올바른 용어가 아닙니다."
+msgstr "%s은(는) 올바른 '%s' 오브젝트가 아닙니다"
 
 #: sha1-file.c:2048 builtin/index-pack.c:158
 #, c-format
@@ -5387,9 +5385,9 @@ msgid "could not run 'git status' in submodule '%s'"
 msgstr "하위 모듈 '%s'에서 'git status'를 실행할 수 없습니다"
 
 #: submodule.c:1543
-#, fuzzy, c-format
+#, c-format
 msgid "Could not unset core.worktree setting in submodule '%s'"
-msgstr "하위 모듈 '%s'에서 'git status'를 실행할 수 없습니다"
+msgstr "하위 모듈 '%s'에서 core.worktree 설정을 해제할 수 없습니다"
 
 #: submodule.c:1633
 #, c-format
@@ -5519,14 +5517,14 @@ msgid "Would set upstream of '%s' to '%s' of '%s'\n"
 msgstr "'%1$s'의 업스트림을 '%3$s'의 '%2$s'(으)로 설정합니다\n"
 
 #: transport.c:142
-#, fuzzy, c-format
+#, c-format
 msgid "could not read bundle '%s'"
-msgstr "'%s' 파일을 읽을 수 없습니다"
+msgstr "번들 '%s'을(를) 읽을 수 없습니다"
 
 #: transport.c:208
 #, c-format
 msgid "transport: invalid depth option '%s'"
-msgstr "transport: 잘못된 깊이 옵션: %s"
+msgstr "transport: 잘못된 깊이 옵션 '%s'"
 
 #: transport.c:586
 msgid "could not parse transport.color.* config"
@@ -5651,9 +5649,9 @@ msgid "error while running fast-import"
 msgstr "묶음 파일을 닫는데 오류"
 
 #: transport-helper.c:531 transport-helper.c:1091
-#, fuzzy, c-format
+#, c-format
 msgid "could not read ref %s"
-msgstr "%s 레퍼런스를 읽을 수 없습니다"
+msgstr "레퍼런스 %s 을(를) 읽을 수 없습니다"
 
 #: transport-helper.c:576
 #, fuzzy, c-format
@@ -13531,7 +13529,7 @@ msgstr "--keep-unreachable 및 -A 옵션은 호환되지 않습니다"
 
 #: builtin/pack-objects.c:3310
 msgid "cannot use --filter without --stdout"
-msgstr "--filter 옵션을 --stdout 옵션없이 쓸 수 없습니다"
+msgstr "--filter 옵션을 --stdout 옵션 없이 사용 할 수 없습니다"
 
 #: builtin/pack-objects.c:3366
 msgid "Enumerating objects"
@@ -15126,9 +15124,8 @@ msgid "bad number of arguments"
 msgstr ""
 
 #: builtin/replace.c:586
-#, fuzzy
 msgid "-e needs exactly one argument"
-msgstr "정확히 하나의 범위가 필요합니다."
+msgstr "-e 옵션은 정확히 하나의 인자가 필요합니다"
 
 #: builtin/replace.c:592
 msgid "-g needs at least one argument"
