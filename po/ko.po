@@ -65,7 +65,7 @@ msgstr ""
 "Project-Id-Version: git\n"
 "Report-Msgid-Bugs-To: Git Mailing List <git@vger.kernel.org>\n"
 "POT-Creation-Date: 2018-08-21 08:28+0800\n"
-"PO-Revision-Date: 2018-06-19 02:00+0900\n"
+"PO-Revision-Date: 2018-08-22 22:52+0900\n"
 "Last-Translator: Changwoo Ryu <cwryu@debian.org>\n"
 "Language-Team: Git Korean translation <http://github.com/changwoo/git-l10n-"
 "ko>\n"
@@ -74,7 +74,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Poedit 2.0.6\n"
+"X-Generator: Poedit 2.1.1\n"
 
 #: advice.c:97
 #, c-format
@@ -904,9 +904,9 @@ msgid "cannot stream blob %s"
 msgstr "%s을(를) 저장할 수 없습니다"
 
 #: archive-tar.c:260 archive-zip.c:361
-#, fuzzy, c-format
+#, c-format
 msgid "unsupported file mode: 0%o (SHA1: %s)"
-msgstr "지원하지 않는 인덱스 버전 %s"
+msgstr "지원하지 않는 파일 모드: 0%o (SHA1: %s)"
 
 #: archive-tar.c:287 archive-zip.c:352
 #, fuzzy, c-format
@@ -931,12 +931,12 @@ msgstr "'%s'은(는) 저장소 밖입니다"
 #: archive-zip.c:313
 #, c-format
 msgid "path is not valid UTF-8: %s"
-msgstr ""
+msgstr "경로가 유효한 UTF-8 인코딩이 아닙니다: %s"
 
 #: archive-zip.c:317
 #, c-format
 msgid "path too long (%d chars, SHA1: %s): %s"
-msgstr ""
+msgstr "너무 긴 경로 (%d 문자, SHA1: %s): %s"
 
 #: archive-zip.c:470 builtin/pack-objects.c:216 builtin/pack-objects.c:219
 #, c-format
@@ -1382,7 +1382,7 @@ msgstr ""
 #: commit-graph.c:83
 #, c-format
 msgid "graph file %s is too small"
-msgstr ""
+msgstr "그래프 파일 %s 이(가) 너무 작습니다"
 
 #: commit-graph.c:90
 #, c-format
@@ -1410,14 +1410,14 @@ msgid "chunk id %08x appears multiple times"
 msgstr ""
 
 #: commit-graph.c:261
-#, fuzzy, c-format
+#, c-format
 msgid "could not find commit %s"
-msgstr "%s 커밋을 파싱할 수 없습니다"
+msgstr "%s 커밋을 찾을 수 없습니다"
 
 #: commit-graph.c:565 builtin/pack-objects.c:2571
-#, fuzzy, c-format
+#, c-format
 msgid "unable to get type of object %s"
-msgstr "오브젝트를 파싱할 수 없습니다: %s"
+msgstr "오브젝트 %s 의 종류를 가져 올 수 없습니다"
 
 #: commit-graph.c:730
 #, fuzzy, c-format
@@ -1483,7 +1483,7 @@ msgstr "'%s'은(는) '%s'을(를) 가리키지 않습니다"
 #: config.c:354
 #, c-format
 msgid "key does not contain variable name: %s"
-msgstr ""
+msgstr "키가 변수 이름을 포함하지 않습니다: %s"
 
 #: config.c:378 sequencer.c:2206
 #, c-format
@@ -1600,7 +1600,7 @@ msgstr "%d번은 올바른 zlib 압축 단계가 아닙니다"
 
 #: config.c:1290
 msgid "core.commentChar should only be one character"
-msgstr ""
+msgstr "core.commentChar는 오직 한 글자여야 합니다"
 
 #: config.c:1323
 #, c-format
@@ -1608,14 +1608,14 @@ msgid "invalid mode for object creation: %s"
 msgstr "오브젝트 생성 모드가 올바르지 않습니다: %s"
 
 #: config.c:1403
-#, fuzzy, c-format
+#, c-format
 msgid "malformed value for %s"
-msgstr "%s의 값이 올바르지 않습니다"
+msgstr "%s에 대해 잘못된 형식의 값"
 
 #: config.c:1429
-#, fuzzy, c-format
+#, c-format
 msgid "malformed value for %s: %s"
-msgstr "%s의 값이 잘못됨: %s"
+msgstr "%s에 대해 잘못된 형식의 값: %s"
 
 #: config.c:1430
 msgid "must be one of nothing, matching, simple, upstream or current"
@@ -1642,9 +1642,9 @@ msgid "unable to resolve config blob '%s'"
 msgstr "리비전을 찾아낼 수 없습니다: %s"
 
 #: config.c:1660
-#, fuzzy, c-format
+#, c-format
 msgid "failed to parse %s"
-msgstr "%s을(를) 읽는데 실패했습니다"
+msgstr "%s을(를) 파싱하는데 실패했습니다"
 
 #: config.c:1700
 msgid "unable to parse command-line config"
@@ -1680,9 +1680,9 @@ msgid "bad config variable '%s' in file '%s' at line %d"
 msgstr "'%2$s' 파일의 %3$d번 줄 '%1$s' 설정 변수가 잘못되었습니다"
 
 #: config.c:2379
-#, fuzzy, c-format
+#, c-format
 msgid "invalid section name '%s'"
-msgstr "잘못된 내용: '%s'"
+msgstr "잘못된 섹션 이름 '%s'"
 
 #: config.c:2411
 #, c-format
@@ -1725,9 +1725,9 @@ msgid "unable to mmap '%s'"
 msgstr "'%s'에 접근할 수 없습니다"
 
 #: config.c:2795 config.c:3033
-#, fuzzy, c-format
+#, c-format
 msgid "chmod on %s failed"
-msgstr "%s에 대해 fstat 실패"
+msgstr "%s에 대해 chmod 실패"
 
 #: config.c:2880 config.c:3130
 #, fuzzy, c-format
@@ -1854,6 +1854,8 @@ msgid ""
 "done.\n"
 "Connecting to %s (port %s) ... "
 msgstr ""
+"완료.\n"
+"%s (포트 %s) 에 연결중 ... "
 
 #: connect.c:668 connect.c:745
 #, fuzzy, c-format
@@ -1881,12 +1883,12 @@ msgstr "알 수 없는 옵션: %s"
 #: connect.c:848 connect.c:1174
 #, c-format
 msgid "strange hostname '%s' blocked"
-msgstr ""
+msgstr "잘못된 호스트 이름 '%s'이(가) 차단되었습니다"
 
 #: connect.c:850
 #, c-format
 msgid "strange port '%s' blocked"
-msgstr ""
+msgstr "잘못된 포트 '%s'이(가) 차단되었습니다"
 
 #: connect.c:860
 #, fuzzy, c-format
@@ -1913,12 +1915,11 @@ msgstr "받는 쪽에서 --signed 푸시를 지원하지 않습니다"
 #: connect.c:1262
 #, c-format
 msgid "strange pathname '%s' blocked"
-msgstr ""
+msgstr "잘못된 경로이름 '%s'이(가) 차단되었습니다"
 
 #: connect.c:1307
-#, fuzzy
 msgid "unable to fork"
-msgstr "%s을(를) 열 수 없습니다"
+msgstr "fork 할 수 없습니다"
 
 #: connected.c:68 builtin/fsck.c:203 builtin/prune.c:146
 msgid "Checking connectivity"
@@ -2035,13 +2036,12 @@ msgid "external filter '%s' failed"
 msgstr "'%s'의 이름 바꾸기가 실패했습니다"
 
 #: convert.c:844
-#, fuzzy
 msgid "unexpected filter type"
-msgstr "예상치 못하게 파일이 끝났습니다"
+msgstr "예상치 못한 필터 종류"
 
 #: convert.c:855
 msgid "path name too long for external filter"
-msgstr ""
+msgstr "외부 필터를 위한 경로 이름이 너무 깁니다"
 
 #: convert.c:929
 #, c-format
@@ -2148,13 +2148,12 @@ msgid "  Unknown dirstat parameter '%s'\n"
 msgstr "  알 수 없는 dirstat 파라미터 '%s'\n"
 
 #: diff.c:291
-#, fuzzy
 msgid ""
 "color moved setting must be one of 'no', 'default', 'blocks', 'zebra', "
 "'dimmed-zebra', 'plain'"
 msgstr ""
-"옮김 색 설정은 'no', 'default', 'zebra', 'dimmed_zebra', 'plain' 중의 하나입"
-"니다."
+"옮김 색 설정은 'no', 'default’, ‘blocks’, 'zebra', 'dimmed_zebra', 'plain' 중"
+"의 하나입니다"
 
 #: diff.c:316
 #, c-format
@@ -2291,9 +2290,9 @@ msgid "could not set GIT_DIR to '%s'"
 msgstr "'%s'을(를) '%s'(으)로 설정할 수 없습니다"
 
 #: exec-cmd.c:361
-#, fuzzy, c-format
+#, c-format
 msgid "too many args to run %s"
-msgstr "업스트림 설정을 해제하는데 인자가 너무 많습니다"
+msgstr "%s을(를) 실행하는데 인자가 너무 많습니다"
 
 #: fetch-object.c:17
 msgid "Remote with no URL"
@@ -3414,9 +3413,8 @@ msgid "packet write failed"
 msgstr "태그 파일을 쓸 수 없습니다"
 
 #: pkt-line.c:291
-#, fuzzy
 msgid "read error"
-msgstr "입력에 읽기 오류"
+msgstr "읽기 오류"
 
 #: pkt-line.c:299
 #, fuzzy
@@ -3438,9 +3436,8 @@ msgid "unable to parse --pretty format"
 msgstr "--pretty 형식을 파싱할 수 없습니다"
 
 #: range-diff.c:48
-#, fuzzy
 msgid "could not start `log`"
-msgstr "%s에 대해 stat()할 수 없습니다"
+msgstr "`log`를 시작할 수 없습니다"
 
 #: range-diff.c:51
 #, fuzzy
@@ -3614,9 +3611,9 @@ msgid "could not delete references: %s"
 msgstr "레퍼런스를 삭제할 수 없습니다: %s"
 
 #: refspec.c:137
-#, fuzzy, c-format
+#, c-format
 msgid "invalid refspec '%s'"
-msgstr "잘못된 파일: '%s'"
+msgstr "잘못된 레퍼런스명세 '%s'"
 
 #: ref-filter.c:38 wt-status.c:1850
 msgid "gone"
@@ -3981,7 +3978,7 @@ msgstr ""
 "  (리모트의 브랜치를 현재 브랜치로 병합하려면 \"git pull\"을 사용하십시오)\n"
 
 #: replace-object.c:20
-#, fuzzy, c-format
+#, c-format
 msgid "bad replace ref name: %s"
 msgstr "대체 레퍼런스를 삭제합니다"
 
@@ -4584,9 +4581,9 @@ msgstr ""
 "\tgit rebase --continue"
 
 #: sequencer.c:2636
-#, fuzzy, c-format
+#, c-format
 msgid "Could not apply %s... %.*s"
-msgstr "다음을 적용할(apply) 수 없습니다: %s... %s"
+msgstr "다음을 적용할(apply) 수 없습니다: %s... %.*s"
 
 #: sequencer.c:2643
 #, fuzzy, c-format
@@ -5114,9 +5111,9 @@ msgid "mmap failed"
 msgstr "%s 실패"
 
 #: sha1-file.c:973
-#, fuzzy, c-format
+#, c-format
 msgid "object file %s is empty"
-msgstr "오브젝트 필터링"
+msgstr "오브젝트 파일 %s이(가) 비었습니다"
 
 #: sha1-file.c:1093 sha1-file.c:2206
 #, fuzzy, c-format
@@ -5149,9 +5146,9 @@ msgid "unable to parse %s header with --allow-unknown-type"
 msgstr ""
 
 #: sha1-file.c:1231
-#, fuzzy, c-format
+#, c-format
 msgid "unable to parse %s header"
-msgstr "%s의 오브젝트 헤더를 파싱할 수 없습니다"
+msgstr "%s 헤더를 파싱할 수 없습니다"
 
 #: sha1-file.c:1422
 #, fuzzy, c-format
@@ -5184,14 +5181,12 @@ msgid "unable to set permission to '%s'"
 msgstr "%s의 크기를 알아낼 수 없습니다"
 
 #: sha1-file.c:1550
-#, fuzzy
 msgid "file write error"
-msgstr "rev-list 쓰기에 실패했습니다"
+msgstr "파일 쓰기 오류"
 
 #: sha1-file.c:1569
-#, fuzzy
 msgid "error when closing sha1 file"
-msgstr "묶음 파일을 닫는데 오류"
+msgstr "sha1 파일을 닫는데 오류"
 
 #: sha1-file.c:1635
 #, c-format
@@ -5199,9 +5194,8 @@ msgid "insufficient permission for adding an object to repository database %s"
 msgstr ""
 
 #: sha1-file.c:1637
-#, fuzzy
 msgid "unable to create temporary file"
-msgstr "임시 인덱스를 만들 수 없습니다"
+msgstr "임시 파일를 만들 수 없습니다"
 
 #: sha1-file.c:1661
 #, fuzzy
@@ -5229,9 +5223,9 @@ msgid "failed utime() on %s"
 msgstr "'%s'을(를) 여는데 실패"
 
 #: sha1-file.c:1760
-#, fuzzy, c-format
+#, c-format
 msgid "cannot read sha1_file for %s"
-msgstr "다시 재생할 $file 파일을 읽을 수 없습니다"
+msgstr "%s에 대한 sha1_file을 읽을 수 없습니다"
 
 #: sha1-file.c:1805
 #, fuzzy
@@ -5259,9 +5253,9 @@ msgid "%s: failed to insert into database"
 msgstr "gpg에서 데이터를 서명하는데 실패했습니다."
 
 #: sha1-file.c:1995
-#, fuzzy, c-format
+#, c-format
 msgid "%s: unsupported file type"
-msgstr "지원하지 않는 인덱스 버전 %s"
+msgstr "%s: 지원하지 않는 파일 종류"
 
 #: sha1-file.c:2019
 #, fuzzy, c-format
@@ -5284,9 +5278,9 @@ msgid "sha1 mismatch for %s (expected %s)"
 msgstr ""
 
 #: sha1-file.c:2241
-#, fuzzy, c-format
+#, c-format
 msgid "unable to mmap %s"
-msgstr "%s을(를) 열 수 없습니다"
+msgstr "%s을(를) mmap 할 수 없습니다"
 
 #: sha1-file.c:2246
 #, fuzzy, c-format
@@ -5294,9 +5288,9 @@ msgid "unable to unpack header of %s"
 msgstr "%s의 오브젝트 헤더를 파싱할 수 없습니다"
 
 #: sha1-file.c:2252
-#, fuzzy, c-format
+#, c-format
 msgid "unable to parse header of %s"
-msgstr "%s의 오브젝트 헤더를 파싱할 수 없습니다"
+msgstr "%s의 헤더를 파싱할 수 없습니다"
 
 #: sha1-file.c:2263
 #, fuzzy, c-format
@@ -5554,7 +5548,7 @@ msgstr "'%s' 브랜치가 없습니다."
 
 #: transport.c:903
 msgid "git-over-rsync is no longer supported"
-msgstr ""
+msgstr "git-over-rsync 는 더 이상 사용되지 않고 제거될 예정입니다"
 
 #: transport.c:998
 #, c-format
@@ -8322,9 +8316,8 @@ msgid "--track needs a branch name"
 msgstr "--track 옵션은 브랜치 이름이 필요합니다"
 
 #: builtin/checkout.c:1206
-#, fuzzy
 msgid "missing branch name; try -b"
-msgstr "브랜치 이름이 없습니다. -b 옵션을 사용해 보십시오"
+msgstr "브랜치 이름이 없습니다; -b 옵션을 사용해 보십시오"
 
 #: builtin/checkout.c:1243
 msgid "invalid path specification"
@@ -9471,18 +9464,16 @@ msgid "git commit-graph read [--object-dir <objdir>]"
 msgstr "git commit-graph read [--object-dir <오브젝트디렉터리>]"
 
 #: builtin/commit-graph.c:12 builtin/commit-graph.c:18
-#, fuzzy
 msgid "git commit-graph verify [--object-dir <objdir>]"
-msgstr "git commit-graph [--object-dir <오브젝트디렉터리>]"
+msgstr "git commit-graph verify [--object-dir <오브젝트디렉터리>]"
 
 #: builtin/commit-graph.c:13 builtin/commit-graph.c:28
-#, fuzzy
 msgid ""
 "git commit-graph write [--object-dir <objdir>] [--append] [--reachable|--"
 "stdin-packs|--stdin-commits]"
 msgstr ""
-"git commit-graph write [--object-dir <오브젝트디렉터리>] [--append] [--stdin-"
-"packs|--stdin-commits]"
+"git commit-graph write [--object-dir <오브젝트디렉터리>] [--append] [--"
+"reachable|--stdin-packs|--stdin-commits]"
 
 #: builtin/commit-graph.c:48 builtin/commit-graph.c:77
 #: builtin/commit-graph.c:131 builtin/commit-graph.c:184 builtin/fetch.c:150
@@ -9685,9 +9676,9 @@ msgid "wrong number of arguments, should be from %d to %d"
 msgstr ""
 
 #: builtin/config.c:304
-#, fuzzy, c-format
+#, c-format
 msgid "invalid key pattern: %s"
-msgstr "잘못된 키: %s"
+msgstr "잘못된 키 패턴: %s"
 
 #: builtin/config.c:340
 #, c-format
@@ -9709,9 +9700,8 @@ msgid "not in a git directory"
 msgstr "깃 저장소가 아닙니다"
 
 #: builtin/config.c:495
-#, fuzzy
 msgid "writing to stdin is not supported"
-msgstr "--deepen 옵션에 음수 깊이는 지원하지 않습니다"
+msgstr "표준입력에 쓰는 것은 지원하지 않습니다"
 
 #: builtin/config.c:498
 #, fuzzy
@@ -9746,9 +9736,8 @@ msgid "--blob can only be used inside a git repository"
 msgstr "--blob 옵션은 깃 저장소 안에서만 쓸 수 있습니다"
 
 #: builtin/config.c:633
-#, fuzzy
 msgid "$HOME not set"
-msgstr "사용하지 않습니다"
+msgstr "$HOME이 설정되지 않았습니다"
 
 #: builtin/config.c:670
 msgid "--get-color and variable type are incoherent"
@@ -9783,14 +9772,12 @@ msgid "error processing config file(s)"
 msgstr "저장소 설정 파일을 사용합니다"
 
 #: builtin/config.c:726
-#, fuzzy
 msgid "editing stdin is not supported"
-msgstr "--deepen 옵션에 음수 깊이는 지원하지 않습니다"
+msgstr "표준입력을 수정하는 것은 지원하지 않습니다"
 
 #: builtin/config.c:728
-#, fuzzy
 msgid "editing blobs is not supported"
-msgstr "--deepen 옵션에 음수 깊이는 지원하지 않습니다"
+msgstr "블롭을 수정하는 것은 지원하지 않습니다"
 
 #: builtin/config.c:742
 #, c-format
@@ -9808,9 +9795,9 @@ msgstr ""
 "사용하십시오."
 
 #: builtin/config.c:829 builtin/config.c:840
-#, fuzzy, c-format
+#, c-format
 msgid "no such section: %s"
-msgstr "그런 레퍼런스가 없습니다: %s"
+msgstr "그런 섹션이 없습니다: %s"
 
 #: builtin/count-objects.c:90
 msgid "git count-objects [-v] [-H | --human-readable]"
@@ -10085,9 +10072,8 @@ msgid "use symlinks in dir-diff mode"
 msgstr "dir-diff 모드에서 심볼릭 링크를 사용합니다"
 
 #: builtin/difftool.c:706
-#, fuzzy
 msgid "tool"
-msgstr "<도구>"
+msgstr "도구"
 
 #: builtin/difftool.c:707
 msgid "use the specified diff tool"
@@ -10838,9 +10824,8 @@ msgid "print NUL after filenames"
 msgstr "파일 이름 다음에 NUL을 출력합니다"
 
 #: builtin/grep.c:848
-#, fuzzy
 msgid "show only matching parts of a line"
-msgstr "일치하지 않는 줄을 표시합니다"
+msgstr "줄에서 일치하는 부분만 표시합니다"
 
 #: builtin/grep.c:850
 msgid "show the number of matches instead of matching lines"
@@ -10955,7 +10940,6 @@ msgid "option not supported with --recurse-submodules"
 msgstr "--recurse-submodules와 같이 지원하지 않는 옵션입니다."
 
 #: builtin/grep.c:1102
-#, fuzzy
 msgid "--cached or --untracked cannot be used with --no-index"
 msgstr ""
 "--cached 또는 --untracked 옵션은 --no-index 옵션과 같이 쓸 수 없습니다."
@@ -13350,9 +13334,9 @@ msgid "not a rev '%s'"
 msgstr "'%s'을(를) 읽을 수 없습니다"
 
 #: builtin/pack-objects.c:3025
-#, fuzzy, c-format
+#, c-format
 msgid "bad revision '%s'"
-msgstr "잘못된 저장소 '%s'"
+msgstr "잘못된 리비전 '%s'"
 
 #: builtin/pack-objects.c:3045
 #, fuzzy
@@ -13386,9 +13370,8 @@ msgid "similar to --all-progress when progress meter is shown"
 msgstr "진행률이 표시될 때 --all-progress와 비슷합니다"
 
 #: builtin/pack-objects.c:3138
-#, fuzzy
 msgid "<version>[,<offset>]"
-msgstr "버전[,오프셋]"
+msgstr "<버전>[,<오프셋>]"
 
 #: builtin/pack-objects.c:3139
 msgid "write the pack index file in the specified idx format version"
@@ -13547,9 +13530,8 @@ msgid "--keep-unreachable and --unpack-unreachable are incompatible"
 msgstr "--keep-unreachable 및 -A 옵션은 호환되지 않습니다"
 
 #: builtin/pack-objects.c:3310
-#, fuzzy
 msgid "cannot use --filter without --stdout"
-msgstr "-a 옵션을 -d 옵션과 같이 쓸 수 없습니다"
+msgstr "--filter 옵션을 --stdout 옵션없이 쓸 수 없습니다"
 
 #: builtin/pack-objects.c:3366
 msgid "Enumerating objects"
@@ -13990,9 +13972,8 @@ msgid "force updates"
 msgstr "강제로 업데이트"
 
 #: builtin/push.c:561 builtin/send-pack.c:181
-#, fuzzy
 msgid "<refname>:<expect>"
-msgstr "레퍼런스이름>:<예상"
+msgstr "<레퍼런스이름>:<예상>"
 
 #: builtin/push.c:562 builtin/send-pack.c:182
 msgid "require old value of ref to be at this value"
@@ -14747,7 +14728,7 @@ msgstr "가져온 후에 리모트를 잘라냅니다"
 #: builtin/remote.c:1437 builtin/remote.c:1491 builtin/remote.c:1559
 #, c-format
 msgid "No such remote '%s'"
-msgstr "그런 리모트가 없습니다 ('%s')"
+msgstr "그런 리모트가 없습니다 '%s'"
 
 #: builtin/remote.c:1453
 msgid "add branch"
@@ -14985,9 +14966,9 @@ msgid "cat-file reported failure"
 msgstr ""
 
 #: builtin/replace.c:254
-#, fuzzy, c-format
+#, c-format
 msgid "unable to open %s for reading"
-msgstr "%s을(를) 열거나 읽을 수 없습니다"
+msgstr "%s을(를) 읽기용으로 열 수 없습니다"
 
 #: builtin/replace.c:268
 #, fuzzy
@@ -15015,13 +14996,12 @@ msgid "unable to fstat %s"
 msgstr "%s을(를) 업데이트할 수 없습니다"
 
 #: builtin/replace.c:299
-#, fuzzy
 msgid "unable to write object to database"
-msgstr "노트 오브젝트를 쓸 수 없습니다"
+msgstr "오브젝트를 데이터베이스에 쓸 수 없습니다"
 
 #: builtin/replace.c:318 builtin/replace.c:371 builtin/replace.c:415
 #: builtin/replace.c:445
-#, fuzzy, c-format
+#, c-format
 msgid "not a valid object name: '%s'"
 msgstr "올바른 오브젝트 이름이 아닙니다: '%s'"
 
@@ -15031,9 +15011,8 @@ msgid "unable to get object type for %s"
 msgstr "종류가 %s인 오브젝트에서 grep을 할 수 없습니다"
 
 #: builtin/replace.c:338
-#, fuzzy
 msgid "editing object file failed"
-msgstr "이등분 레퍼런스 읽기에 실패했습니다"
+msgstr "오브젝트 파일 편집에 실패했습니다"
 
 #: builtin/replace.c:347
 #, c-format
@@ -15135,13 +15114,12 @@ msgid "-f only makes sense when writing a replacement"
 msgstr "-z 옵션은 --stdin 옵션과 같이 써야만 의미가 있습니다"
 
 #: builtin/replace.c:568
-#, fuzzy
 msgid "--raw only makes sense with --edit"
-msgstr "-z 옵션은 --stdin 옵션과 같이 써야만 의미가 있습니다"
+msgstr "--raw 옵션은 --edit 옵션과 같이 써야만 의미가 있습니다"
 
 #: builtin/replace.c:574
 msgid "-d needs at least one argument"
-msgstr ""
+msgstr "-d 옵션은 적어도 하나의 인자가 필요합니다"
 
 #: builtin/replace.c:580
 msgid "bad number of arguments"
@@ -15154,12 +15132,11 @@ msgstr "정확히 하나의 범위가 필요합니다."
 
 #: builtin/replace.c:592
 msgid "-g needs at least one argument"
-msgstr ""
+msgstr "-g 옵션은 적어도 하나의 인자가 필요합니다"
 
 #: builtin/replace.c:598
-#, fuzzy
 msgid "--convert-graft-file takes no argument"
-msgstr "--continue 옵션은 인자를 받지 않습니다"
+msgstr "--convert-graft-file 옵션은 인자를 받지 않습니다"
 
 #: builtin/replace.c:604
 #, fuzzy
@@ -15707,7 +15684,7 @@ msgstr[0] "한 번에 %d개 항목만 표시할 수 있습니다."
 #: builtin/show-branch.c:745
 #, c-format
 msgid "no such ref %s"
-msgstr "그런 레퍼런스가 없습니다: %s"
+msgstr "그런 레퍼런스가 없습니다 %s"
 
 #: builtin/show-branch.c:829
 #, c-format
@@ -15848,9 +15825,8 @@ msgid "Recurse into nested submodules"
 msgstr "중첩된 하위 모듈에 재귀적으로 적용합니다"
 
 #: builtin/submodule--helper.c:568
-#, fuzzy
 msgid "git submodule--helper foreach [--quiet] [--recursive] <command>"
-msgstr "git submodule--helper sync [--quiet] [--recursive] [<경로>]"
+msgstr "git submodule--helper foreach [--quiet] [--recursive] <명령>"
 
 #: builtin/submodule--helper.c:644
 #, c-format
@@ -18526,19 +18502,19 @@ msgid ""
 msgstr ""
 "\n"
 "명령어:\n"
-" p, pick = 커밋 사용\n"
-" r, reword = 커밋 사용하지만, 커밋 메시지 편집\n"
-" e, edit = 커밋 사용하지만, 커밋 수정(amend)을 위해 중단\n"
-" s, squash = 커밋 사용하지만, 이전 커밋과 합치기\n"
-" f, fixup = \"squash\"와 같지만, 이 커밋의 로그 메시지를 버림\n"
-" x, exec = 셸을 사용해 명령 실행 (뒤에 명령 지정)\n"
-" d, drop = 커밋 제거\n"
-" l, label <레이블> = 현재 HEAD에 이름을 붙입니다\n"
-" t, reset <레이블> = HEAD를 레이블 위치로 리셋합니다\n"
-" m, merge [-C <커밋> | -c <커밋>] <레이블> [# <한줄>]\n"
-" .       본래 병합 커밋의 메시지를 이용해 병합 커밋을 만듭니다.\n"
-" .       (본래 병합 커밋을 지정하지 않는 경우, <한줄>을 메시지로\n"
-" .       사용합니다.) 커밋 메시지를 편집하려면 -c <커밋>을 사용.\n"
+"p, pick <커밋> = 커밋 사용\n"
+"r, reword <커밋> = 커밋 사용하지만, 커밋 메시지 편집\n"
+"e, edit <커밋> = 커밋 사용하지만, 커밋 수정(amend)을 위해 중단\n"
+"s, squash <커밋> = 커밋 사용하지만, 이전 커밋과 합치기\n"
+"f, fixup <커밋> = “squash”와 같지만, 이 커밋의 로그 메시지를 버림\n"
+"x, exec <명령>= 셸을 사용해 명령 실행 (뒤에 명령 지정)\n"
+"d, drop <커밋> = 커밋 제거\n"
+"l, label <레이블> = 현재 HEAD에 이름을 붙입니다\n"
+"t, reset <레이블> = HEAD를 레이블 위치로 리셋합니다\n"
+"m, merge [-C <커밋> | -c <커밋>] <레이블> [# <한줄>]\n"
+".       본래 병합 커밋의 메시지를 이용해 병합 커밋을 만듭니다.\n"
+".       (본래 병합 커밋을 지정하지 않는 경우, <한줄>을 메시지로\n"
+".       사용합니다.) 커밋 메시지를 편집하려면 -c <커밋>을 사용.\n"
 "\n"
 "이 줄은 순서를 바꿀 수 있습니다. 위에서 아래 순서로 실행합니다.\n"
 
@@ -18613,7 +18589,7 @@ msgid ""
 "\t"
 msgstr ""
 "\n"
-"하지만 모두 제거할 경우, 리베이스를 중지합니다.\n"
+"\t하지만 모두 제거할 경우, 리베이스를 중지합니다.\n"
 "\n"
 "\t"
 
@@ -18631,7 +18607,6 @@ msgid "Rebasing ($new_count/$total)"
 msgstr "리베이스중 ($new_count/$total)"
 
 #: git-rebase--preserve-merges.sh:152
-#, fuzzy
 msgid ""
 "\n"
 "Commands:\n"
@@ -18653,19 +18628,19 @@ msgid ""
 msgstr ""
 "\n"
 "명령어:\n"
-" p, pick = 커밋 사용\n"
-" r, reword = 커밋 사용하지만, 커밋 메시지 편집\n"
-" e, edit = 커밋 사용하지만, 커밋 수정(amend)을 위해 중단\n"
-" s, squash = 커밋 사용하지만, 이전 커밋과 합치기\n"
-" f, fixup = \"squash\"와 같지만, 이 커밋의 로그 메시지를 버림\n"
-" x, exec = 셸을 사용해 명령 실행 (뒤에 명령 지정)\n"
-" d, drop = 커밋 제거\n"
-" l, label <레이블> = 현재 HEAD에 이름을 붙입니다\n"
-" t, reset <레이블> = HEAD를 레이블 위치로 리셋합니다\n"
-" m, merge [-C <커밋> | -c <커밋>] <레이블> [# <한줄>]\n"
-" .       본래 병합 커밋의 메시지를 이용해 병합 커밋을 만듭니다.\n"
-" .       (본래 병합 커밋을 지정하지 않는 경우, <한줄>을 메시지로\n"
-" .       사용합니다.) 커밋 메시지를 편집하려면 -c <커밋>을 사용.\n"
+"p, pick <커밋> = 커밋 사용\n"
+"r, reword <커밋> = 커밋 사용하지만, 커밋 메시지 편집\n"
+"e, edit <커밋> = 커밋 사용하지만, 커밋 수정(amend)을 위해 중단\n"
+"s, squash <커밋> = 커밋 사용하지만, 이전 커밋과 합치기\n"
+"f, fixup <커밋> = \"squash\"와 같지만, 이 커밋의 로그 메시지를 버림\n"
+"x, exec <커밋>= 셸을 사용해 명령 실행 (뒤에 명령 지정)\n"
+"d, drop <커밋> = 커밋 제거\n"
+"l, label <레이블> = 현재 HEAD에 이름을 붙입니다\n"
+"t, reset <레이블> = HEAD를 레이블 위치로 리셋합니다\n"
+"m, merge [-C <커밋> | -c <커밋>] <레이블> [# <한줄>]\n"
+".       본래 병합 커밋의 메시지를 이용해 병합 커밋을 만듭니다.\n"
+".       (본래 병합 커밋을 지정하지 않는 경우, <한줄>을 메시지로\n"
+".       사용합니다.) 커밋 메시지를 편집하려면 -c <커밋>을 사용.\n"
 "\n"
 "이 줄은 순서를 바꿀 수 있습니다. 위에서 아래 순서로 실행합니다.\n"
 
@@ -18892,7 +18867,6 @@ msgid "Could not commit staged changes."
 msgstr "스테이징한 변경 사항은 커밋할 수 없습니다."
 
 #: git-rebase--preserve-merges.sh:893
-#, fuzzy
 msgid ""
 "\n"
 "However, if you remove everything, the rebase will be aborted.\n"
@@ -18901,7 +18875,6 @@ msgstr ""
 "\n"
 "하지만 모두 제거할 경우, 리베이스를 중지합니다.\n"
 "\n"
-"\t"
 
 #: git-rebase--preserve-merges.sh:942 git-rebase--preserve-merges.sh:947
 msgid "Could not init rewritten commits"
