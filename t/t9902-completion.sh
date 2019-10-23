@@ -501,6 +501,42 @@ test_expect_success '__gitcomp - suffix' '
 	EOF
 '
 
+test_expect_success '__gitcomp - ignore optional negative options' '
+	test_gitcomp "--" "--abc --def --no-one -- --no-two" <<-\EOF
+	--abc Z
+	--def Z
+	--no-one Z
+	--no-... Z
+	EOF
+'
+
+test_expect_success '__gitcomp - ignore/narrow optional negative options' '
+	test_gitcomp "--a" "--abc --abcdef --no-one -- --no-two" <<-\EOF
+	--abc Z
+	--abcdef Z
+	EOF
+'
+
+test_expect_success '__gitcomp - ignore/narrow optional negative options' '
+	test_gitcomp "--n" "--abc --def --no-one -- --no-two" <<-\EOF
+	--no-one Z
+	--no-... Z
+	EOF
+'
+
+test_expect_success '__gitcomp - expand all negative options' '
+	test_gitcomp "--no-" "--abc --def --no-one -- --no-two" <<-\EOF
+	--no-one Z
+	--no-two Z
+	EOF
+'
+
+test_expect_success '__gitcomp - expand/narrow all negative options' '
+	test_gitcomp "--no-o" "--abc --def --no-one -- --no-two" <<-\EOF
+	--no-one Z
+	EOF
+'
+
 test_expect_success '__gitcomp - doesnt fail because of invalid variable name' '
 	__gitcomp "$invalid_variable_name"
 '
@@ -1067,7 +1103,7 @@ test_expect_success '__git_complete_refs - remote' '
 	master-in-other Z
 	EOF
 	(
-		cur=
+		cur= &&
 		__git_complete_refs --remote=other &&
 		print_comp
 	) &&
@@ -1086,7 +1122,7 @@ test_expect_success '__git_complete_refs - track' '
 	master-in-other Z
 	EOF
 	(
-		cur=
+		cur= &&
 		__git_complete_refs --track &&
 		print_comp
 	) &&
@@ -1213,7 +1249,7 @@ test_expect_success 'teardown after ref completion' '
 
 test_path_completion ()
 {
-	test $# = 2 || error "bug in the test script: not 2 parameters to test_path_completion"
+	test $# = 2 || BUG "not 2 parameters to test_path_completion"
 
 	local cur="$1" expected="$2"
 	echo "$expected" >expected &&
@@ -1242,7 +1278,7 @@ test_expect_success 'setup for path completion tests' '
 	   touch BS\\dir/DQ\"file \
 		 '$'separators\034in\035dir/sep\036in\037file''
 	then
-		test_set_prereq FUNNYNAMES
+		test_set_prereq FUNNIERNAMES
 	else
 		rm -rf BS\\dir '$'separators\034in\035dir''
 	fi
@@ -1284,7 +1320,7 @@ test_expect_success '__git_complete_index_file - UTF-8 in ls-files output' '
 	test_path_completion árvíztűrő/С "árvíztűrő/Сайн яваарай"
 '
 
-test_expect_success FUNNYNAMES \
+test_expect_success FUNNIERNAMES \
     '__git_complete_index_file - C-style escapes in ls-files output' '
 	test_path_completion BS \
 			     BS\\dir &&
@@ -1296,7 +1332,7 @@ test_expect_success FUNNYNAMES \
 			     BS\\dir/DQ\"file
 '
 
-test_expect_success FUNNYNAMES \
+test_expect_success FUNNIERNAMES \
     '__git_complete_index_file - \nnn-escaped characters in ls-files output' '
 	test_path_completion sep '$'separators\034in\035dir'' &&
 	test_path_completion '$'separators\034i'' \
@@ -1398,8 +1434,10 @@ test_expect_success 'double dash "git checkout"' '
 	--ignore-other-worktrees Z
 	--recurse-submodules Z
 	--progress Z
-	--no-track Z
-	--no-recurse-submodules Z
+	--guess Z
+	--no-guess Z
+	--no-... Z
+	--overlay Z
 	EOF
 '
 
@@ -1446,6 +1484,12 @@ test_expect_success 'git --help completion' '
 	test_completion "git --help core" "core-tutorial "
 '
 
+test_expect_success 'completion.commands removes multiple commands' '
+	test_config completion.commands "-cherry -mergetool" &&
+	git --list-cmds=list-mainporcelain,list-complete,config >out &&
+	! grep -E "^(cherry|mergetool)$" out
+'
+
 test_expect_success 'setup for integration tests' '
 	echo content >file1 &&
 	echo more >file2 &&
@@ -1479,8 +1523,8 @@ test_expect_success 'show completes all refs' '
 
 test_expect_success '<ref>: completes paths' '
 	test_completion "git show mytag:f" <<-\EOF
-	file1 Z
-	file2 Z
+	file1Z
+	file2Z
 	EOF
 '
 
@@ -1489,7 +1533,7 @@ test_expect_success 'complete tree filename with spaces' '
 	git add "name with spaces" &&
 	git commit -m spaces &&
 	test_completion "git show HEAD:nam" <<-\EOF
-	name with spaces Z
+	name with spacesZ
 	EOF
 '
 
@@ -1498,12 +1542,12 @@ test_expect_success 'complete tree filename with metacharacters' '
 	git add "name with \${meta}" &&
 	git commit -m meta &&
 	test_completion "git show HEAD:nam" <<-\EOF
-	name with ${meta} Z
-	name with spaces Z
+	name with ${meta}Z
+	name with spacesZ
 	EOF
 '
 
-test_expect_success 'send-email' '
+test_expect_success PERL 'send-email' '
 	test_completion "git send-email --cov" "--cover-letter " &&
 	test_completion "git send-email ma" "master "
 '
@@ -1607,6 +1651,7 @@ test_expect_success 'completion used <cmd> completion for alias: !f() { : git <c
 test_expect_success 'completion without explicit _git_xxx function' '
 	test_completion "git version --" <<-\EOF
 	--build-options Z
+	--no-build-options Z
 	EOF
 '
 
@@ -1660,7 +1705,8 @@ test_expect_success 'sourcing the completion script clears cached commands' '
 	verbose test -z "$__git_all_commands"
 '
 
-test_expect_success !GETTEXT_POISON 'sourcing the completion script clears cached merge strategies' '
+test_expect_success 'sourcing the completion script clears cached merge strategies' '
+	GIT_TEST_GETTEXT_POISON=false &&
 	__git_compute_merge_strategies &&
 	verbose test -n "$__git_merge_strategies" &&
 	. "$GIT_BUILD_DIR/contrib/completion/git-completion.bash" &&
